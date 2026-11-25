@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Phân tích Độ hòa tan Tương đồng f2 & Bootstrap CI 90%</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff', 100: '#e0f2fe', 500: '#0284c7', 600: '#0369a1',
+                            700: '#035485', 800: '#075985', 900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .tooltip-box {
+            display: none; position: absolute; z-index: 50; background-color: #1e293b; color: #fff;
+            padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; max-width: 250px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .has-tooltip:hover .tooltip-box { display: block; }
+        .tooltip-box { width: 250px; white-space: pre-line; text-transform: none; letter-spacing: normal; font-weight: 400; line-height: 1.45; text-align: left; }
+        #dataTable input.cell-input.invalid { background: #fee2e2; color: #b91c1c; font-weight: 700; }
+        #dataTable th.excluded { background: #fee2e2; color: #b91c1c; }
+        .chart-container { width: 100%; height: 380px; position: relative; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Excel-like grid */
+        #dataTable { border-collapse: collapse; table-layout: fixed; }
+        #dataTable th, #dataTable td { border: 1px solid #e2e8f0; }
+        #dataTable td.cell { padding: 0; min-width: 58px; }
+        #dataTable input.cell-input {
+            width: 100%; height: 26px; text-align: center; font-size: 12px; padding: 0 2px;
+            border: none; outline: none; background: transparent; border-radius: 0;
+        }
+        #dataTable input.cell-input:focus {
+            outline: 2px solid #0284c7; outline-offset: -2px; background: #f0f9ff;
+        }
+        #dataTable td.rowlabel { background: #f8fafc; color: #64748b; font-weight: 600; text-align: center; padding: 0 6px; width: 40px; }
+
+        /* Theory block */
+        .theory-formula { overflow-x: auto; padding: 10px 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 6px; }
+        .theory-formula .katex-display { margin: 0; }
+        .theory-formula .katex { font-size: 1.05em; }
+        .theory-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; margin-top: 6px; }
+        .theory-list { list-style: disc; padding-left: 18px; margin-top: 4px; }
+        .theory-list li { margin-top: 2px; }
+    
+        /* Deep Dark Mode for f2 */
+        [data-theme="dark"], [data-theme="dark"] body {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+        [data-theme="dark"] .bg-white {
+            background-color: #1e293b !important;
+            color: #f1f5f9 !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .bg-slate-50, [data-theme="dark"] .bg-slate-100, [data-theme="dark"] .bg-gray-50, [data-theme="dark"] .bg-gray-100 {
+            background-color: #0f172a !important;
+            color: #cbd5e1 !important;
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] .text-slate-800, [data-theme="dark"] .text-slate-700, [data-theme="dark"] .text-slate-900, [data-theme="dark"] .text-gray-800, [data-theme="dark"] .text-gray-900 {
+            color: #f8fafc !important;
+        }
+        [data-theme="dark"] .text-slate-600, [data-theme="dark"] .text-slate-500, [data-theme="dark"] .text-gray-600, [data-theme="dark"] .text-gray-500 {
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] .border-slate-100, [data-theme="dark"] .border-slate-200, [data-theme="dark"] .border-slate-300, [data-theme="dark"] .border-gray-200, [data-theme="dark"] .border-gray-300 {
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] #dataTable th, [data-theme="dark"] #dataTable td {
+            border-color: #334155 !important;
+        }
+        [data-theme="dark"] #dataTable td.rowlabel {
+            background-color: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+        [data-theme="dark"] #dataTable input.cell-input {
+            color: #f8fafc !important;
+        }
+        [data-theme="dark"] #dataTable input.cell-input:focus {
+            background-color: #0c4a6e !important;
+            color: #38bdf8 !important;
+        }
+        [data-theme="dark"] .theory-formula, [data-theme="dark"] .theory-box {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+        [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border-color: #475569 !important;
+        }
+        [data-theme="dark"] .shadow-sm, [data-theme="dark"] .shadow {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+        }
+        [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a !important;
+        }
+        [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155 !important;
+        }
+
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN -->
+        <section class="lg:col-span-5 flex flex-col space-y-5">
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-gear text-brand-600"></i>
+                        <span data-i18n="configTitle">Cấu hình Thông số Hòa tan</span>
+                    </h2>
+                    <span class="has-tooltip relative cursor-pointer text-slate-400 hover:text-brand-600">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div class="tooltip-box right-0 top-6" data-i18n="tipCfg"></div>
+                    </span>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex items-center mb-1"><label class="block text-xs font-semibold text-slate-700" data-i18n="envLabel">Điều kiện Môi trường Thử (pH / Môi trường):</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 ml-1.5 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box left-0 top-5" data-i18n="tipEnv"></div></span></div>
+                        <input type="text" id="envInput" value="pH 6.8" oninput="updateEnvLabel()"
+                               class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none transition"
+                               placeholder="VD: pH 6.8, pH 1.2, Nước cất...">
+                    </div>
+
+                    <div>
+                        <div class="flex items-center mb-1"><label class="block text-xs font-semibold text-slate-700" data-i18n="stdLabel">Tiêu chuẩn áp dụng (Quy tắc cắt mốc 85%):</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 ml-1.5 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box left-0 top-5" data-i18n="tipStd"></div></span></div>
+                        <div class="grid grid-cols-2 gap-2" id="stdToggleGroup">
+                            <button type="button" id="stdBtnEMA" onclick="setRegulatoryStandard('EMA')"
+                                    class="px-3 py-2 rounded-lg border text-left transition text-xs font-semibold bg-brand-600 text-white border-brand-600 shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <span>EMA (2010)</span>
+                                    <span class="text-[10px] opacity-90 font-normal">App. I</span>
+                                </div>
+                                <div class="text-[10px] font-normal opacity-90 mt-0.5" data-i18n="stdSubEMA">Tối đa 1 mốc &gt; 85% ở bất kỳ lô nào</div>
+                            </button>
+                            <button type="button" id="stdBtnFDA" onclick="setRegulatoryStandard('FDA')"
+                                    class="px-3 py-2 rounded-lg border text-left transition text-xs font-semibold bg-white text-slate-700 border-slate-300 hover:bg-slate-50">
+                                <div class="flex items-center justify-between">
+                                    <span>FDA (1997)</span>
+                                    <span class="text-[10px] opacity-75 font-normal">Sec. V.A</span>
+                                </div>
+                                <div class="text-[10px] font-normal opacity-75 mt-0.5" data-i18n="stdSubFDA">1 mốc sau khi cả hai lô &gt; 85%</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="col-span-1">
+                            <div class="flex items-center mb-1"><label class="block text-xs font-semibold text-slate-700" data-i18n="unitLabel">Đơn vị:</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 ml-1.5 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box left-0 top-5" data-i18n="tipUnit"></div></span></div>
+                            <select id="timeUnitSelect" onchange="updateTimepoints()" class="w-full text-xs border border-slate-300 rounded-lg px-2 py-2 focus:ring-2 focus:ring-brand-500 outline-none bg-white font-medium">
+                                <option value="phút">Phút (min)</option>
+                                <option value="giờ">Giờ (h)</option>
+                                <option value="giây">Giây (s)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <div class="flex items-center mb-1"><label class="block text-xs font-semibold text-slate-700" data-i18n="timepointsLabel">Các mốc thời gian (cách bằng dấu phẩy):</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 ml-1.5 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box right-0 top-5" data-i18n="tipTime"></div></span></div>
+                            <input type="text" id="timepointsInput" value="5, 10, 15, 20, 30, 45, 60"
+                                   class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none transition"
+                                   placeholder="VD: 1, 3, 10 hoặc 5, 10, 15">
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="updateTimepoints()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition" data-i18n="btnUpdate">Cập nhật Mốc thời gian</button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <div>
+                            <div class="flex items-center mb-1"><label class="block text-xs font-semibold text-slate-700" data-i18n="unitsPerBatchLabel">Số viên/lô (n):</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 ml-1.5 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box left-0 top-5" data-i18n="tipUnits"></div></span></div>
+                            <input type="number" id="unitsPerBatch" value="12" min="3" max="24" onchange="updateTimepoints()"
+                                   class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1"><label class="block text-xs font-semibold text-slate-700" data-i18n="bootstrapRunsLabel">Số vòng Bootstrap (B):</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 ml-1.5 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box right-0 top-5" data-i18n="tipBoot"></div></span></div>
+                            <input type="number" id="bootstrapRuns" value="5000" step="500" min="500" max="20000" onchange="onBootstrapChange()"
+                                   class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-table text-brand-600"></i>
+                        <span data-i18n="dataInputTitle">Nhập Dữ liệu Hòa tan (%)</span><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box left-0 top-6" data-i18n="tipData"></div></span>
+                    </h2>
+                    <button onclick="simulateData()" class="px-2.5 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span data-i18n="btnSimulate">Mô phỏng Dữ liệu</span>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between border-b border-slate-200 mb-3 pb-1 gap-2">
+                    <div class="flex overflow-x-auto custom-scrollbar max-w-[260px]" id="batchTabs"></div>
+                    <div class="flex items-center space-x-1">
+                        <button onclick="addNewTestBatch()" class="px-2 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded text-xs font-semibold hover:bg-brand-100 transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> <span data-i18n="btnAddTest">Thêm Lô Test</span>
+                        </button>
+                        <button onclick="removeCurrentTestBatch()" id="removeBatchBtn" class="px-2 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded text-xs font-semibold hover:bg-rose-100 transition hidden">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <label class="text-xs font-bold text-slate-600 whitespace-nowrap" data-i18n="batchNameLabel">Tên Lô hiển thị:</label><span class="has-tooltip relative cursor-help text-slate-400 hover:text-brand-600 text-xs"><i class="fa-solid fa-circle-info"></i><div class="tooltip-box left-0 top-5" data-i18n="tipBatchName"></div></span>
+                    <input type="text" id="currentBatchNameInput" oninput="updateCurrentBatchName(this.value)"
+                           class="flex-1 text-xs border border-slate-300 rounded px-2 py-1 bg-white focus:ring-1 focus:ring-brand-500 outline-none font-semibold text-brand-700">
+                </div>
+
+                <div class="text-[11px] text-slate-400 mb-2 italic">
+                    <i class="fa-solid fa-keyboard mr-1"></i><span data-i18n="pasteHint">Dùng phím mũi tên / Enter / Tab để di chuyển như Excel. Ctrl+V để dán cả vùng dữ liệu (mỗi giá trị vào một ô riêng).</span>
+                </div>
+
+                <div id="ruleWarnGrid" class="hidden space-y-2 mb-2"></div>
+                <div class="flex-1 overflow-x-auto overflow-y-auto max-h-[340px] border border-slate-200 rounded-lg custom-scrollbar">
+                    <table class="w-full text-xs text-left" id="dataTable">
+                        <thead class="bg-slate-50 text-slate-600 sticky top-0 z-10">
+                            <tr id="tableHeader"><th class="p-2 font-semibold">Viên</th></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+                    <button onclick="clearCurrentBatchData()" class="text-xs text-rose-600 hover:text-rose-800 font-medium">
+                        <i class="fa-solid fa-trash-can mr-1"></i><span data-i18n="btnClearBatch">Xóa dữ liệu lô này</span>
+                    </button>
+                    <button onclick="calculateAll()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-lg shadow-sm shadow-brand-600/30 transition flex items-center gap-2">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span data-i18n="btnCalculate">Phân tích & Tính Bootstrap</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN -->
+        <section class="lg:col-span-7 flex flex-col space-y-5">
+
+            <div class="flex flex-wrap justify-between items-center gap-2 bg-slate-900 text-white rounded-xl p-3 px-4 shadow-sm">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-file-medical text-sky-400"></i>
+                    <span class="text-xs font-semibold tracking-wide" data-i18n="reportHeader">BÁO CÁO PHÂN TÍCH TƯƠNG ĐỒNG HÒA TAN</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="decimalToggleBtn" onclick="toggleDecimalSeparator()" type="button" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-sliders text-sky-400"></i>
+                        <span id="decimalToggleText">Dấu thập phân: Chấm (1.5)</span>
+                    </button>
+                    <button onclick="copyChart()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy text-amber-300"></i><span data-i18n="btnCopyChart">Copy biểu đồ</span>
+                    </button>
+                    <button onclick="copyStatTable()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-table-cells text-amber-300"></i><span data-i18n="btnCopyTable">Copy bảng</span>
+                    </button>
+                    <button onclick="exportPNG()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-image text-emerald-400"></i><span data-i18n="btnPng">Xuất Ảnh PNG</span>
+                    </button>
+                    <button onclick="exportPDF()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-medium shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf text-rose-300"></i><span data-i18n="btnPdf">Xuất Báo Cáo PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Everything inside reportArea goes to PDF -->
+            <div id="reportArea" class="flex flex-col space-y-5">
+
+                <!-- Report info (product names + environment) -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-xs" id="reportInfo"></div>
+                <div id="ruleWarnReport" class="hidden space-y-2"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                        <div class="text-xs font-semibold text-slate-500 mb-1" data-i18n="f2Traditional">Giá trị f2 Truyền thống</div>
+                        <div class="text-2xl font-black text-slate-800" id="f2Value">--</div>
+                        <div class="text-[10px] text-slate-400 mt-1" id="f2Status">Chờ tính toán...</div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                        <div class="text-xs font-semibold text-slate-500 mb-1" data-i18n="bootstrapCI">Khoảng Tin cậy 90% f2</div>
+                        <div class="text-xl font-black text-brand-700" id="f2BootstrapCI">[ -- , -- ]</div>
+                        <div class="text-[10px] text-slate-400 mt-1" id="bootstrapMean">--</div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-slate-500 mb-1" data-i18n="conclusionTitle">Đánh giá Tương đồng</div>
+                            <div class="text-sm font-bold" id="finalConclusion">--</div>
+                        </div>
+                        <div class="text-[10px] px-2 py-0.5 rounded-full w-max mt-2 font-semibold" id="complianceBadge">FDA / EMA Standard</div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-brand-600"></i>
+                            <span id="chartTitleDynamic">Biểu đồ biểu thị độ hòa tan tại môi trường pH 6.8</span>
+                        </h3>
+                        <span class="text-[10px] text-slate-400 font-mono" data-i18n="chartSub">Line Profile Chart</span>
+                    </div>
+                    <div class="chart-container bg-white rounded-lg p-2 border border-slate-100">
+                        <canvas id="dissolutionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-brand-600"></i>
+                        <span data-i18n="statTableTitle">Bảng Tóm tắt Thống kê theo Mốc thời gian</span>
+                    </h3>
+                    <div class="text-[11px] text-slate-500 mb-3" id="statCaption"></div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-xs text-left border-collapse" id="statTable">
+                            <thead class="bg-slate-50">
+                                <tr class="text-slate-700 border-b border-slate-200">
+                                    <th class="p-2 font-semibold" id="timeHeaderTh">Mốc thời gian</th>
+                                    <th class="p-2 font-semibold">Ref Mean (%)</th>
+                                    <th class="p-2 font-semibold">Ref %RSD</th>
+                                    <th class="p-2 font-semibold">Test Mean (%)</th>
+                                    <th class="p-2 font-semibold">Test %RSD</th>
+                                    <th class="p-2 font-semibold" id="diffTh">Khác biệt (|R-T|)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statTableBody" class="divide-y divide-slate-100 text-slate-600">
+                                <tr><td colspan="6" class="p-3 text-center text-slate-400">Chưa có dữ liệu phân tích</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Explanations & Formulas -->
+                <div class="bg-slate-50 rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5">
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-brand-600"></i>
+                        <span data-i18n="theoryTitle">Giải thích Phương pháp & Công thức Tính toán</span>
+                    </h3>
+                    <div class="space-y-4 text-xs text-slate-600 leading-relaxed" id="theoryContent"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-3 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            Dissolution Profile Similarity & F2 Bootstrap Tool &bull; Tuân thủ hướng dẫn FDA & EMA về Đánh giá Tương đương Sinh học.
+        </div>
+    </footer>
+
+    <script>
+        // ---------- State ----------
+        let currentLang = 'vi';
+        let regulatoryStandard = 'EMA'; // 'EMA' | 'FDA'
+        let decimalSeparator = '.';
+        let timeUnit = 'phút';
+        let timeUnitSuffix = 'min';
+        let timepoints = [5, 10, 15, 20, 30, 45, 60];
+        let unitsCount = 12;
+        let activeTab = 'ref';
+        let chartInstance = null;
+        let envMedium = "pH 6.8";
+        let lastBoot = null; // {B, valid, p5, p95, mean}
+        let lastF2 = null;
+
+        let refBatch = { name: "Lô Đối Chứng (Ref)", data: [] };
+        let testBatches = [{ id: 0, name: "Lô Thử Nghiệm 1 (Test 1)", data: [] }];
+
+        const translations = {
+            vi: {
+                configTitle: "Cấu hình Thông số Hòa tan",
+                envLabel: "Điều kiện Môi trường Thử (pH / Môi trường):",
+                unitLabel: "Đơn vị:",
+                timepointsLabel: "Các mốc thời gian (cách bằng dấu phẩy):",
+                btnUpdate: "Cập nhật Mốc thời gian",
+                unitsPerBatchLabel: "Số viên/lô (n):",
+                bootstrapRunsLabel: "Số vòng Bootstrap (B):",
+                dataInputTitle: "Nhập Dữ liệu Hòa tan (%)",
+                btnSimulate: "Mô phỏng Dữ liệu",
+                btnAddTest: "Thêm Lô Test",
+                batchNameLabel: "Tên Lô hiển thị:",
+                btnClearBatch: "Xóa dữ liệu lô này",
+                btnCalculate: "Phân tích & Tính Bootstrap",
+                reportHeader: "BÁO CÁO PHÂN TÍCH TƯƠNG ĐỒNG HÒA TAN",
+                f2Traditional: "Giá trị f2 Truyền thống",
+                bootstrapCI: "Khoảng Tin cậy 90% f2",
+                conclusionTitle: "Đánh giá Tương đồng",
+                chartSub: "Line Profile Chart",
+                statTableTitle: "Bảng Tóm tắt Thống kê theo Mốc thời gian",
+                theoryTitle: "Giải thích Phương pháp & Công thức Tính toán",
+                pasteHint: "Dùng phím mũi tên / Enter / Tab để di chuyển như Excel. Ctrl+V để dán cả vùng dữ liệu (mỗi giá trị vào một ô riêng).",
+                decimalDot: "Dấu thập phân: Chấm (1.5)",
+                decimalComma: "Dấu thập phân: Phẩy (1,5)",
+                similar: "TƯƠNG ĐỒNG",
+                notSimilar: "KHÔNG TƯƠNG ĐỒNG",
+                pending: "Chờ tính toán...",
+                yAxisLabel: "Độ hòa tan (%)",
+                xAxisPrefix: "Thời gian",
+                btnCopyChart: "Copy biểu đồ",
+                btnCopyTable: "Copy bảng",
+                btnPng: "Xuất Ảnh PNG",
+                btnPdf: "Xuất Báo Cáo PDF",
+                bootMean: "Trung bình Bootstrap",
+                diffHeader: "Khác biệt (|R-T|)",
+                tipCfg: "Thiết lập các thông số chung của phép thử hòa tan: môi trường thử, đơn vị và mốc thời gian, số viên mỗi lô, số vòng Bootstrap.\nĐổi các thông số này sẽ cập nhật bảng nhập liệu, biểu đồ và kết quả.",
+                tipEnv: "Ghi môi trường thử hòa tan, ví dụ pH 1.2, pH 4.5, pH 6.8 hoặc nước cất.\nNội dung này xuất hiện trong tiêu đề biểu đồ, báo cáo PDF, tên file PNG và khi copy biểu đồ/bảng.\nNên chạy riêng từng môi trường (FDA/EMA thường yêu cầu nhiều môi trường pH).",
+                tipUnit: "Đơn vị thời gian của các mốc lấy mẫu (phút, giờ, giây).\nChỉ ảnh hưởng nhãn hiển thị, không ảnh hưởng công thức f2.",
+                tipTime: "Nhập các mốc lấy mẫu, cách nhau bằng dấu phẩy, ví dụ: 5, 10, 15, 30, 45, 60.\nCần ít nhất 3 mốc (không tính mốc 0). Hệ thống tự sắp xếp tăng dần.\nBấm 'Cập nhật Mốc thời gian' để áp dụng; dữ liệu đã nhập ở các mốc còn lại được giữ nguyên.",
+                tipUnits: "Số viên/đơn vị thử trong mỗi lô (3–24).\nFDA/EMA khuyến cáo dùng 12 viên mỗi lô.\nĐây cũng là cỡ mẫu của mỗi vòng lấy mẫu lại Bootstrap.",
+                tipBoot: "Số lần lấy mẫu lại có hoàn lại để ước lượng khoảng tin cậy 90% của f2.\nB càng lớn kết quả càng ổn định nhưng tính lâu hơn (thường dùng 1000–5000).\nĐổi B sẽ tự tính lại và cập nhật phần giải thích bên dưới.",
+                tipBatchName: "Tên sản phẩm/lô hiển thị trong tab, chú thích biểu đồ, bảng thống kê, báo cáo PDF và khi copy.\nNên ghi rõ tên sản phẩm và số lô, ví dụ 'Generic A - lô 001'.",
+                stdLabel: "Tiêu chuẩn áp dụng (Quy tắc cắt mốc 85%):",
+                stdSubEMA: "Tối đa 1 mốc > 85% ở bất kỳ lô nào",
+                stdSubFDA: "1 mốc sau khi cả hai lô > 85%",
+                tipStd: "Chọn chuẩn mực pháp lý áp dụng cho điều kiện cắt mốc > 85% trong phép tính f2:\n• EMA (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **): Không quá một giá trị trung bình > 85% hòa tan đối với bất kỳ công thức nào (dừng ngay tại mốc đầu tiên có Ref > 85% hoặc Test > 85%).\n• FDA (CDER, August 1997): Chỉ xét một điểm đo sau khi cả hai sản phẩm đạt trên 85% hòa tan (dừng tại mốc đầu tiên có cả Ref > 85% và Test > 85%).",
+                tipData: "Nhập % hòa tan của từng viên tại từng mốc (0–100).\nDùng mũi tên/Enter/Tab để di chuyển, Ctrl+V để dán vùng dữ liệu từ Excel.\nCác mốc vượt quá điều kiện cắt mốc 85% theo tiêu chuẩn đang chọn (EMA hoặc FDA) sẽ được đánh dấu đỏ và loại trừ khỏi phép tính f2."
+            },
+            en: {
+                configTitle: "Dissolution Parameters Config",
+                envLabel: "Dissolution Medium / pH Condition:",
+                unitLabel: "Unit:",
+                timepointsLabel: "Timepoints (comma-separated):",
+                btnUpdate: "Update Timepoints",
+                unitsPerBatchLabel: "Units/Batch (n):",
+                bootstrapRunsLabel: "Bootstrap Runs (B):",
+                dataInputTitle: "Dissolution Data Input (%)",
+                btnSimulate: "Simulate Data",
+                btnAddTest: "Add Test Batch",
+                batchNameLabel: "Display Batch Name:",
+                btnClearBatch: "Clear Batch Data",
+                btnCalculate: "Analyze & Run Bootstrap",
+                reportHeader: "DISSOLUTION SIMILARITY REPORT",
+                f2Traditional: "Traditional f2 Value",
+                bootstrapCI: "90% Bootstrap CI for f2",
+                conclusionTitle: "Similarity Conclusion",
+                chartSub: "Line Profile Chart",
+                statTableTitle: "Statistical Summary by Timepoint",
+                theoryTitle: "Methods & Formulas Explanation",
+                pasteHint: "Use arrow keys / Enter / Tab to move like Excel. Ctrl+V pastes a whole range (one value per cell).",
+                decimalDot: "Decimal: Point (1.5)",
+                decimalComma: "Decimal: Comma (1,5)",
+                similar: "SIMILAR",
+                notSimilar: "NOT SIMILAR",
+                pending: "Awaiting calculation...",
+                yAxisLabel: "Dissolution (%)",
+                xAxisPrefix: "Time",
+                btnCopyChart: "Copy chart",
+                btnCopyTable: "Copy table",
+                btnPng: "Export PNG",
+                btnPdf: "Export PDF Report",
+                bootMean: "Bootstrap Mean",
+                diffHeader: "Difference (|R-T|)",
+                tipCfg: "General settings of the dissolution test: medium, time unit and timepoints, units per batch, bootstrap runs.\nChanging them updates the input grid, chart and results.",
+                tipEnv: "Enter the dissolution medium, e.g. pH 1.2, pH 4.5, pH 6.8 or water.\nIt appears in the chart title, PDF report, PNG file name and when copying the chart/table.\nRun each medium separately (FDA/EMA usually require several pH media).",
+                tipUnit: "Time unit of the sampling points (minutes, hours, seconds).\nAffects labels only, not the f2 formula.",
+                tipTime: "Enter sampling points separated by commas, e.g. 5, 10, 15, 30, 45, 60.\nAt least 3 points are needed (excluding zero). They are sorted ascending automatically.\nClick 'Update Timepoints' to apply; data at the remaining points is kept.",
+                tipUnits: "Number of units tested per batch (3–24).\nFDA/EMA recommend 12 units per batch.\nAlso the sample size of each bootstrap resample.",
+                tipBoot: "Number of resamples with replacement used to estimate the 90% CI of f2.\nLarger B is more stable but slower (typically 1000–5000).\nChanging B recalculates and updates the explanation below.",
+                tipBatchName: "Product/batch name shown in tabs, chart legend, statistics table, PDF report and when copying.\nInclude product and batch number, e.g. 'Generic A - lot 001'.",
+                stdLabel: "Regulatory Standard (85% Cutoff Rule):",
+                stdSubEMA: "Max 1 mean > 85% for any formulation",
+                stdSubFDA: "1 measurement after both > 85%",
+                tipStd: "Select the regulatory guideline governing the > 85% dissolution cutoff for f2 calculation:\n• EMA (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **): Not more than one mean value of > 85% dissolved for any of the formulations (stops at the first timepoint where Ref > 85% or Test > 85%).\n• FDA (CDER, August 1997): Only one measurement should be considered after 85% dissolution of both products (stops at the first timepoint where both Ref > 85% and Test > 85%).",
+                tipData: "Enter % dissolved for each unit at each timepoint (0–100).\nUse arrows/Enter/Tab to move, Ctrl+V to paste a range from Excel.\nTimepoints beyond the 85% cutoff rule of the selected standard (EMA or FDA) are highlighted red and excluded from f2."
+            }
+        };
+
+        const T = (k) => translations[currentLang][k];
+
+        // ---------- Init ----------
+        window.addEventListener('load', function () {
+            applyI18n();
+            updateStandardButtons();
+            initDataArrays();
+            renderTabs();
+            renderTableHeader();
+            renderTableBody();
+            initChart();
+            updateEnvLabel();
+            renderTheory();
+            updateReportInfo();
+        });
+
+        // ---------- Utilities ----------
+        function formatNumber(val, decimals = 2) {
+            if (val === null || val === undefined || isNaN(val)) return "--";
+            let s = Number(val).toFixed(decimals);
+            return decimalSeparator === ',' ? s.replace('.', ',') : s;
+        }
+
+        function parseFormattedInput(valStr) {
+            if (valStr === null || valStr === undefined) return NaN;
+            let s = valStr.toString().trim().replace(/^"|"$/g, '').replace('%', '').replace(/\s/g, '').replace(',', '.');
+            if (s === '') return NaN;
+            return parseFloat(s);
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function getActiveTestBatch() {
+            if (activeTab.startsWith('test_')) {
+                const id = parseInt(activeTab.split('_')[1]);
+                const b = testBatches.find(x => x.id === id);
+                if (b) return b;
+            }
+            return testBatches[0];
+        }
+
+        function getCurrentMatrix() {
+            return activeTab === 'ref' ? refBatch.data : getActiveTestBatch().data;
+        }
+
+        function applyI18n() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+            });
+        }
+
+        function toggleDecimalSeparator() {
+            decimalSeparator = decimalSeparator === '.' ? ',' : '.';
+            document.getElementById('decimalToggleText').innerText = decimalSeparator === '.' ? T('decimalDot') : T('decimalComma');
+            renderTableBody();
+            calculateAll();
+        }
+
+        function setLanguage(lang) {
+            if (lang !== 'vi' && lang !== 'en') return;
+            currentLang = lang;
+            document.documentElement.lang = currentLang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+            const decEl = document.getElementById('decimalToggleText');
+            if (decEl) decEl.innerText = decimalSeparator === '.' ? T('decimalDot') : T('decimalComma');
+            const diffEl = document.getElementById('diffTh');
+            if (diffEl) diffEl.innerText = T('diffHeader');
+            renderTabs();
+            renderTableHeader();
+            updateEnvLabel();
+            calculateAll();
+        }
+
+        function toggleLanguage() {
+            setLanguage(currentLang === 'vi' ? 'en' : 'vi');
+        }
+
+        // Synchronize with parent portal
+        window.addEventListener('message', function(e) {
+            if (!e.data) return;
+            if (e.data.lang) {
+                setLanguage(e.data.lang);
+            }
+        });
+
+        // Initialize language from parent or localStorage
+        try {
+            if (window.parent && window.parent.L) {
+                currentLang = window.parent.L;
+            } else {
+                currentLang = localStorage.getItem('lang') || 'vi';
+            }
+        } catch(e) {}
+
+        const REG_LINKS = {
+            ema_be: 'https://www.ema.europa.eu/en/documents/scientific-guideline/guideline-investigation-bioequivalence-rev1_en.pdf',
+            ema_m9: 'https://www.ema.europa.eu/en/documents/scientific-guideline/ich-m9-biopharmaceutics-classification-system-based-biowaivers-step-5_en.pdf',
+            ema_qa: 'https://www.ema.europa.eu/en/scientific-guidelines/clinical-pharmacology-pharmacokinetics-questions-answers',
+            fda_1997_pdf: 'https://www.fda.gov/media/70936/download',
+            fda_1997_page: 'https://www.fda.gov/regulatory-information/search-fda-guidance-documents/dissolution-testing-immediate-release-solid-oral-dosage-forms',
+            fda_m9_2021: 'https://www.fda.gov/media/148472/download'
+        };
+
+        function getStandardLabel(shortForm = false) {
+            if (regulatoryStandard === 'EMA') {
+                return shortForm
+                    ? 'EMA (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr ** & ICH M9 2020)'
+                    : 'EMA — Guideline on the Investigation of Bioequivalence (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **, 2010, Appendix I) & ICH M9 (2020)';
+            }
+            return shortForm
+                ? 'FDA (CDER, August 1997)'
+                : 'FDA — Guidance for Industry: Dissolution Testing of Immediate Release Solid Oral Dosage Forms (CDER, August 1997, Section V.A)';
+        }
+
+        function getStandardHtmlLink() {
+            const linkCls = 'font-bold text-brand-700 hover:text-brand-900 underline decoration-brand-300 hover:decoration-brand-700 transition';
+            const extIcon = ' <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-80"></i>';
+            if (regulatoryStandard === 'EMA') {
+                return `<a href="${REG_LINKS.ema_be}" target="_blank" rel="noopener noreferrer" class="${linkCls}">EMA — Guideline on the Investigation of Bioequivalence (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **, 2010, Appendix I)${extIcon}</a>` +
+                    ` &bull; <a href="${REG_LINKS.ema_m9}" target="_blank" rel="noopener noreferrer" class="${linkCls}">EMA/ICH M9 (2020)${extIcon}</a>`;
+            }
+            return `<a href="${REG_LINKS.fda_1997_pdf}" target="_blank" rel="noopener noreferrer" class="${linkCls}">FDA — Guidance for Industry: Dissolution Testing of Immediate Release Solid Oral Dosage Forms (CDER, August 1997, Section V.A)${extIcon}</a>` +
+                ` (<a href="${REG_LINKS.fda_1997_page}" target="_blank" rel="noopener noreferrer" class="${linkCls}">FDA Page${extIcon}</a>)`;
+        }
+
+        function updateStandardButtons() {
+            const btnEMA = document.getElementById('stdBtnEMA');
+            const btnFDA = document.getElementById('stdBtnFDA');
+            if (!btnEMA || !btnFDA) return;
+            const activeCls = 'px-3 py-2 rounded-lg border text-left transition text-xs font-semibold bg-brand-600 text-white border-brand-600 shadow-sm';
+            const inactiveCls = 'px-3 py-2 rounded-lg border text-left transition text-xs font-semibold bg-white text-slate-700 border-slate-300 hover:bg-slate-50';
+            btnEMA.className = regulatoryStandard === 'EMA' ? activeCls : inactiveCls;
+            btnFDA.className = regulatoryStandard === 'FDA' ? activeCls : inactiveCls;
+        }
+
+        function setRegulatoryStandard(std) {
+            if (std !== 'EMA' && std !== 'FDA') return;
+            regulatoryStandard = std;
+            updateStandardButtons();
+            refreshRule();
+            calculateAll();
+        }
+
+        function updateEnvLabel() {
+            envMedium = document.getElementById('envInput').value.trim() || "pH 6.8";
+            const titleElem = document.getElementById('chartTitleDynamic');
+            titleElem.innerText = currentLang === 'vi'
+                ? `Biểu đồ biểu thị độ hòa tan tại môi trường ${envMedium}`
+                : `Dissolution profile graph at medium ${envMedium}`;
+            updateReportInfo();
+            if (chartInstance) updateChart();
+        }
+
+        function updateReportInfo() {
+            const el = document.getElementById('reportInfo');
+            if (!el) return;
+            const vi = currentLang === 'vi';
+            const active = getActiveTestBatch();
+            const tests = testBatches.map(b => escapeHtml(b.name)).join(' ; ');
+            const B = getB();
+            el.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                    <div><span class="font-semibold text-slate-500">${vi ? 'Môi trường thử' : 'Test medium'}:</span> <span class="font-bold text-slate-800">${escapeHtml(envMedium)}</span></div>
+                    <div><span class="font-semibold text-slate-500">${vi ? 'Ngày' : 'Date'}:</span> <span class="text-slate-800">${new Date().toLocaleDateString(vi ? 'vi-VN' : 'en-GB')}</span></div>
+                    <div><span class="font-semibold text-slate-500">${vi ? 'Sản phẩm đối chiếu' : 'Reference product'}:</span> <span class="font-bold text-slate-800">${escapeHtml(refBatch.name)}</span></div>
+                    <div><span class="font-semibold text-slate-500">${vi ? 'Sản phẩm thử nghiệm' : 'Test product(s)'}:</span> <span class="font-bold text-slate-800">${tests}</span></div>
+                    <div><span class="font-semibold text-slate-500">${vi ? 'So sánh f2 đang xét' : 'f2 comparison'}:</span> <span class="text-slate-800">${escapeHtml(refBatch.name)} vs ${escapeHtml(active.name)}</span></div>
+                    <div><span class="font-semibold text-slate-500">n / B:</span> <span class="text-slate-800">${unitsCount} / ${B}</span></div>
+                    <div class="sm:col-span-2"><span class="font-semibold text-slate-500">${vi ? 'Tiêu chuẩn áp dụng' : 'Regulatory standard'}:</span> ${getStandardHtmlLink()}</div>
+                </div>`;
+            const cap = document.getElementById('statCaption');
+            if (cap) {
+                cap.innerText = `${vi ? 'Môi trường' : 'Medium'}: ${envMedium} | ${refBatch.name} vs ${active.name} | ${regulatoryStandard}` +
+                    ((lastRule && lastRule.excluded.length) ? (vi ? ` | ✕ = mốc bị loại khỏi f2 (quy tắc 85% ${regulatoryStandard})` : ` | ✕ = excluded from f2 (${regulatoryStandard} 85% rule)`) : '');
+            }
+        }
+
+        function getB() {
+            let B = parseInt(document.getElementById('bootstrapRuns').value);
+            if (isNaN(B) || B < 100) B = 5000;
+            return B;
+        }
+
+        function onBootstrapChange() {
+            lastBoot = null;
+            renderTheory();
+            updateReportInfo();
+            calculateAll();
+        }
+
+        // ---------- Timepoints & arrays ----------
+        function updateTimepoints() {
+            const raw = document.getElementById('timepointsInput').value;
+            const parsed = raw.split(/[;,\s]+/).map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && n >= 0);
+            if (parsed.length < 3) {
+                alert(currentLang === 'vi' ? "Vui lòng nhập ít nhất 3 mốc thời gian!" : "Please enter at least 3 valid timepoints!");
+                return;
+            }
+            timepoints = parsed.sort((a, b) => a - b);
+
+            timeUnit = document.getElementById('timeUnitSelect').value;
+            timeUnitSuffix = timeUnit === 'giờ' ? 'h' : (timeUnit === 'giây' ? 's' : 'min');
+
+            let n = parseInt(document.getElementById('unitsPerBatch').value) || 12;
+            n = Math.min(24, Math.max(3, n));
+            document.getElementById('unitsPerBatch').value = n;
+            unitsCount = n;
+
+            resizeArrays();
+            renderTableHeader();
+            renderTableBody();
+            updateReportInfo();
+            calculateAll();
+        }
+
+        function makeMatrix(oldM) {
+            return Array.from({ length: unitsCount }, (_, i) =>
+                Array.from({ length: timepoints.length }, (_, j) => (oldM && oldM[i] && oldM[i][j] !== undefined) ? oldM[i][j] : ''));
+        }
+
+        function resizeArrays() {
+            refBatch.data = makeMatrix(refBatch.data);
+            testBatches.forEach(b => b.data = makeMatrix(b.data));
+        }
+
+        function initDataArrays() { resizeArrays(); }
+
+        function ensureRows(n) {
+            n = Math.min(24, n);
+            if (n > unitsCount) {
+                unitsCount = n;
+                document.getElementById('unitsPerBatch').value = n;
+                resizeArrays();
+                updateReportInfo();
+            }
+        }
+
+        // ---------- Batches ----------
+        function addNewTestBatch() {
+            const newId = testBatches.length > 0 ? Math.max(...testBatches.map(b => b.id)) + 1 : 0;
+            const newName = `Lô Thử Nghiệm ${testBatches.length + 1} (Test ${testBatches.length + 1})`;
+            testBatches.push({ id: newId, name: newName, data: makeMatrix(null) });
+            activeTab = `test_${newId}`;
+            renderTabs();
+            renderTableBody();
+            updateReportInfo();
+            updateChart();
+        }
+
+        function removeCurrentTestBatch() {
+            if (testBatches.length <= 1) return;
+            const testId = parseInt(activeTab.split('_')[1]);
+            testBatches = testBatches.filter(b => b.id !== testId);
+            activeTab = `test_${testBatches[0].id}`;
+            renderTabs();
+            renderTableBody();
+            updateReportInfo();
+            calculateAll();
+        }
+
+        function updateCurrentBatchName(newName) {
+            if (activeTab === 'ref') refBatch.name = newName;
+            else getActiveTestBatch().name = newName;
+            renderTabsOnly();
+            updateReportInfo();
+            if (chartInstance) updateChart();
+        }
+
+        function renderTabsOnly() {
+            // re-render tab buttons without touching the name input (keeps caret position)
+            renderTabs(true);
+        }
+
+        function renderTabs(keepInput) {
+            const container = document.getElementById('batchTabs');
+            container.innerHTML = '';
+            const cls = (on) => on
+                ? "py-1.5 px-3 text-xs font-bold border-b-2 border-brand-600 text-brand-600 whitespace-nowrap transition"
+                : "py-1.5 px-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 whitespace-nowrap transition";
+
+            const refBtn = document.createElement('button');
+            refBtn.onclick = () => switchTab('ref');
+            refBtn.className = cls(activeTab === 'ref');
+            refBtn.innerText = refBatch.name;
+            container.appendChild(refBtn);
+
+            testBatches.forEach(batch => {
+                const tabKey = `test_${batch.id}`;
+                const btn = document.createElement('button');
+                btn.onclick = () => switchTab(tabKey);
+                btn.className = cls(activeTab === tabKey);
+                btn.innerText = batch.name;
+                container.appendChild(btn);
+            });
+
+            if (!keepInput) {
+                document.getElementById('currentBatchNameInput').value = activeTab === 'ref' ? refBatch.name : getActiveTestBatch().name;
+            }
+
+            const removeBtn = document.getElementById('removeBatchBtn');
+            if (activeTab.startsWith('test_') && testBatches.length > 1) removeBtn.classList.remove('hidden');
+            else removeBtn.classList.add('hidden');
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            renderTabs();
+            renderTableBody();
+            updateReportInfo();
+        }
+
+        // ---------- Excel-like grid ----------
+        function renderTableHeader() {
+            const tr = document.getElementById('tableHeader');
+            tr.innerHTML = `<th class="p-1.5 font-semibold text-center">${currentLang === 'vi' ? 'Viên' : 'Unit'}</th>`;
+            timepoints.forEach(tp => {
+                const th = document.createElement('th');
+                th.className = "p-1.5 font-semibold text-center";
+                th.innerText = `${tp} ${timeUnitSuffix}`;
+                tr.appendChild(th);
+            });
+            document.getElementById('timeHeaderTh').innerText = `${T('xAxisPrefix')} (${timeUnitSuffix})`;
+        }
+
+        function cellValueToString(val) {
+            if (val === '' || val === null || val === undefined || isNaN(val)) return '';
+            const s = val.toString();
+            return decimalSeparator === ',' ? s.replace('.', ',') : s;
+        }
+
+        function renderTableBody() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            const m = getCurrentMatrix();
+
+            for (let i = 0; i < unitsCount; i++) {
+                const tr = document.createElement('tr');
+                const tdLabel = document.createElement('td');
+                tdLabel.className = "rowlabel";
+                tdLabel.innerText = `#${i + 1}`;
+                tr.appendChild(tdLabel);
+
+                for (let j = 0; j < timepoints.length; j++) {
+                    const td = document.createElement('td');
+                    td.className = "cell";
+                    const input = document.createElement('input');
+                    input.type = "text";
+                    input.inputMode = "decimal";
+                    input.autocomplete = "off";
+                    input.className = "cell-input";
+                    input.dataset.row = i;
+                    input.dataset.col = j;
+                    input.value = cellValueToString(m[i][j]);
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+            refreshRule();
+        }
+
+        function focusCell(r, c) {
+            const el = document.querySelector(`#tableBody input[data-row="${r}"][data-col="${c}"]`);
+            if (el) { el.focus(); el.select(); }
+        }
+
+        // Delegated events on the table body
+        (function bindGrid() {
+            const tbody = document.getElementById('tableBody');
+
+            tbody.addEventListener('focusin', (e) => {
+                if (e.target.classList.contains('cell-input')) setTimeout(() => e.target.select(), 0);
+            });
+
+            tbody.addEventListener('input', (e) => {
+                const t = e.target;
+                if (!t.classList.contains('cell-input')) return;
+                const r = +t.dataset.row, c = +t.dataset.col;
+                const p = parseFormattedInput(t.value);
+                getCurrentMatrix()[r][c] = isNaN(p) ? '' : p;
+                refreshRule();
+            });
+
+            tbody.addEventListener('keydown', (e) => {
+                const t = e.target;
+                if (!t.classList.contains('cell-input')) return;
+                const r = +t.dataset.row, c = +t.dataset.col;
+                const lastR = unitsCount - 1, lastC = timepoints.length - 1;
+                const k = e.key;
+
+                if (k === 'ArrowDown' || (k === 'Enter' && !e.shiftKey)) { e.preventDefault(); focusCell(Math.min(lastR, r + 1), c); }
+                else if (k === 'ArrowUp' || (k === 'Enter' && e.shiftKey)) { e.preventDefault(); focusCell(Math.max(0, r - 1), c); }
+                else if (k === 'ArrowRight') {
+                    const atEnd = t.selectionStart === t.value.length && t.selectionEnd === t.value.length;
+                    const allSel = t.selectionStart === 0 && t.selectionEnd === t.value.length;
+                    if (atEnd || allSel) { e.preventDefault(); focusCell(r, Math.min(lastC, c + 1)); }
+                }
+                else if (k === 'ArrowLeft') {
+                    const atStart = t.selectionStart === 0 && t.selectionEnd === 0;
+                    const allSel = t.selectionStart === 0 && t.selectionEnd === t.value.length;
+                    if (atStart || allSel) { e.preventDefault(); focusCell(r, Math.max(0, c - 1)); }
+                }
+                else if (k === 'Tab') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        if (c > 0) focusCell(r, c - 1); else if (r > 0) focusCell(r - 1, lastC);
+                    } else {
+                        if (c < lastC) focusCell(r, c + 1); else if (r < lastR) focusCell(r + 1, 0);
+                    }
+                }
+                else if (k === 'Delete' && t.selectionStart === 0 && t.selectionEnd === t.value.length) {
+                    // let default delete the text; input event syncs the model
+                }
+            });
+
+            tbody.addEventListener('paste', (e) => {
+                const t = e.target;
+                if (!t.classList.contains('cell-input')) return;
+                const text = (e.clipboardData || window.clipboardData).getData('text');
+                if (!text) return;
+                e.preventDefault();
+                pasteBlock(text, +t.dataset.row, +t.dataset.col);
+            });
+        })();
+
+        function pasteBlock(text, startRow, startCol) {
+            let rows = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+            while (rows.length > 1 && rows[rows.length - 1].trim() === '') rows.pop();
+
+            const hasTab = text.indexOf('\t') !== -1;
+            const grid = rows.map(line => hasTab ? line.split('\t') : line.trim().split(/[;\s]+/));
+
+            ensureRows(startRow + grid.length);
+            const m = getCurrentMatrix();
+
+            let lastR = startRow, lastC = startCol;
+            for (let r = 0; r < grid.length; r++) {
+                const tr = startRow + r;
+                if (tr >= unitsCount) break;
+                for (let c = 0; c < grid[r].length; c++) {
+                    const tc = startCol + c;
+                    if (tc >= timepoints.length) break;
+                    const v = parseFormattedInput(grid[r][c]);
+                    if (!isNaN(v)) m[tr][tc] = v;
+                    else if (grid[r][c].trim() === '') { /* keep existing value for empty cell */ }
+                    lastR = tr; lastC = tc;
+                }
+            }
+            renderTableBody();
+            focusCell(lastR, lastC);
+            calculateAll();
+        }
+
+        function clearCurrentBatchData() {
+            const m = getCurrentMatrix();
+            for (let i = 0; i < unitsCount; i++) for (let j = 0; j < timepoints.length; j++) m[i][j] = '';
+            renderTableBody();
+            calculateAll();
+        }
+
+        function simulateData() {
+            refBatch.data = refBatch.data.map(() => timepoints.map((t) => {
+                let base = 100 * (1 - Math.exp(-0.08 * t));
+                let noise = (Math.random() - 0.5) * 4;
+                return Math.min(100, Math.max(0, parseFloat((base + noise).toFixed(1))));
+            }));
+            testBatches.forEach((batch, idx) => {
+                let rate = 0.075 - (idx * 0.005);
+                batch.data = batch.data.map(() => timepoints.map((t) => {
+                    let base = 100 * (1 - Math.exp(-rate * t));
+                    let noise = (Math.random() - 0.5) * 5;
+                    return Math.min(100, Math.max(0, parseFloat((base + noise).toFixed(1))));
+                }));
+            });
+            renderTableBody();
+            calculateAll();
+        }
+
+        // ---------- Calculations ----------
+        function calculateMeansAndRSD(matrix) {
+            const numTp = timepoints.length;
+            let means = [], rsds = [];
+            for (let j = 0; j < numTp; j++) {
+                let vals = [];
+                for (let i = 0; i < unitsCount; i++) {
+                    const v = matrix[i] ? matrix[i][j] : '';
+                    if (typeof v === 'number' && !isNaN(v)) vals.push(v);
+                }
+                if (vals.length === 0) { means.push(null); rsds.push(null); continue; }
+                const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+                const std = vals.length > 1
+                    ? Math.sqrt(vals.reduce((s, n) => s + Math.pow(n - mean, 2), 0) / (vals.length - 1)) : 0;
+                means.push(mean);
+                rsds.push(mean > 0 ? (std / mean) * 100 : 0);
+            }
+            return { means, rsds };
+        }
+
+        // Regulatory 85% cutoff rule (zero timepoint excluded):
+        // - EMA (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **, Appendix I):
+        //   "Not more than one mean value of > 85% dissolved for any of the formulations."
+        //   Stops at the first timepoint where refMean > 85 OR testMean > 85.
+        // - FDA (Guidance for Industry, August 1997, Section V.A):
+        //   "Only one measurement should be considered after 85% dissolution of both the products."
+        //   Stops at the first timepoint where refMean > 85 AND testMean > 85.
+        function analyzeRule(refMeans, testMeans, standard = regulatoryStandard) {
+            const used = [], excluded = [], zeroExcluded = [];
+            let cut = false, cutIdx = -1, cutTrigger = null;
+            for (let j = 0; j < refMeans.length; j++) {
+                const r = refMeans[j], t = testMeans[j];
+                if (r === null || t === null) continue;
+                if (timepoints[j] === 0) { zeroExcluded.push(j); excluded.push(j); continue; }
+                if (cut) { excluded.push(j); continue; }
+                used.push(j);
+                const hit = standard === 'EMA' ? (r > 85 || t > 85) : (r > 85 && t > 85);
+                if (hit) {
+                    cut = true;
+                    cutIdx = j;
+                    cutTrigger = (r > 85 && t > 85) ? 'both' : (r > 85 ? 'ref' : 'test');
+                }
+            }
+            return { used, excluded, zeroExcluded, cutIdx, cutTrigger, standard };
+        }
+
+        function tpList(arr) {
+            return arr.map(j => `${timepoints[j]} ${timeUnitSuffix}`).join(', ') || '--';
+        }
+
+        function ruleSummary() {
+            if (!lastRule) return { used: '--', excl: '' };
+            return { used: tpList(lastRule.used), excl: lastRule.excluded.length ? tpList(lastRule.excluded) : '' };
+        }
+
+        function renderRuleWarnings(rule) {
+            const vi = currentLang === 'vi';
+            const box = (cls, icon, inner) => `<div class="rounded-lg border px-3 py-2 text-[11px] leading-relaxed flex gap-2 ${cls}"><i class="fa-solid ${icon} mt-0.5"></i><div>${inner}</div></div>`;
+            let html = '';
+            const active = getActiveTestBatch();
+            const refStats = calculateMeansAndRSD(refBatch.data);
+            const testStats = calculateMeansAndRSD(active.data);
+            const rsdViolations = collectRsdViolations(refStats, testStats, rule.used);
+            if (rsdViolations.length) {
+                const details = rsdViolations.map(v => `${v.batch} ${timepoints[v.index]} ${timeUnitSuffix}: ${formatNumber(v.rsd, 1)}% > ${v.limit}%`).join('; ');
+                html += box('bg-rose-50 border-rose-300 text-rose-800', 'fa-triangle-exclamation', vi
+                    ? `<b>Biến động vượt ngưỡng RSD:</b> ${details}. Dù f2 có thể ≥ 50, không nên kết luận tương đồng chỉ dựa vào f2 truyền thống; cần điều tra biến thiên và áp dụng phương pháp phù hợp đã được quy định/biện minh trong kế hoạch phân tích.`
+                    : `<b>RSD variability exceeds the screening limits:</b> ${details}. Even if conventional f2 is ≥ 50, do not conclude similarity from f2 alone; investigate variability and use an appropriate method justified in the analysis plan.`);
+            }
+            const post85Excluded = rule.excluded.filter(idx => !(rule.zeroExcluded && rule.zeroExcluded.includes(idx)));
+            if (rule.zeroExcluded && rule.zeroExcluded.length) {
+                html += box('bg-slate-50 border-slate-300 text-slate-700', 'fa-circle-info', vi
+                    ? `<b>Loại trừ mốc 0:</b> Mốc thời gian <b>${tpList(rule.zeroExcluded)}</b> không được tính vào phép tính f2 theo quy định (không tính mốc 0).`
+                    : `<b>Zero timepoint excluded:</b> Timepoint <b>${tpList(rule.zeroExcluded)}</b> is excluded from f2 calculation (zero excluded).`);
+            }
+            if (post85Excluded.length && rule.cutIdx >= 0) {
+                if (rule.standard === 'EMA') {
+                    const trigVi = rule.cutTrigger === 'both' ? 'cả hai công thức' : (rule.cutTrigger === 'ref' ? escapeHtml(refBatch.name) : escapeHtml(active.name));
+                    const trigEn = rule.cutTrigger === 'both' ? 'both formulations' : (rule.cutTrigger === 'ref' ? escapeHtml(refBatch.name) : escapeHtml(active.name));
+                    html += box('bg-rose-50 border-rose-200 text-rose-700', 'fa-triangle-exclamation', vi
+                        ? `<b>Quy tắc cắt mốc 85% (EMA):</b> Giá trị trung bình hòa tan vượt 85% ở <b>${trigVi}</b> tại mốc <b>${tpList([rule.cutIdx])}</b>. Theo hướng dẫn EMA (không quá một giá trị trung bình &gt; 85% đối với bất kỳ công thức nào), các mốc sau đó (<b>${tpList(post85Excluded)}</b>) được đánh dấu đỏ và <b>loại trừ</b> khỏi f2 và Bootstrap. Các mốc đưa vào tính toán: ${tpList(rule.used)}.`
+                        : `<b>85% cutoff rule (EMA):</b> Mean dissolution exceeds 85% for <b>${trigEn}</b> at <b>${tpList([rule.cutIdx])}</b>. Per EMA guidance (not more than one mean value of &gt; 85% dissolved for any of the formulations), subsequent points (<b>${tpList(post85Excluded)}</b>) are highlighted red and <b>excluded</b> from f2 and bootstrap. Included timepoints: ${tpList(rule.used)}.`);
+                } else {
+                    html += box('bg-rose-50 border-rose-200 text-rose-700', 'fa-triangle-exclamation', vi
+                        ? `<b>Quy tắc cắt mốc 85% (FDA):</b> Cả hai sản phẩm đã vượt 85% hòa tan tại mốc <b>${tpList([rule.cutIdx])}</b>. Theo hướng dẫn FDA (chỉ xét một điểm đo sau khi cả hai sản phẩm đạt trên 85% hòa tan), các mốc sau đó (<b>${tpList(post85Excluded)}</b>) được đánh dấu đỏ và <b>loại trừ</b> khỏi f2 và Bootstrap. Các mốc đưa vào tính toán: ${tpList(rule.used)}.`
+                        : `<b>85% cutoff rule (FDA):</b> Both products exceed 85% dissolution at <b>${tpList([rule.cutIdx])}</b>. Per FDA guidance (only one measurement should be considered after 85% dissolution of both products), subsequent points (<b>${tpList(post85Excluded)}</b>) are highlighted red and <b>excluded</b> from f2 and bootstrap. Included timepoints: ${tpList(rule.used)}.`);
+                }
+            }
+            if (rule.used.length > 0 && rule.used.length < 3) {
+                html += box('bg-amber-50 border-amber-200 text-amber-700', 'fa-circle-exclamation', vi
+                    ? `<b>Chưa đủ mốc hợp lệ (${rule.standard}):</b> Chỉ có ${rule.used.length} mốc thời gian hợp lệ (yêu cầu tối thiểu 3 mốc, không tính mốc 0) nên không đủ điều kiện tính f2 theo ${getStandardLabel(true)}.`
+                    : `<b>Insufficient valid timepoints (${rule.standard}):</b> Only ${rule.used.length} usable timepoint(s) available (minimum 3 timepoints required, zero excluded) per ${getStandardLabel(true)}.`);
+            }
+            ['ruleWarnGrid', 'ruleWarnReport'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = html;
+                el.classList.toggle('hidden', html === '');
+            });
+        }
+
+        // Recompute rule for the pair shown (Ref vs active test), highlight red cells, update banners
+        function refreshRule() {
+            const act = getActiveTestBatch();
+            const rs = calculateMeansAndRSD(refBatch.data);
+            const ts = calculateMeansAndRSD(act.data);
+            const rule = analyzeRule(rs.means, ts.means);
+            lastRule = rule;
+            const ex = new Set(rule.excluded);
+            const m = getCurrentMatrix();
+            document.querySelectorAll('#tableBody input.cell-input').forEach(inp => {
+                const r = +inp.dataset.row, c = +inp.dataset.col;
+                inp.classList.toggle('invalid', ex.has(c) && m[r] && typeof m[r][c] === 'number');
+            });
+            document.querySelectorAll('#tableHeader th').forEach((th, idx) => {
+                if (idx > 0) th.classList.toggle('excluded', ex.has(idx - 1));
+            });
+            renderRuleWarnings(rule);
+            return rule;
+        }
+
+        function computeF2(refMeans, testMeans, indices) {
+            const allowed = indices ? new Set(indices) : null;
+            let sum = 0, count = 0;
+            for (let i = 0; i < refMeans.length; i++) {
+                if (allowed && !allowed.has(i)) continue;
+                if (refMeans[i] !== null && testMeans[i] !== null) {
+                    sum += Math.pow(refMeans[i] - testMeans[i], 2);
+                    count++;
+                }
+            }
+            if (count === 0) return null;
+            return 50 * Math.log10(100 / Math.sqrt(1 + sum / count));
+        }
+
+        function calculateAll() {
+            const refStats = calculateMeansAndRSD(refBatch.data);
+            const testBatch = getActiveTestBatch();
+            const testStats = calculateMeansAndRSD(testBatch.data);
+            // Always derive the allowed timepoints from the current Ref/Test pair.
+            // Apply the same 85% rule to the conventional f2 and the bootstrap analysis.
+            const rule = analyzeRule(refStats.means, testStats.means);
+            lastRule = rule;
+            renderRuleWarnings(rule);
+            const enoughPoints = rule.used.length >= 3;
+            const f2Val = enoughPoints
+                ? computeF2(refStats.means, testStats.means, rule.used)
+                : null;
+            lastF2 = f2Val;
+
+            const f2Elem = document.getElementById('f2Value');
+            const f2StatusElem = document.getElementById('f2Status');
+
+            if (f2Val !== null) {
+                f2Elem.innerText = formatNumber(f2Val, 2);
+                if (f2Val >= 50) {
+                    f2StatusElem.innerText = T('similar') + " (f2 ≥ 50)";
+                    f2StatusElem.className = "text-[10px] text-emerald-600 font-bold mt-1";
+                } else {
+                    f2StatusElem.innerText = T('notSimilar') + " (f2 < 50)";
+                    f2StatusElem.className = "text-[10px] text-rose-600 font-bold mt-1";
+                }
+            } else {
+                f2Elem.innerText = "--";
+                f2StatusElem.innerText = enoughPoints
+                    ? T('pending')
+                    : (currentLang === 'vi' ? 'Không đủ ≥ 3 mốc hợp lệ' : 'Fewer than 3 valid timepoints');
+                f2StatusElem.className = "text-[10px] text-amber-600 font-bold mt-1";
+            }
+
+            runBootstrap(testBatch, rule);
+            renderStatSummaryTable(refStats, testStats);
+            updateReportInfo();
+            updateChart();
+            renderTheory();
+        }
+
+        function runBootstrap(testBatch, rule) {
+            const B = getB();
+            const numTp = timepoints.length;
+            const allowedIndices = rule && Array.isArray(rule.used) ? rule.used : [];
+
+            const hasData = (m) => m.some(row => row.some(v => typeof v === 'number'));
+            if (!hasData(refBatch.data) || !hasData(testBatch.data) || allowedIndices.length < 3) {
+                lastBoot = null;
+                document.getElementById('f2BootstrapCI').innerText = '[ -- , -- ]';
+                document.getElementById('bootstrapMean').innerText = `${T('bootMean')}: --`;
+                document.getElementById('finalConclusion').innerText = '--';
+                document.getElementById('finalConclusion').className = "text-sm font-bold";
+                const badge = document.getElementById('complianceBadge');
+                badge.innerText = allowedIndices.length < 3
+                    ? (currentLang === 'vi' ? 'Không đủ mốc hợp lệ để Bootstrap' : 'Insufficient valid timepoints for bootstrap')
+                    : (currentLang === 'vi' ? 'Chưa có đủ dữ liệu' : 'Insufficient data');
+                badge.className = "text-[10px] px-2 py-0.5 rounded-full w-max mt-2 font-semibold bg-slate-100 text-slate-500";
+                return;
+            }
+
+            const resampleMeans = (data) => {
+                const means = [];
+                const idx = Array.from({ length: unitsCount }, () => Math.floor(Math.random() * unitsCount));
+                // Resample units (rows) so each unit keeps its profile across timepoints
+                for (let j = 0; j < numTp; j++) {
+                    let sum = 0, cnt = 0;
+                    for (let k = 0; k < unitsCount; k++) {
+                        const v = data[idx[k]][j];
+                        if (typeof v === 'number' && !isNaN(v)) { sum += v; cnt++; }
+                    }
+                    means.push(cnt ? sum / cnt : null);
+                }
+                return means;
+            };
+
+            const boots = [];
+            for (let b = 0; b < B; b++) {
+                const refResampledMeans = resampleMeans(refBatch.data);
+                const testResampledMeans = resampleMeans(testBatch.data);
+                // Keep the timepoint selection fixed to the observed profiles; do not
+                // silently re-introduce excluded post-85% timepoints in bootstrap.
+                const complete = allowedIndices.every(i =>
+                    refResampledMeans[i] !== null && testResampledMeans[i] !== null);
+                if (!complete) continue;
+                const f = computeF2(refResampledMeans, testResampledMeans, allowedIndices);
+                if (f !== null && !isNaN(f)) boots.push(f);
+            }
+            if (boots.length === 0) {
+                lastBoot = null;
+                document.getElementById('f2BootstrapCI').innerText = '[ -- , -- ]';
+                document.getElementById('bootstrapMean').innerText = `${T('bootMean')}: --`;
+                document.getElementById('finalConclusion').innerText = currentLang === 'vi' ? 'Không đủ mẫu Bootstrap hợp lệ' : 'Insufficient valid bootstrap samples';
+                document.getElementById('complianceBadge').innerText = currentLang === 'vi' ? 'Không thể kết luận' : 'No conclusion';
+                return;
+            }
+
+            boots.sort((a, b) => a - b);
+            const p5 = boots[Math.floor(0.05 * boots.length)];
+            const p95 = boots[Math.min(boots.length - 1, Math.floor(0.95 * boots.length))];
+            const mean = boots.reduce((a, b) => a + b, 0) / boots.length;
+            lastBoot = { B, valid: boots.length, p5, p95, mean };
+
+            document.getElementById('f2BootstrapCI').innerText = `[ ${formatNumber(p5, 2)} , ${formatNumber(p95, 2)} ]`;
+            document.getElementById('bootstrapMean').innerText = `${T('bootMean')}: ${formatNumber(mean, 2)} (B = ${B})`;
+
+            const finalElem = document.getElementById('finalConclusion');
+            const badge = document.getElementById('complianceBadge');
+            if (p5 >= 50.0) {
+                finalElem.innerText = T('similar');
+                finalElem.className = "text-sm font-black text-emerald-600";
+                badge.innerText = "CI 90% Lower Bound ≥ 50.0";
+                badge.className = "text-[10px] px-2 py-0.5 rounded-full w-max mt-2 font-semibold bg-emerald-100 text-emerald-700";
+            } else {
+                finalElem.innerText = T('notSimilar');
+                finalElem.className = "text-sm font-black text-rose-600";
+                badge.innerText = "CI 90% Lower Bound < 50.0";
+                badge.className = "text-[10px] px-2 py-0.5 rounded-full w-max mt-2 font-semibold bg-rose-100 text-rose-700";
+            }
+            const refStatsForConclusion = calculateMeansAndRSD(refBatch.data);
+            const testStatsForConclusion = calculateMeansAndRSD(testBatch.data);
+            const rsdViolations = collectRsdViolations(refStatsForConclusion, testStatsForConclusion, allowedIndices);
+            if (rsdViolations.length) {
+                const detail = rsdViolations.slice(0, 4).map(v => `${v.batch} ${timepoints[v.index]} ${timeUnitSuffix}: ${formatNumber(v.rsd, 1)}% (limit ${v.limit}%)`).join('; ');
+                const f2LooksSimilar = lastF2 !== null && lastF2 >= 50;
+                finalElem.innerText = currentLang === 'vi'
+                    ? (f2LooksSimilar ? 'CHƯA ĐỦ CƠ SỞ KẾT LUẬN: f2 đạt nhưng RSD vượt ngưỡng' : 'CHƯA ĐẠT ĐIỀU KIỆN ĐÁNH GIÁ: RSD vượt ngưỡng')
+                    : (f2LooksSimilar ? 'INCONCLUSIVE: f2 passes but RSD exceeds limits' : 'ASSESSMENT CRITERIA NOT MET: RSD exceeds limits');
+                finalElem.className = 'text-sm font-black text-rose-700';
+                badge.innerText = currentLang === 'vi' ? 'RSD vượt ngưỡng — cần xem xét' : 'RSD exceeds limits — review required';
+                badge.className = 'text-[10px] px-2 py-0.5 rounded-full w-max mt-2 font-semibold bg-rose-100 text-rose-800';
+                finalElem.title = detail;
+            }
+        }
+
+        // Variability screen: first measured timepoint <=20% RSD; subsequent timepoints <=10%.
+        function rsdLimitAt(index) { return index === 0 ? 20 : 10; }
+
+        function collectRsdViolations(refStats, testStats, indices) {
+            const checked = Array.isArray(indices) && indices.length ? indices : timepoints.map((_, i) => i);
+            const violations = [];
+            checked.forEach((i, position) => {
+                const limit = position === 0 ? 20 : 10;
+                const r = refStats.rsds[i], t = testStats.rsds[i];
+                if (r !== null && r > limit) violations.push({ batch: 'Ref', index: i, rsd: r, limit });
+                if (t !== null && t > limit) violations.push({ batch: 'Test', index: i, rsd: t, limit });
+            });
+            return violations;
+        }
+
+        function renderStatSummaryTable(refStats, testStats) {
+            const tbody = document.getElementById('statTableBody');
+            tbody.innerHTML = '';
+            for (let i = 0; i < timepoints.length; i++) {
+                const rMean = refStats.means[i], rRsd = refStats.rsds[i];
+                const tMean = testStats.means[i], tRsd = testStats.rsds[i];
+                const diff = (rMean !== null && tMean !== null) ? Math.abs(rMean - tMean) : null;
+                const limit = rsdLimitAt(i);
+                const rBad = rRsd !== null && rRsd > limit;
+                const tBad = tRsd !== null && tRsd > limit;
+                const badCell = 'bg-rose-100 text-rose-800 font-bold ring-1 ring-inset ring-rose-300';
+                const isExcl = lastRule && lastRule.excluded && lastRule.excluded.includes(i);
+                const tr = document.createElement('tr');
+                if (isExcl) tr.className = 'bg-rose-50/50 text-slate-400';
+                tr.innerHTML = `
+                    <td class="p-2 font-semibold ${isExcl ? 'text-rose-600 line-through' : 'text-slate-700'}">${timepoints[i]} ${timeUnitSuffix}${isExcl ? ' ✕' : ''}</td>
+                    <td class="p-2">${formatNumber(rMean, 1)}</td>
+                    <td class="p-2 ${!isExcl && rBad ? badCell : ''}" title="${currentLang === 'vi' ? 'Ngưỡng tại mốc này: ' : 'Limit at this timepoint: '}${limit}%">${rRsd === null ? '--' : formatNumber(rRsd, 1) + '%'}${!isExcl && rBad ? ' ⚠' : ''}</td>
+                    <td class="p-2">${formatNumber(tMean, 1)}</td>
+                    <td class="p-2 ${!isExcl && tBad ? badCell : ''}" title="${currentLang === 'vi' ? 'Ngưỡng tại mốc này: ' : 'Limit at this timepoint: '}${limit}%">${tRsd === null ? '--' : formatNumber(tRsd, 1) + '%'}${!isExcl && tBad ? ' ⚠' : ''}</td>
+                    <td class="p-2 font-medium">${formatNumber(diff, 1)}</td>`;
+                tbody.appendChild(tr);
+            }
+        }
+
+        // ---------- Theory (dynamic, KaTeX) ----------
+        function tex(str, display) {
+            if (window.katex) {
+                try { return katex.renderToString(str, { displayMode: !!display, throwOnError: false }); } catch (e) { }
+            }
+            return `<code>${escapeHtml(str)}</code>`;
+        }
+
+        function renderTheory() {
+            const el = document.getElementById('theoryContent');
+            if (!el) return;
+            const vi = currentLang === 'vi';
+            const isEMA = regulatoryStandard === 'EMA';
+            const B = getB();
+            const rankLow = Math.floor(0.05 * B), rankHigh = Math.floor(0.95 * B);
+            const f2Formula = isEMA
+                ? String.raw`f_2 = 50 \cdot \log_{10}\left[\frac{100}{\sqrt{1 + \frac{\sum_{t=1}^{n}\left[R(t)-T(t)\right]^2}{n}}}\right]`
+                : String.raw`f_2 = 50 \cdot \log_{10}\left\{\left[1+\frac{1}{n}\sum_{t=1}^{n}\left(R_t-T_t\right)^2\right]^{-0.5}\cdot 100\right\}`;
+
+            let resultHtml = '';
+            if (lastBoot) {
+                const ok = lastBoot.p5 >= 50;
+                resultHtml = `
+                <div class="theory-box">
+                    <div class="font-semibold text-slate-800 mb-1">${vi ? 'Kết quả hiện tại' : 'Current result'} (${escapeHtml(getActiveTestBatch().name)} — ${regulatoryStandard}):</div>
+                    <ul class="theory-list">
+                        <li>f<sub>2</sub> ${vi ? 'truyền thống' : 'conventional'} = <b>${formatNumber(lastF2, 2)}</b></li>
+                        <li>${vi ? 'CI 90% bootstrap' : '90% bootstrap CI'} = <b>[ ${formatNumber(lastBoot.p5, 2)} ; ${formatNumber(lastBoot.p95, 2)} ]</b> (B = ${lastBoot.B})</li>
+                        <li>${vi ? 'Cận dưới' : 'Lower bound'} ${ok ? '≥' : '&lt;'} 50 → <b class="${ok ? 'text-emerald-600' : 'text-rose-600'}">${ok ? T('similar') : T('notSimilar')}</b></li>
+                    </ul>
+                </div>`;
+            }
+
+            const notesHtml = isEMA ? (vi ? `
+                <div class="theory-box">
+                    <div class="font-semibold text-slate-800">Điều kiện áp dụng theo hướng dẫn EMA (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **, Phụ lục I)</div>
+                    <ul class="theory-list">
+                        <li>Tối thiểu 3 mốc thời gian (không tính mốc 0) — <i>"A minimum of three time points (zero excluded)"</i>.</li>
+                        <li>Các mốc thời gian lấy mẫu phải giống nhau giữa hai công thức — <i>"The time points should be the same for the two formulations"</i>.</li>
+                        <li>12 giá trị riêng lẻ tại mỗi mốc thời gian cho mỗi công thức — <i>"Twelve individual values for every time point for each formulation"</i>.</li>
+                        <li><b>Không quá một giá trị trung bình &gt; 85% hòa tan đối với bất kỳ công thức nào</b> — <i>"Not more than one mean value of &gt; 85% dissolved for any of the formulations."</i> (Hệ thống dừng ngay tại mốc thời gian đầu tiên có ${tex('R(t) > 85\\%')} hoặc ${tex('T(t) > 85\\%')}).</li>
+                        <li>Độ lệch chuẩn tương đối (%RSD) hoặc hệ số biến thiên (%CV) của bất kỳ sản phẩm nào phải nhỏ hơn 20% tại mốc đầu tiên và nhỏ hơn 10% từ mốc thứ hai đến mốc cuối cùng — <i>"less than 20% for the first point and less than 10% from second to last time point"</i>.</li>
+                        <li>Giá trị ${tex('f_2')} từ 50 đến 100 cho thấy hai đồ thị hòa tan tương đồng. Trường hợp cả hai sản phẩm hòa tan trên 85% trong vòng 15 phút (hòa tan rất nhanh), sự tương đồng có thể được chấp nhận mà không cần tính ${tex('f_2')} (Phụ lục III, Mục IV.1.2).</li>
+                    </ul>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200 text-[11px] text-slate-600 space-y-1">
+                        <div class="font-semibold text-slate-700">Tài liệu tham chiếu chính thức (EMA / ICH):</div>
+                        <ul class="list-disc pl-4 space-y-0.5">
+                            <li><a href="${REG_LINKS.ema_be}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">European Medicines Agency (CHMP), <i>Guideline on the Investigation of Bioequivalence</i>, CPMP/EWP/QWP/1401/98 Rev. 1/ Corr ** (20 January 2010), Appendix I (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a></li>
+                            <li><a href="${REG_LINKS.ema_m9}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">EMA/CHMP/ICH/493213/2018, <i>ICH M9 on Biopharmaceutics Classification System-Based Biowaivers</i> (Step 5, 2020), Section 3.2 (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a></li>
+                            <li><a href="${REG_LINKS.ema_qa}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">EMA, <i>Clinical Pharmacology and Pharmacokinetics: Questions and Answers</i> — Section 3.11 (Bootstrap methodology) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a></li>
+                        </ul>
+                    </div>
+                </div>` : `
+                <div class="theory-box">
+                    <div class="font-semibold text-slate-800">Evaluation Conditions per EMA Guideline (CPMP/EWP/QWP/1401/98 Rev. 1/ Corr **, Appendix I)</div>
+                    <ul class="theory-list">
+                        <li>A minimum of three time points (zero excluded).</li>
+                        <li>The time points should be the same for the two formulations.</li>
+                        <li>Twelve individual values for every time point for each formulation.</li>
+                        <li><b>Not more than one mean value of &gt; 85% dissolved for any of the formulations.</b> (Calculation stops at the first timepoint where ${tex('R(t) > 85\\%')} or ${tex('T(t) > 85\\%')}.)</li>
+                        <li>The relative standard deviation (%RSD) or coefficient of variation (%CV) of any product should be less than 20% for the first point and less than 10% from second to last time point.</li>
+                        <li>An ${tex('f_2')} value between 50 and 100 suggests that the two dissolution profiles are similar. When more than 85% is dissolved within 15 minutes for both test and reference products (very rapidly dissolving), similarity may be accepted without mathematical calculation (Appendix III, Section IV.1.2).</li>
+                    </ul>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200 text-[11px] text-slate-600 space-y-1">
+                        <div class="font-semibold text-slate-700">Official Regulatory References (EMA / ICH):</div>
+                        <ul class="list-disc pl-4 space-y-0.5">
+                            <li><a href="${REG_LINKS.ema_be}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">European Medicines Agency (CHMP), <i>Guideline on the Investigation of Bioequivalence</i>, CPMP/EWP/QWP/1401/98 Rev. 1/ Corr ** (20 January 2010), Appendix I (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a></li>
+                            <li><a href="${REG_LINKS.ema_m9}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">EMA/CHMP/ICH/493213/2018, <i>ICH M9 on Biopharmaceutics Classification System-Based Biowaivers</i> (Step 5, 2020), Section 3.2 (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a></li>
+                            <li><a href="${REG_LINKS.ema_qa}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">EMA, <i>Clinical Pharmacology and Pharmacokinetics: Questions and Answers</i> — Section 3.11 (Bootstrap methodology) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a></li>
+                        </ul>
+                    </div>
+                </div>`) : (vi ? `
+                <div class="theory-box">
+                    <div class="font-semibold text-slate-800">Điều kiện áp dụng theo hướng dẫn FDA (CDER, August 1997, Section V.A)</div>
+                    <ul class="theory-list">
+                        <li>Xác định đồ thị hòa tan của hai sản phẩm (12 đơn vị cho mỗi lô thử và lô đối chiếu) trong cùng điều kiện thử nghiệm và cùng các mốc thời gian.</li>
+                        <li>Phương pháp độc lập mô hình phù hợp nhất khi có từ 3 đến 4 mốc thời gian trở lên — <i>"most suitable for dissolution profile comparison when three to four or more dissolution time points are available"</i>.</li>
+                        <li><b>Chỉ xét một điểm đo sau khi cả hai sản phẩm đạt trên 85% hòa tan</b> — <i>"Only one measurement should be considered after 85% dissolution of both the products."</i> (Hệ thống dừng tại mốc thời gian đầu tiên có đồng thời ${tex('R_t > 85\\%')} và ${tex('T_t > 85\\%')}).</li>
+                        <li>Để sử dụng giá trị trung bình, hệ số biến thiên (%CV) tại các mốc thời gian sớm (ví dụ: 15 phút) không được vượt quá 20%, và tại các mốc thời gian khác không được vượt quá 10% — <i>"should not be more than 20% at the earlier time points, and at other time points should not be more than 10%"</i>.</li>
+                        <li>Giá trị ${tex('f_2')} lớn hơn 50 (50–100) đảm bảo sự giống nhau hoặc tương đương giữa hai đường cong hòa tan — <i>"f2 values greater than 50 (50-100) ensure sameness or equivalence of the two curves"</i>.</li>
+                    </ul>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200 text-[11px] text-slate-600 space-y-1">
+                        <div class="font-semibold text-slate-700">Tài liệu tham chiếu chính thức (FDA / ICH):</div>
+                        <ul class="list-disc pl-4 space-y-0.5">
+                            <li><a href="${REG_LINKS.fda_1997_pdf}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">U.S. FDA (CDER), <i>Guidance for Industry: Dissolution Testing of Immediate Release Solid Oral Dosage Forms</i> (August 1997), Section V.A, pp. 8–9 (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a> (<a href="${REG_LINKS.fda_1997_page}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline">Trang tài liệu FDA</a>)</li>
+                            <li><a href="${REG_LINKS.fda_m9_2021}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">U.S. FDA / ICH, <i>M9 Biopharmaceutics Classification System-Based Biowaivers</i> (May 2021), Section 3.2, p. 8 (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a> — <i>Lưu ý: đối với hồ sơ miễn thử tương đương sinh học theo BCS (BCS-based biowaivers), FDA/ICH M9 (2021) áp dụng điều kiện không quá một giá trị trung bình ≥ 85% hòa tan cho bất kỳ sản phẩm nào (tương ứng chế độ EMA).</i></li>
+                        </ul>
+                    </div>
+                </div>` : `
+                <div class="theory-box">
+                    <div class="font-semibold text-slate-800">Recommendations per FDA Guidance (CDER, August 1997, Section V.A)</div>
+                    <ul class="theory-list">
+                        <li>Determine the dissolution profile of two products (12 units each) of the test and reference products under identical test conditions and identical sampling time points.</li>
+                        <li>Most suitable for dissolution profile comparison when three to four or more dissolution time points are available.</li>
+                        <li><b>Only one measurement should be considered after 85% dissolution of both the products.</b> (Calculation stops at the first timepoint where both ${tex('R_t > 85\\%')} and ${tex('T_t > 85\\%')}.)</li>
+                        <li>To allow use of mean data, the percent coefficient of variation (%CV) at the earlier time points (e.g., 15 minutes) should not be more than 20%, and at other time points should not be more than 10%.</li>
+                        <li>Generally, ${tex('f_2')} values greater than 50 (50–100) ensure sameness or equivalence of the two curves.</li>
+                    </ul>
+                    <div class="mt-2.5 pt-2 border-t border-slate-200 text-[11px] text-slate-600 space-y-1">
+                        <div class="font-semibold text-slate-700">Official Regulatory References (FDA / ICH):</div>
+                        <ul class="list-disc pl-4 space-y-0.5">
+                            <li><a href="${REG_LINKS.fda_1997_pdf}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">U.S. FDA (CDER), <i>Guidance for Industry: Dissolution Testing of Immediate Release Solid Oral Dosage Forms</i> (August 1997), Section V.A, pp. 8–9 (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a> (<a href="${REG_LINKS.fda_1997_page}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline">FDA Guidance Page</a>)</li>
+                            <li><a href="${REG_LINKS.fda_m9_2021}" target="_blank" rel="noopener noreferrer" class="text-brand-700 hover:underline font-medium">U.S. FDA / ICH, <i>M9 Biopharmaceutics Classification System-Based Biowaivers</i> (May 2021), Section 3.2, p. 8 (PDF) <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a> — <i>Note: for BCS-based biowaivers, FDA/ICH M9 (2021) applies "not more than one mean value of ≥85% dissolved for either of the products" (aligned with EMA mode).</i></li>
+                        </ul>
+                    </div>
+                </div>`);
+
+            const notationVi = isEMA
+                ? `Trong đó ${tex('n')} là số mốc thời gian hợp lệ, ${tex('R(t)')} và ${tex('T(t)')} lần lượt là % dược chất hòa tan trung bình của công thức đối chiếu và công thức thử nghiệm tại thời điểm ${tex('t')}.`
+                : `Trong đó ${tex('n')} là số mốc thời gian hợp lệ, ${tex('R_t')} và ${tex('T_t')} lần lượt là % hòa tan trung bình của lô đối chiếu và lô thử nghiệm tại mốc thời gian ${tex('t')}.`;
+            const notationEn = isEMA
+                ? `Where ${tex('n')} is the number of valid time points, ${tex('R(t)')} is the mean percent reference drug dissolved at time ${tex('t')}, and ${tex('T(t)')} is the mean percent test drug dissolved at time ${tex('t')}.`
+                : `Where ${tex('n')} is the number of valid time points, ${tex('R_t')} is the mean dissolution value of the reference batch at time ${tex('t')}, and ${tex('T_t')} is the mean dissolution value of the test batch at time ${tex('t')}.`;
+
+            const bootNoteVi = isEMA
+                ? `Khi biến thiên hòa tan vượt ngưỡng %RSD cho phép của ${tex('f_2')} truyền thống, EMA Q&A (Mục 3.11) khuyến nghị sử dụng khoảng tin cậy 90% hai phía của ${tex('f_2')} bằng phương pháp Bootstrap (tối thiểu 5.000 mẫu lặp), sử dụng các mốc thời gian cho đến mốc mà một trong hai sản phẩm đạt &gt; 85% hòa tan. Tương đồng được kết luận khi cận dưới của khoảng tin cậy 90% ${tex(String.raw`\ge 50`)}.`
+                : `Khi biến thiên nội lô vượt ngưỡng %CV cho phép, có thể xem xét khoảng tin cậy 90% Bootstrap (hoặc phương pháp vùng tin cậy đa biến theo Mục V.B, hướng dẫn FDA 1997) với cơ sở biện minh thống kê trong kế hoạch phân tích. Cận dưới ${tex(String.raw`\ge 50`)} là ngưỡng tham khảo của phương pháp Bootstrap.`;
+            const bootNoteEn = isEMA
+                ? `When high variability precludes conventional ${tex('f_2')}, EMA Q&A (Section 3.11) recommends a two-sided 90% confidence interval for ${tex('f_2')} using bootstrap methodology (at least 5,000 samples), considering sampling times until one of the products reaches &gt; 85% dissolved. Similarity may be concluded if the lower bound is ${tex(String.raw`\ge 50`)}.`
+                : `When within-batch variability exceeds %CV limits, a 90% bootstrap confidence interval (or a model-independent multivariate confidence region procedure per FDA 1997 Section V.B) may be considered with statistical justification in the analysis plan. A lower bound ${tex(String.raw`\ge 50`)} is the bootstrap reference criterion.`;
+
+            el.innerHTML = vi ? `
+                <div>
+                    <strong class="text-slate-800">1. Hệ số tương đồng (${tex('f_2')}) — Chế độ ${regulatoryStandard}:</strong>
+                    <p class="mt-1">Đánh giá mức độ tương đồng giữa hai đồ thị hòa tan của công thức đối chiếu và công thức thử nghiệm. Giá trị ${tex('f_2')} từ 50 đến 100 cho thấy hai đồ thị hòa tan tương đồng.</p>
+                    <div class="theory-formula">${tex(f2Formula, true)}</div>
+                    <p class="mt-1">${notationVi}</p>
+                </div>
+                <div>
+                    <strong class="text-slate-800">2. Khoảng tin cậy Bootstrap 90% (B = ${B}):</strong>
+                    <p class="mt-1">Lấy mẫu lại có hoàn lại <b>${B}</b> lần trên các đơn vị thử của mỗi lô, tính lại ${tex('f_2')} trên tập các mốc thời gian hợp lệ theo tiêu chuẩn <b>${regulatoryStandard}</b>, sau đó sắp xếp tăng dần:</p>
+                    <ul class="theory-list">
+                        <li>Cận dưới = phân vị thứ 5 (vị trí xấp xỉ ${rankLow}/${B}).</li>
+                        <li>Cận trên = phân vị thứ 95 (vị trí xấp xỉ ${rankHigh}/${B}).</li>
+                    </ul>
+                    <p class="mt-1">${bootNoteVi}</p>
+                </div>
+                ${resultHtml}
+                ${notesHtml}` : `
+                <div>
+                    <strong class="text-slate-800">1. Similarity factor (${tex('f_2')}) — ${regulatoryStandard} Mode:</strong>
+                    <p class="mt-1">Measures the similarity in percent dissolution between the reference and test profiles. An ${tex('f_2')} value between 50 and 100 suggests that the two dissolution profiles are similar.</p>
+                    <div class="theory-formula">${tex(f2Formula, true)}</div>
+                    <p class="mt-1">${notationEn}</p>
+                </div>
+                <div>
+                    <strong class="text-slate-800">2. 90% Bootstrap confidence interval (B = ${B}):</strong>
+                    <p class="mt-1">Units of each batch are resampled with replacement <b>${B}</b> times and ${tex('f_2')} is recomputed on the valid timepoints defined by the <b>${regulatoryStandard}</b> standard:</p>
+                    <ul class="theory-list">
+                        <li>Lower bound = 5th percentile (rank about ${rankLow}/${B}).</li>
+                        <li>Upper bound = 95th percentile (rank about ${rankHigh}/${B}).</li>
+                    </ul>
+                    <p class="mt-1">${bootNoteEn}</p>
+                </div>
+                ${resultHtml}
+                ${notesHtml}`;
+        }
+
+        // ---------- Chart ----------
+        const whiteBackgroundPlugin = {
+            id: 'customCanvasBackgroundColor',
+            beforeDraw: (chart) => {
+                const ctx = chart.canvas.getContext('2d');
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        };
+
+        function chartTitleLines() {
+            const vi = currentLang === 'vi';
+            const title = (vi ? 'Biểu đồ độ hòa tan tại môi trường ' : 'Dissolution profile at medium ') + envMedium;
+            const sub = (vi ? 'Đối chiếu: ' : 'Reference: ') + refBatch.name + '  |  ' +
+                (vi ? 'Thử nghiệm: ' : 'Test: ') + testBatches.map(b => b.name).join(', ');
+            return { title, sub };
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('dissolutionChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: timepoints.map(t => `${t} ${timeUnitSuffix}`), datasets: [] },
+                plugins: [whiteBackgroundPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        title: { display: true, text: '', font: { family: 'Inter', size: 13, weight: '700' }, color: '#0f172a', padding: { top: 2, bottom: 2 } },
+                        subtitle: { display: true, text: '', font: { family: 'Inter', size: 11 }, color: '#475569', padding: { bottom: 8 } },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'line',
+                                boxWidth: 40,
+                                boxHeight: 8,
+                                padding: 14,
+                                font: { family: 'Inter', size: 11, weight: '600' }
+                            }
+                        },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { title: { display: true, text: '', font: { size: 11, weight: '600' } }, grid: { display: false } },
+                        y: { title: { display: true, text: '', font: { size: 11, weight: '600' } }, min: 0, max: 100, ticks: { stepSize: 20 } }
+                    }
+                }
+            });
+            updateChart();
+        }
+
+        function updateChart() {
+            if (!chartInstance) return;
+            const refStats = calculateMeansAndRSD(refBatch.data);
+            const colors = ['#0284c7', '#e11d48', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+            const datasets = [{
+                label: refBatch.name,
+                data: refStats.means,
+                borderColor: '#0f172a', backgroundColor: '#0f172a',
+                borderWidth: 3, pointRadius: 4, tension: 0.2
+            }];
+            testBatches.forEach((batch, idx) => {
+                const s = calculateMeansAndRSD(batch.data);
+                datasets.push({
+                    label: batch.name,
+                    data: s.means,
+                    borderColor: colors[idx % colors.length], backgroundColor: colors[idx % colors.length],
+                    borderWidth: 2.5, pointRadius: 4, borderDash: idx > 0 ? [6, 4] : [], tension: 0.2
+                });
+            });
+
+            const tl = chartTitleLines();
+            chartInstance.data.labels = timepoints.map(t => `${t} ${timeUnitSuffix}`);
+            chartInstance.data.datasets = datasets;
+            chartInstance.options.plugins.title.text = tl.title;
+            chartInstance.options.plugins.subtitle.text = tl.sub;
+            chartInstance.options.scales.x.title.text = `${T('xAxisPrefix')} (${timeUnitSuffix})`;
+            chartInstance.options.scales.y.title.text = T('yAxisLabel');
+            chartInstance.update();
+        }
+
+        // ---------- Copy / Export ----------
+        function toast(msg) {
+            let t = document.getElementById('toastMsg');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toastMsg';
+                t.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity';
+                document.body.appendChild(t);
+            }
+            t.innerText = msg;
+            t.style.opacity = '1';
+            clearTimeout(t._h);
+            t._h = setTimeout(() => t.style.opacity = '0', 2200);
+        }
+
+        function copyChart() {
+            const canvas = document.getElementById('dissolutionChart');
+            canvas.toBlob(async (blob) => {
+                try {
+                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                    toast(currentLang === 'vi' ? 'Đã copy biểu đồ (kèm tên sản phẩm & môi trường thử)' : 'Chart copied (with product names & medium)');
+                } catch (err) {
+                    toast(currentLang === 'vi' ? 'Trình duyệt không cho copy ảnh, hãy dùng "Xuất Ảnh PNG"' : 'Clipboard blocked, use "Export PNG"');
+                }
+            }, 'image/png');
+        }
+
+        function copyStatTable() {
+            const vi = currentLang === 'vi';
+            const active = getActiveTestBatch();
+            const refStats = calculateMeansAndRSD(refBatch.data);
+            const testStats = calculateMeansAndRSD(active.data);
+
+            const head = [`${T('xAxisPrefix')} (${timeUnitSuffix})`,
+                `${refBatch.name} Mean (%)`, `${refBatch.name} %RSD`,
+                `${active.name} Mean (%)`, `${active.name} %RSD`, T('diffHeader')];
+
+            const rows = timepoints.map((tp, i) => {
+                const rM = refStats.means[i], tM = testStats.means[i];
+                return [tp, formatNumber(rM, 1), formatNumber(refStats.rsds[i], 1), formatNumber(tM, 1), formatNumber(testStats.rsds[i], 1),
+                    (rM !== null && tM !== null) ? formatNumber(Math.abs(rM - tM), 1) : '--'];
+            });
+
+            const meta = [
+                [vi ? 'Môi trường thử' : 'Test medium', envMedium],
+                [vi ? 'Tiêu chuẩn áp dụng' : 'Regulatory standard', getStandardLabel(true)],
+                [vi ? 'Sản phẩm đối chiếu' : 'Reference product', refBatch.name],
+                [vi ? 'Sản phẩm thử nghiệm' : 'Test product', active.name],
+                ['f2', formatNumber(lastF2, 2)],
+                [vi ? 'CI 90% bootstrap' : '90% bootstrap CI', lastBoot ? `[${formatNumber(lastBoot.p5, 2)} ; ${formatNumber(lastBoot.p95, 2)}] (B=${lastBoot.B})` : '--']
+            ];
+
+            const plain = meta.map(m => m.join('\t')).join('\n') + '\n\n' + head.join('\t') + '\n' + rows.map(r => r.join('\t')).join('\n');
+
+            const html = '<table border="1" style="border-collapse:collapse">' +
+                meta.map(m => `<tr><td><b>${escapeHtml(m[0])}</b></td><td colspan="5">${escapeHtml(m[1])}</td></tr>`).join('') +
+                `<tr><td colspan="6"></td></tr><tr>${head.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr>` +
+                rows.map(r => `<tr>${r.map(c => `<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('') + '</table>';
+
+            const done = () => toast(vi ? 'Đã copy bảng (kèm tên sản phẩm & môi trường thử)' : 'Table copied (with product names & medium)');
+            if (navigator.clipboard && window.ClipboardItem) {
+                navigator.clipboard.write([new ClipboardItem({
+                    'text/html': new Blob([html], { type: 'text/html' }),
+                    'text/plain': new Blob([plain], { type: 'text/plain' })
+                })]).then(done).catch(() => navigator.clipboard.writeText(plain).then(done));
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(plain).then(done);
+            }
+        }
+
+        function safeName(s) { return String(s).replace(/[^\w\-]+/g, '_').replace(/^_+|_+$/g, ''); }
+
+        function exportPNG() {
+            const link = document.createElement('a');
+            link.download = `Dissolution_F2_${safeName(envMedium)}_${new Date().toISOString().slice(0, 10)}.png`;
+            link.href = document.getElementById('dissolutionChart').toDataURL('image/png', 1.0);
+            link.click();
+        }
+
+        function exportPDF() {
+            const element = document.getElementById('reportArea');
+            const opt = {
+                margin: 0.3,
+                filename: `Dissolution_f2_Bootstrap_${safeName(envMedium)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                pagebreak: { mode: ['avoid-all', 'css'] },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    
+function applyTheme(theme) {
+    if (!theme) return;
+    document.documentElement.setAttribute('data-theme', theme);
+    if (document.body) document.body.setAttribute('data-theme', theme);
+    if (window.f2Chart && window.f2Chart.options) {
+        const isDark = theme === 'dark';
+        try {
+            window.f2Chart.options.scales.x.grid.color = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)';
+            window.f2Chart.options.scales.y.grid.color = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)';
+            window.f2Chart.options.scales.x.ticks.color = isDark ? '#94a3b8' : '#64748b';
+            window.f2Chart.options.scales.y.ticks.color = isDark ? '#94a3b8' : '#64748b';
+            window.f2Chart.update();
+        } catch(e){}
+    }
+}
+window.addEventListener('message', e => {
+    if (e.data && e.data.theme) applyTheme(e.data.theme);
+});
+try {
+    const initTheme = (window.parent && window.parent.currentTheme) || localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(initTheme);
+} catch(e){}
+
+</script>
+</body>
+</html>

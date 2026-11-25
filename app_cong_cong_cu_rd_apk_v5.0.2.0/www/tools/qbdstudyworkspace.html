@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QbD Study Workspace — DOE & Response Surface Methodology</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#17243a;--muted:#66758a;--line:#dce4ee;--blue:#2859c5;--blue2:#eaf0ff;--green:#177c59;--red:#c23b45;--amber:#9a6700;--shadow:0 8px 24px rgba(20,40,80,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;background:#fff;padding:9px 12px;color:var(--ink)}button:hover{border-color:#9eb4e8}button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}button.danger{color:var(--red)}button.small{padding:5px 8px;font-size:12px}
+header{background:linear-gradient(120deg,#162b55,#2859c5);color:#fff;padding:22px clamp(16px,3vw,34px);display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+header h1{font-size:clamp(21px,2.4vw,29px);margin:0 0 5px}header p{margin:0;color:#dbe6ff;max-width:850px}.header-actions{display:flex;gap:8px;flex-wrap:wrap}.header-actions button{background:#ffffff14;color:#fff;border-color:#ffffff45}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:calc(100vh - 110px)}aside{padding:18px 12px;border-right:1px solid var(--line);background:#f9fbfe}.nav-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:800;padding:8px 12px}.nav button{display:flex;width:100%;text-align:left;gap:10px;align-items:center;border:0;background:transparent;margin:3px 0;padding:11px 12px}.nav button.active{background:var(--blue2);color:var(--blue);font-weight:700}.nav .ico{width:22px;text-align:center}.side-note{margin:18px 8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--muted);font-size:12px}
+main{padding:clamp(14px,2.3vw,28px);min-width:0;max-width:1600px;width:100%;margin:0 auto}.page{display:none}.page.active{display:block}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.page-head h2{margin:0;font-size:24px}.page-head p{margin:4px 0 0;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}.metric{padding:16px}.metric .label{color:var(--muted);font-size:12px}.metric .value{font-size:28px;font-weight:800;margin:3px 0}.metric .hint{font-size:12px;color:var(--muted)}.panel{padding:18px;margin-bottom:16px;min-width:0}.panel h3{margin:0 0 12px;font-size:16px}.panel p.sub{margin:-6px 0 14px;color:var(--muted);font-size:12px}.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+label{display:block;font-weight:650;font-size:12px;color:#45546b;margin:0 0 5px}input,select,textarea{width:100%;border:1px solid #cfd9e6;border-radius:8px;padding:9px 10px;background:white;color:var(--ink);min-width:0}input:focus,select:focus,textarea:focus{outline:2px solid #b9cbff;border-color:var(--blue)}textarea{min-height:85px;resize:vertical}.field{margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-grid .wide{grid-column:1/-1}.muted{color:var(--muted)}.tiny{font-size:12px}.pill{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:750;background:#edf2fa;color:#53647b}.pill.green{background:#e2f5ec;color:var(--green)}.pill.amber{background:#fff3d4;color:var(--amber)}.pill.red{background:#ffe8e8;color:var(--red)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;font-size:12px;min-width:650px}th,td{padding:10px 11px;text-align:left;border-bottom:1px solid #e8edf4;vertical-align:top}th{background:#f4f7fb;color:#4e5d73;font-size:11px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}tr:last-child td{border-bottom:0}td.num{text-align:right;font-variant-numeric:tabular-nums}.empty{padding:26px;text-align:center;color:var(--muted)}.notice{border-radius:10px;padding:12px 14px;background:#eef4ff;border:1px solid #d6e3ff;color:#284477;font-size:13px;margin-bottom:14px}.notice.warn{background:#fff7e5;border-color:#f3dfaa;color:#785500}.notice.good{background:#eaf8f0;border-color:#c5ead6;color:#176644}.chartbox{height:480px;position:relative}.chart-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.checkrow{display:flex;gap:9px;align-items:flex-start;margin:8px 0}.checkrow input{width:auto;margin-top:4px}.checkrow label{font-weight:500;font-size:13px;color:var(--ink)}.footer{padding:18px;color:var(--muted);font-size:11px;text-align:center}
+.pred-box{background:#f8fafc;border:1px dashed #b2c4db;border-radius:12px;padding:16px;margin-top:10px}
+.pred-result{font-size:24px;font-weight:800;color:var(--blue);margin-top:8px}
+.dynamic-inputs{background:#fdfdff;border:1px solid var(--line);padding:12px;border-radius:10px;margin-bottom:12px}
+@media(max-width:950px){.app{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line);padding:8px}.nav{display:flex;overflow:auto}.nav button{width:auto;white-space:nowrap}.nav-label,.side-note{display:none}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.two,.three,.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:12px}.panel{padding:13px}.metric{padding:12px}.metric .value{font-size:24px}}
+
+[data-theme="dark"] {
+  --bg: #121316;
+  --panel: #1e1f22;
+  --ink: #e3e3e3;
+  --muted: #9aa0a6;
+  --line: #2d3540;
+  --blue: #4a94e8;
+  --blue2: #1e293b;
+  --shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] aside {
+  background: #18191b !important;
+}
+[data-theme="dark"] th {
+  background: #18191b !important;
+  color: #c4c7c5 !important;
+}
+[data-theme="dark"] td {
+  border-bottom-color: #2d3540 !important;
+}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+  background: #121316 !important;
+  border-color: #3b424d !important;
+  color: #e3e3e3 !important;
+}
+[data-theme="dark"] .pred-box {
+  background: #18191b !important;
+  border-color: #3b424d !important;
+}
+[data-theme="dark"] .side-note {
+  background: #1e1f22 !important;
+}
+[data-theme="dark"] .notice {
+  background: #162438 !important;
+  border-color: #24416a !important;
+  color: #a8c7fa !important;
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>QbD Study Workspace</h1>
+    <p>Quản lý nghiên cứu phát triển dược phẩm, dữ liệu DOE, bề mặt đáp ứng 3D Wireframe & Dự đoán.</p>
+  </div>
+  <div class="header-actions">
+    <button id="saveBtn">Lưu dự án</button>
+    <button id="exportBtn">Xuất dữ liệu CSV</button>
+    <button id="backupBtn">Sao lưu JSON</button>
+    <button id="importBtn">Nhập JSON</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+  </div>
+</header>
+<div class="app">
+<aside>
+  <div class="nav-label">Workspace</div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard"><span class="ico">▦</span>Tổng quan</button>
+    <button data-page="project"><span class="ico">▤</span>Thông tin dự án</button>
+    <button data-page="studies"><span class="ico">⚗</span>Nghiên cứu</button>
+    <button data-page="data"><span class="ico">▦</span>Dữ liệu thí nghiệm</button>
+    <button data-page="analysis"><span class="ico">⌁</span>Phân tích & Hồi quy</button>
+    <button data-page="qbd"><span class="ico">✓</span>Bằng chứng QbD</button>
+  </nav>
+  <div class="side-note"><strong>Nhập liệu trực quan</strong><br>Không cần gõ mã JSON. Tự động sinh ô nhập theo tên yếu tố và chỉ tiêu bạn đã cấu hình.</div>
+</aside>
+<main>
+<section class="page active" id="page-dashboard">
+  <div class="page-head"><div><h2>Tổng quan nghiên cứu</h2><p>Theo dõi trạng thái dữ liệu và mức độ hoàn thiện hồ sơ QbD.</p></div><div class="actions"><button class="primary" onclick="newStudy()">＋ Tạo nghiên cứu</button></div></div>
+  <div class="cards">
+    <div class="metric"><div class="label">Nghiên cứu</div><div class="value" id="mStudies">0</div><div class="hint">Study records</div></div>
+    <div class="metric"><div class="label">Thí nghiệm / mẻ chạy</div><div class="value" id="mRuns">0</div><div class="hint">Experiment records</div></div>
+    <div class="metric"><div class="label">Chỉ tiêu đáp ứng (Responses)</div><div class="value" id="mResponses">0</div><div class="hint">Responses</div></div>
+    <div class="metric"><div class="label">Mức hoàn thiện hồ sơ</div><div class="value" id="mComplete">0%</div><div class="hint">Checklist tham khảo</div></div>
+  </div>
+  <div class="notice warn"><strong>Lưu ý:</strong> Ứng dụng hỗ trợ mô hình hồi quy bậc 2 cho Bề mặt đáp ứng (RSM) 3D có ô lưới Wireframe và công cụ nhập số liệu trực quan không cần JSON.</div>
+  <div class="two">
+    <div class="panel"><h3>Nghiên cứu gần đây</h3><div id="recentStudies"></div></div>
+    <div class="panel"><h3>Chỉ số dữ liệu</h3><div id="dataQuality"></div></div>
+  </div>
+</section>
+
+<section class="page" id="page-project">
+  <div class="page-head"><div><h2>Thông tin dự án</h2><p>Thông tin tổng quan liên kết với các nghiên cứu phát triển sản phẩm.</p></div><div class="actions"><button class="primary" id="projectSave">Lưu thông tin</button></div></div>
+  <div class="panel">
+    <div class="form-grid">
+      <div class="field"><label for="pName">Tên dự án / sản phẩm</label><input id="pName" placeholder="Ví dụ: Viên nén IR Acetriptan 50mg"></div>
+      <div class="field"><label for="pCode">Mã dự án</label><input id="pCode" placeholder="PRJ-ACT-002"></div>
+      <div class="field"><label for="pForm">Dạng bào chế</label><select id="pForm"><option value="">Chọn...</option><option>Viên nén giải phóng tức thì</option><option>Viên nén giải phóng kéo dài</option><option>Viên nén bao phim</option><option>Viên nang</option><option>Bột/cốm</option></select></div>
+      <div class="field"><label for="pStage">Giai đoạn phát triển</label><select id="pStage"><option>Tiền công thức</option><option>Phát triển công thức</option><option>Phát triển quy trình</option><option>Scale-up / chuyển giao</option><option>Hỗ trợ hồ sơ đăng ký</option></select></div>
+      <div class="field"><label for="pGoal">Mục tiêu nghiên cứu</label><textarea id="pGoal" placeholder="Nêu mục tiêu chất lượng..."></textarea></div>
+      <div class="field"><label for="pQTPP">QTPP / yêu cầu chất lượng mục tiêu</label><textarea id="pQTPP" placeholder="Hàm lượng, độ rã, độ hòa tan..."></textarea></div>
+      <div class="field wide"><label for="pNotes">Ghi chú và cơ sở khoa học</label><textarea id="pNotes" placeholder="Tài liệu tham khảo, chiến lược kiểm soát..."></textarea></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-studies">
+  <div class="page-head"><div><h2>Danh mục nghiên cứu</h2><p>Quản lý các thiết kế thí nghiệm (Screening, RSM, Mixture).</p></div><div class="actions"><button class="primary" onclick="newStudy()">＋ Tạo nghiên cứu</button></div></div>
+  <div class="two">
+    <div class="panel"><h3>Thông tin nghiên cứu</h3>
+      <input type="hidden" id="sId">
+      <div class="field"><label for="sName">Tên nghiên cứu</label><input id="sName" placeholder="Ví dụ: Tối ưu hóa quá trình cán ép cốm"></div>
+      <div class="form-grid">
+        <div class="field"><label for="sType">Nhóm nghiên cứu</label><select id="sType"><option>Thiết kế công thức</option><option>Phát triển quy trình</option><option>Tiền công thức / nguyên liệu</option><option>Độ ổn định</option></select></div>
+        <div class="field"><label for="sStatus">Trạng thái</label><select id="sStatus"><option>Đã hoàn tất</option><option>Đang thực hiện</option><option>Đang lập kế hoạch</option></select></div>
+        <div class="field wide"><label for="sObjective">Mục tiêu / giả thuyết</label><textarea id="sObjective" placeholder="Câu hỏi nghiên cứu cần giải quyết..."></textarea></div>
+        <div class="field wide"><label for="sFactors">Yếu tố đầu vào (Mỗi dòng 1 tên yếu tố)</label><textarea id="sFactors" placeholder="Ap_luc_can (bar)&#10;Khe_ho_can (mm)"></textarea></div>
+        <div class="field wide"><label for="sResponses">Đáp ứng đầu ra (Mỗi dòng 1 chỉ tiêu)</label><textarea id="sResponses" placeholder="Do_hoa_tan_15p (%)&#10;Do_cung (kP)"></textarea></div>
+        <div class="field wide"><label for="sCqa">Tiêu chí chấp nhận (Spec)</label><textarea id="sCqa" placeholder="Độ hòa tan > 85% tại phút 15"></textarea></div>
+        <div class="field wide"><label for="sDesign">Mô hình thiết kế DOE</label><select id="sDesign"><option>Response surface</option><option>Factorial / fractional factorial</option><option>Mixture design</option><option>Thăm dò / screening</option></select></div>
+      </div>
+      <div class="actions"><button class="primary" id="studySave">Lưu nghiên cứu</button><button id="studyClear">Xóa trắng</button></div>
+    </div>
+    <div class="panel"><h3>Nghiên cứu đã tạo</h3><div id="studyList"></div></div>
+  </div>
+</section>
+
+<section class="page" id="page-data">
+  <div class="page-head"><div><h2>Dữ liệu thí nghiệm</h2><p>Quản lý các mẻ chạy và kết quả đo lường trực quan.</p></div><div class="actions"><button id="templateBtn">Tải CSV mẫu</button><button id="clearDataBtn" class="danger">Xóa toàn bộ dữ liệu</button></div></div>
+  <div class="panel">
+    <h3>Thêm / sửa dòng dữ liệu thí nghiệm</h3>
+    <input type="hidden" id="dId">
+    <div class="form-grid">
+      <div class="field"><label for="dStudy">Nghiên cứu</label><select id="dStudy" onchange="buildDynamicForm()"></select></div>
+      <div class="field"><label for="dRun">Mã thí nghiệm (Run)</label><input id="dRun" placeholder="RUN-01"></div>
+      <div class="field"><label for="dBatch">Mã lô (Batch)</label><input id="dBatch" placeholder="BATCH-001"></div>
+      <div class="field"><label for="dRep">Lần lặp (Replicate)</label><input id="dRep" placeholder="1"></div>
+      
+      <div class="field wide">
+        <label>Giá trị Yếu tố đầu vào (CMAs / CPPs)</label>
+        <div id="dynamicFactorInputs" class="dynamic-inputs form-grid"></div>
+      </div>
+      <div class="field wide">
+        <label>Kết quả Đáp ứng đầu ra (CQAs)</label>
+        <div id="dynamicResponseInputs" class="dynamic-inputs form-grid"></div>
+      </div>
+
+      <div class="field"><label for="dDate">Ngày thực hiện</label><input type="date" id="dDate"></div>
+      <div class="field"><label for="dAnalyst">Người thực hiện</label><input id="dAnalyst" placeholder="Tên KTV / QC"></div>
+      <div class="field wide"><label for="dNotes">Ghi chú & quan sát</label><textarea id="dNotes" placeholder="Hiện tượng trong quá trình..."></textarea></div>
+    </div>
+    <div class="actions"><button class="primary" id="dataSave">Lưu dòng dữ liệu</button><button id="dataClear">Xóa trắng</button></div>
+  </div>
+  <div class="panel"><div class="page-head"><div><h3 style="margin:0">Bảng dữ liệu chi tiết</h3></div></div>
+    <div class="form-grid" style="margin-bottom:12px"><div class="field"><label for="dataFilter">Lọc nghiên cứu</label><select id="dataFilter"><option value="">Tất cả nghiên cứu</option></select></div><div class="field"><label for="dataSearch">Tìm kiếm mã</label><input id="dataSearch" placeholder="Nhập từ khóa..."></div></div>
+    <div id="dataTable"></div>
+  </div>
+</section>
+
+<section class="page" id="page-analysis">
+  <div class="page-head"><div><h2>Phân tích, Mô hình Bề mặt 3D & Dự đoán</h2><p>Khảo sát mô hình 3D ô lưới Wireframe, biểu đồ đồng mức 2D và công cụ tính toán dự đoán chỉ tiêu.</p></div><div class="actions"><button id="refreshAnalysis" class="primary">Cập nhật phân tích</button></div></div>
+  <div class="panel">
+    <div class="form-grid">
+      <div class="field"><label for="aStudy">Nghiên cứu</label><select id="aStudy"></select></div>
+      <div class="field"><label for="aResponse">Chỉ tiêu đáp ứng (Response)</label><select id="aResponse"></select></div>
+      <div class="field"><label for="aChart">Kiểu biểu đồ hiển thị</label>
+        <select id="aChart">
+          <option value="surface3d">Biểu đồ Bề mặt đáp ứng 3D (Có ô lưới Wireframe)</option>
+          <option value="contour">Biểu đồ đồng mức 2D (Contour Plot có nhãn giá trị)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <div class="two">
+    <div class="panel">
+      <h3>Biểu đồ trực quan (Plotly 3D/2D)</h3>
+      <div class="chartbox" id="plotlyChart"></div>
+      <div id="chartLegend" class="chart-legend"></div>
+    </div>
+    
+    <div class="panel">
+      <h3>Dự đoán chỉ tiêu chất lượng (Predictor Calculator)</h3>
+      <p class="sub">Nhập thông số đầu vào để tính toán giá trị đáp ứng dự đoán ($Y$) theo mô hình hồi quy bậc 2:</p>
+      
+      <div class="pred-box">
+        <div id="predFields" class="form-grid"></div>
+        <button class="primary" style="width:100%; margin-top:10px" onclick="calculatePrediction()">Tính toán giá trị dự đoán</button>
+        <div style="margin-top:14px; text-align:center">
+          <div style="font-size:12px; color:var(--muted)">Kết quả dự đoán (<span id="predResponseName">Response</span>):</div>
+          <div class="pred-result" id="predValue">—</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px">Thống kê mô tả mô hình</h3>
+      <div id="stats"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-qbd">
+  <div class="page-head"><div><h2>Bằng chứng QbD & Hồ sơ P.3.2</h2><p>Checklist theo dõi nội dung hồ sơ phát triển dược phẩm.</p></div><div class="actions"><button class="primary" id="reportBtn">Tạo báo cáo HTML</button></div></div>
+  <div class="panel"><h3>Checklist tài liệu P.3.2</h3><div id="checklist"></div><div class="actions" style="margin-top:14px"><button id="checkSave">Lưu checklist</button><span class="tiny muted" id="checkStatus"></span></div></div>
+  <div class="panel"><h3>Tóm tắt nội dung báo cáo</h3><div id="reportPreview" class="muted">Chưa có thông tin dự án.</div></div>
+</section>
+<div class="footer">QbD Study Workspace · Phiên bản nhập liệu trực quan & Bề mặt 3D Wireframe</div>
+</main>
+</div>
+
+<script>
+
+let currentLang = 'vi';
+try {
+  if (window.parent && window.parent.L) currentLang = window.parent.L;
+  else currentLang = localStorage.getItem('lang') || 'vi';
+} catch(e) {}
+
+const I18N_QBD = {
+  vi: {
+    app_title: "QbD Study Workspace — DOE & Response Surface",
+    app_desc: "Không gian làm việc nghiên cứu QbD: quản lý thông tin dự án, thiết kế công thức/quy trình (DOE), lưu trữ dữ liệu thực nghiệm, dựng bề mặt đáp ứng 3D và trích xuất bằng chứng khoa học cho hồ sơ.",
+    btn_save_proj: "Lưu dự án",
+    btn_export_csv: "Xuất dữ liệu CSV",
+    btn_backup_json: "Sao lưu JSON",
+    btn_import_json: "Nhập JSON",
+    btn_export_report: "Xuất báo cáo HTML",
+    nav_workspace: "Không gian làm việc",
+    nav_overview: "Tổng quan",
+    nav_project: "Thông tin dự án",
+    nav_studies: "Nghiên cứu",
+    nav_data: "Dữ liệu thí nghiệm",
+    nav_analysis: "Phân tích & Hồi quy",
+    nav_evidence: "Bằng chứng QbD",
+    ov_title: "Tổng quan nghiên cứu",
+    ov_desc: "Theo dõi tiến độ, số lượng thí nghiệm và các chỉ số chất lượng chính của dự án QbD.",
+    m_studies: "Số nghiên cứu",
+    m_runs: "Số mẻ / run DOE",
+    m_factors: "Yếu tố (Factors)",
+    m_responses: "Đáp ứng (CQAs)",
+    p_recent_studies: "Nghiên cứu gần đây",
+    p_data_metrics: "Chỉ số dữ liệu",
+    btn_new_study: "＋ Tạo nghiên cứu",
+    lbl_save_info: "Lưu thông tin",
+    proj_title: "Thông tin dự án",
+    proj_desc: "Thông tin tổng quan liên kết với các nghiên cứu phát triển sản phẩm.",
+    lbl_pname: "Tên dự án / sản phẩm",
+    lbl_pcode: "Mã dự án",
+    lbl_pform: "Dạng bào chế",
+    lbl_pstage: "Giai đoạn phát triển",
+    lbl_pgoal: "Mục tiêu nghiên cứu",
+    lbl_pqtpp: "QTPP / yêu cầu chất lượng mục tiêu",
+    lbl_pnotes: "Ghi chú và cơ sở khoa học",
+    studies_title: "Danh mục nghiên cứu",
+    studies_desc: "Quản lý các thiết kế thí nghiệm (Screening, RSM, Mixture).",
+    study_info_title: "Thông tin nghiên cứu",
+    lbl_sname: "Tên nghiên cứu",
+    lbl_stype: "Nhóm nghiên cứu",
+    lbl_sstatus: "Trạng thái",
+    lbl_sobj: "Mục tiêu / giả thuyết",
+    lbl_sfactors: "Yếu tố đầu vào (Mỗi dòng 1 tên yếu tố)",
+    lbl_sresponses: "Đáp ứng đầu ra (Mỗi dòng 1 chỉ tiêu)",
+    lbl_scqa: "Tiêu chí chấp nhận (Spec)",
+    lbl_sdesign: "Mô hình thiết kế DOE",
+    btn_save_study: "Lưu nghiên cứu",
+    btn_clear: "Xóa trắng",
+    created_studies: "Nghiên cứu đã tạo",
+    data_title: "Dữ liệu thí nghiệm",
+    data_desc: "Nhập số liệu thực nghiệm theo từng mẻ/công thức hoặc import từ file CSV.",
+    add_row_title: "Thêm / sửa dòng dữ liệu thí nghiệm",
+    detailed_table_title: "Bảng dữ liệu chi tiết",
+    analysis_title: "Phân tích, Mô hình Bề mặt 3D & Dự đoán",
+    analysis_desc: "Mô hình hóa tương quan giữa 2 yếu tố công nghệ/công thức lên 1 chỉ tiêu chất lượng (RSM 3D Surface).",
+    evidence_title: "Bằng chứng QbD cho hồ sơ đăng ký",
+    evidence_desc: "Tổng hợp cơ sở khoa học, bảng kết quả, phương trình và kết luận phục vụ phần P.2 (Phát triển sản phẩm) trong hồ sơ ACTD / ICH CTD."
+  },
+  en: {
+    app_title: "QbD Study Workspace — DOE & Response Surface",
+    app_desc: "Quality by Design Workspace: Project information management, formulation & process DOE designs, experimental observation logging, 3D response surface modeling, and scientific evidence reporting for dossier filings.",
+    btn_save_proj: "Save Project",
+    btn_export_csv: "Export CSV",
+    btn_backup_json: "Backup JSON",
+    btn_import_json: "Import JSON",
+    btn_export_report: "Export HTML Report",
+    nav_workspace: "Workspace",
+    nav_overview: "Overview",
+    nav_project: "Project Info",
+    nav_studies: "Studies",
+    nav_data: "Experiment Data",
+    nav_analysis: "Analysis & Regression",
+    nav_evidence: "QbD Evidence",
+    ov_title: "Study Overview",
+    ov_desc: "Track research progress, experiment runs, and key quality metrics across the QbD project.",
+    m_studies: "Total Studies",
+    m_runs: "Total Runs / Batches",
+    m_factors: "Input Factors",
+    m_responses: "Target CQAs",
+    p_recent_studies: "Recent Studies",
+    p_data_metrics: "Data Quality Metrics",
+    btn_new_study: "＋ New Study",
+    lbl_save_info: "Save Information",
+    proj_title: "Project Information",
+    proj_desc: "Comprehensive product development context linked with all experimental designs.",
+    lbl_pname: "Project / Product Name",
+    lbl_pcode: "Project Code",
+    lbl_pform: "Dosage Form",
+    lbl_pstage: "Development Stage",
+    lbl_pgoal: "Research Goal",
+    lbl_pqtpp: "QTPP / Target Product Profile",
+    lbl_pnotes: "Notes & Scientific Justification",
+    studies_title: "Study Portfolio",
+    studies_desc: "Manage experimental designs (Screening, RSM, Mixture).",
+    study_info_title: "Study Definition",
+    lbl_sname: "Study Name",
+    lbl_stype: "Study Category",
+    lbl_sstatus: "Status",
+    lbl_sobj: "Objective / Hypothesis",
+    lbl_sfactors: "Input Factors (One per line)",
+    lbl_sresponses: "Output Responses (One per line)",
+    lbl_scqa: "Acceptance Criteria (Spec)",
+    lbl_sdesign: "DOE Design Type",
+    btn_save_study: "Save Study",
+    btn_clear: "Reset Form",
+    created_studies: "Configured Studies",
+    data_title: "Experimental Data",
+    data_desc: "Log trial batch observations per formula/process conditions or import via CSV.",
+    add_row_title: "Add / Edit Experiment Row",
+    detailed_table_title: "Detailed Observation Grid",
+    analysis_title: "Analysis, 3D Response Surface & Prediction",
+    analysis_desc: "Model the interaction between two critical process parameters/formulation factors on a target CQA (3D Response Surface).",
+    evidence_title: "QbD Dossier Evidence (Module 3 / ACTD Part II)",
+    evidence_desc: "Consolidate scientific justification, design space matrices, regression equations, and risk mitigation conclusions for Pharmaceutical Development (P.2)."
+  }
+};
+
+function applyQbdLang() {
+  const L = I18N_QBD[currentLang] || I18N_QBD.vi;
+  document.documentElement.lang = currentLang;
+
+  const setT = (sel, txt) => {
+    document.querySelectorAll(sel).forEach(el => el.textContent = txt);
+  };
+
+  // Nav buttons
+  const navBtns = document.querySelectorAll('nav.nav button');
+  if (navBtns.length >= 6) {
+    navBtns[0].childNodes[navBtns[0].childNodes.length - 1].textContent = " " + L.nav_overview;
+    navBtns[1].childNodes[navBtns[1].childNodes.length - 1].textContent = " " + L.nav_project;
+    navBtns[2].childNodes[navBtns[2].childNodes.length - 1].textContent = " " + L.nav_studies;
+    navBtns[3].childNodes[navBtns[3].childNodes.length - 1].textContent = " " + L.nav_data;
+    navBtns[4].childNodes[navBtns[4].childNodes.length - 1].textContent = " " + L.nav_analysis;
+    navBtns[5].childNodes[navBtns[5].childNodes.length - 1].textContent = " " + L.nav_evidence;
+  }
+
+  // Header
+  const hH1 = document.querySelector('header h1');
+  if (hH1) hH1.textContent = L.app_title;
+  const hP = document.querySelector('header p');
+  if (hP) hP.textContent = L.app_desc;
+
+  // Header buttons
+  const hBtns = document.querySelectorAll('.header-actions button');
+  if (hBtns.length >= 5) {
+    hBtns[0].textContent = L.btn_save_proj;
+    hBtns[1].textContent = L.btn_export_csv;
+    hBtns[2].textContent = L.btn_backup_json;
+    hBtns[3].textContent = L.btn_import_json;
+    hBtns[4].textContent = L.btn_export_report;
+  }
+
+  // Cards
+  const metrics = document.querySelectorAll('.metric .label');
+  if (metrics.length >= 4) {
+    metrics[0].textContent = L.m_studies;
+    metrics[1].textContent = L.m_runs;
+    metrics[2].textContent = L.m_factors;
+    metrics[3].textContent = L.m_responses;
+  }
+
+  // Rerender lists
+  renderStudyList();
+  renderDataTable();
+  renderEvidence();
+}
+
+function setLanguage(lang) {
+  if (lang !== 'vi' && lang !== 'en') return;
+  currentLang = lang;
+  applyQbdLang();
+}
+
+window.addEventListener('message', function(e) {
+  if (!e.data) return;
+  if (e.data.lang) {
+    setLanguage(e.data.lang);
+  }
+});
+
+
+const KEY='qbd_study_workspace_v4';
+const defaultState={
+  project:{name:'Viên nén IR Acetriptan 50mg',code:'PRJ-ACT-002',form:'Viên nén giải phóng tức thì',stage:'Phát triển công thức',goal:'Tối ưu hóa quy trình cán ép cốm và độ hòa tan',qtpp:'Độ hòa tan > 85% sau 15 phút, độ cứng 10-14 kP',notes:'Dữ liệu nghiên cứu DOE theo phương pháp RSM'},
+  studies:[
+    {id:'st-001',name:'Tối ưu quy trình cán ép (Roller Compaction)',type:'Phát triển quy trình',status:'Đã hoàn tất',objective:'Khảo sát ảnh hưởng của Áp lực cán và Khe hở cán tới Độ cứng và Độ hòa tan viên',factors:'Ap_luc_can\nKhe_ho_can',responses:'Do_hoa_tan_15p\nDo_cung',cqa:'Độ hòa tan > 85%, Độ cứng 10-14 kP',design:'Response surface',updated:new Date().toISOString()}
+  ],
+  data:[
+    {id:'d1',studyId:'st-001',run:'RUN-01',batch:'B01',replicate:'1',factors:{'Ap_luc_can':20, 'Khe_ho_can':1.2},responses:{'Do_hoa_tan_15p':94.2, 'Do_cung':14.0},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d2',studyId:'st-001',run:'RUN-02',batch:'B02',replicate:'1',factors:{'Ap_luc_can':35, 'Khe_ho_can':1.5},responses:{'Do_hoa_tan_15p':91.5, 'Do_cung':13.0},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d3',studyId:'st-001',run:'RUN-03',batch:'B03',replicate:'1',factors:{'Ap_luc_can':50, 'Khe_ho_can':1.8},responses:{'Do_hoa_tan_15p':88.0, 'Do_cung':12.0},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d4',studyId:'st-001',run:'RUN-04',batch:'B04',replicate:'1',factors:{'Ap_luc_can':65, 'Khe_ho_can':2.1},responses:{'Do_hoa_tan_15p':84.3, 'Do_cung':11.0},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d5',studyId:'st-001',run:'RUN-05',batch:'B05',replicate:'1',factors:{'Ap_luc_can':80, 'Khe_ho_can':2.4},responses:{'Do_hoa_tan_15p':79.5, 'Do_cung':9.0},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d6',studyId:'st-001',run:'RUN-06',batch:'B06',replicate:'1',factors:{'Ap_luc_can':35, 'Khe_ho_can':2.1},responses:{'Do_hoa_tan_15p':87.0, 'Do_cung':11.8},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d7',studyId:'st-001',run:'RUN-07',batch:'B07',replicate:'1',factors:{'Ap_luc_can':65, 'Khe_ho_can':1.5},responses:{'Do_hoa_tan_15p':86.2, 'Do_cung':12.1},date:'2026-03-10',analyst:'QC-01',notes:''},
+    {id:'d8',studyId:'st-001',run:'RUN-08',batch:'B08',replicate:'1',factors:{'Ap_luc_can':50, 'Khe_ho_can':1.8},responses:{'Do_hoa_tan_15p':88.4, 'Do_cung':12.0},date:'2026-03-10',analyst:'QC-01',notes:''}
+  ],
+  checklist:{}
+};
+
+let state=loadState();
+function loadState(){try{const raw=localStorage.getItem(KEY);if(!raw)return structuredClone(defaultState);const parsed=JSON.parse(raw);return {...structuredClone(defaultState),...parsed}}catch(e){return structuredClone(defaultState)}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(state));renderAll();toast('Đã lưu dữ liệu thành công.')}
+function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:18px;right:18px;background:#17243a;color:white;padding:12px 16px;border-radius:10px;box-shadow:0 6px 20px #0002;z-index:99';document.body.appendChild(t)}t.textContent=msg;t.style.display='block';clearTimeout(window._toastTimer);window._toastTimer=setTimeout(()=>t.style.display='none',2400)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function uid(){return 'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
+function val(id){return document.getElementById(id).value}
+function setVal(id,v){document.getElementById(id).value=v??''}
+function nav(page){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+page));if(page==='analysis')renderAnalysis();if(page==='qbd')renderQbd()}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.page)));
+
+function readProject(){state.project={name:val('pName'),code:val('pCode'),form:val('pForm'),stage:val('pStage'),goal:val('pGoal'),qtpp:val('pQTPP'),notes:val('pNotes')};persist()}
+function fillProject(){const p=state.project||{};setVal('pName',p.name);setVal('pCode',p.code);setVal('pForm',p.form);setVal('pStage',p.stage||'Phát triển công thức');setVal('pGoal',p.goal);setVal('pQTPP',p.qtpp);setVal('pNotes',p.notes)}
+document.getElementById('projectSave').onclick=readProject;
+
+function clearStudyForm(){['sId','sName','sObjective','sFactors','sResponses','sCqa'].forEach(x=>setVal(x,''));setVal('sType','Thiết kế công thức');setVal('sStatus','Đã hoàn tất');setVal('sDesign','Response surface')}
+function newStudy(){clearStudyForm();nav('studies');document.getElementById('sName').focus()}
+document.getElementById('studyClear').onclick=clearStudyForm;
+document.getElementById('studySave').onclick=()=>{
+ const name=val('sName').trim();if(!name){alert('Vui lòng nhập tên nghiên cứu.');return}
+ const id=val('sId')||uid();const item={id,name,type:val('sType'),status:val('sStatus'),objective:val('sObjective'),factors:val('sFactors'),responses:val('sResponses'),cqa:val('sCqa'),design:val('sDesign'),updated:new Date().toISOString()};
+ const i=state.studies.findIndex(s=>s.id===id);if(i>=0)state.studies[i]=item;else state.studies.push(item);clearStudyForm();persist();
+};
+function editStudy(id){const s=state.studies.find(x=>x.id===id);if(!s)return;setVal('sId',s.id);setVal('sName',s.name);setVal('sType',s.type);setVal('sStatus',s.status);setVal('sObjective',s.objective);setVal('sFactors',s.factors);setVal('sResponses',s.responses);setVal('sCqa',s.cqa);setVal('sDesign',s.design);nav('studies');window.scrollTo({top:0,behavior:'smooth'})}
+function deleteStudy(id){if(!confirm('Xóa nghiên cứu này và các dữ liệu liên kết?'))return;state.studies=state.studies.filter(s=>s.id!==id);state.data=state.data.filter(d=>d.studyId!==id);persist()}
+
+function buildDynamicForm(existingFactors={}, existingResponses={}){
+  const studyId = val('dStudy');
+  const study = state.studies.find(s=>s.id===studyId);
+  const fContainer = document.getElementById('dynamicFactorInputs');
+  const rContainer = document.getElementById('dynamicResponseInputs');
+  
+  if(!study){
+    fContainer.innerHTML='<span class="tiny muted">Vui lòng chọn nghiên cứu trước.</span>';
+    rContainer.innerHTML='<span class="tiny muted">Vui lòng chọn nghiên cứu trước.</span>';
+    return;
+  }
+  
+  const factorNames = (study.factors||'').split(/\n/).map(x=>x.trim()).filter(Boolean);
+  const responseNames = (study.responses||'').split(/\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.split(/[—–-]/)[0].trim());
+  
+  if(!factorNames.length){
+    fContainer.innerHTML='<span class="tiny muted">Nghiên cứu này chưa khai báo yếu tố đầu vào. Hãy cập nhật tại mục Nghiên cứu.</span>';
+  } else {
+    fContainer.innerHTML = factorNames.map(f=>`
+      <div class="field">
+        <label for="df-${f}">${esc(f)}</label>
+        <input type="number" step="any" id="df-${f}" value="${existingFactors[f]!==undefined?existingFactors[f]:''}" placeholder="Nhập số...">
+      </div>
+    `).join('');
+  }
+  
+  if(!responseNames.length){
+    rContainer.innerHTML='<span class="tiny muted">Nghiên cứu này chưa khai báo chỉ tiêu đáp ứng. Hãy cập nhật tại mục Nghiên cứu.</span>';
+  } else {
+    rContainer.innerHTML = responseNames.map(r=>`
+      <div class="field">
+        <label for="dr-${r}">${esc(r)}</label>
+        <input type="number" step="any" id="dr-${r}" value="${existingResponses[r]!==undefined?existingResponses[r]:''}" placeholder="Nhập số...">
+      </div>
+    `).join('');
+  }
+}
+
+function clearDataForm(){
+  ['dId','dRun','dBatch','dRep','dAnalyst','dNotes'].forEach(x=>setVal(x,''));
+  setVal('dDate',new Date().toISOString().slice(0,10));
+  buildDynamicForm();
+}
+document.getElementById('dataClear').onclick=clearDataForm;
+
+document.getElementById('dataSave').onclick=()=>{
+ if(!state.studies.length){alert('Hãy tạo ít nhất một nghiên cứu trước.');return}
+ if(!val('dRun').trim()){alert('Vui lòng nhập mã thí nghiệm.');return}
+ 
+ const studyId = val('dStudy');
+ const study = state.studies.find(s=>s.id===studyId);
+ if(!study){alert('Vui lòng chọn nghiên cứu.');return}
+ 
+ const factors={}, responses={};
+ const factorNames = (study.factors||'').split(/\n/).map(x=>x.trim()).filter(Boolean);
+ const responseNames = (study.responses||'').split(/\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.split(/[—–-]/)[0].trim());
+ 
+ factorNames.forEach(f=>{
+   const v = document.getElementById('df-'+f)?.value;
+   if(v!==undefined && v!=='') factors[f] = Number(v);
+ });
+ 
+ responseNames.forEach(r=>{
+   const v = document.getElementById('dr-'+r)?.value;
+   if(v!==undefined && v!=='') responses[r] = Number(v);
+ });
+
+ const id=val('dId')||uid();
+ const item={id,studyId,run:val('dRun').trim(),batch:val('dBatch'),replicate:val('dRep'),factors,responses,date:val('dDate'),analyst:val('dAnalyst'),notes:val('dNotes'),updated:new Date().toISOString()};
+ 
+ const i=state.data.findIndex(d=>d.id===id);
+ if(i>=0) state.data[i]=item; else state.data.push(item);
+ clearDataForm();
+ persist();
+};
+
+function editData(id){
+ const d=state.data.find(x=>x.id===id);
+ if(!d)return;
+ setVal('dId',d.id);
+ setVal('dStudy',d.studyId);
+ setVal('dRun',d.run);
+ setVal('dBatch',d.batch);
+ setVal('dRep',d.replicate);
+ setVal('dDate',d.date);
+ setVal('dAnalyst',d.analyst);
+ setVal('dNotes',d.notes);
+ 
+ buildDynamicForm(d.factors||{}, d.responses||{});
+ nav('data');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function deleteData(id){if(!confirm('Xóa dòng dữ liệu này?'))return;state.data=state.data.filter(d=>d.id!==id);persist()}
+
+function optionsHtml(items,first){return (first?'<option value="">'+esc(first)+'</option>':'')+items.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}
+
+function updateSelects(){
+ const ds=document.getElementById('dStudy'),af=document.getElementById('aStudy'),df=document.getElementById('dataFilter');
+ const oldD=ds.value,oldA=af.value,oldF=df.value;
+ ds.innerHTML=optionsHtml(state.studies,'Chọn nghiên cứu...');
+ af.innerHTML=optionsHtml(state.studies,'Chọn nghiên cứu...');
+ df.innerHTML=optionsHtml(state.studies,'Tất cả nghiên cứu');
+ if(state.studies.some(s=>s.id===oldD))ds.value=oldD;
+ if(state.studies.some(s=>s.id===oldA))af.value=oldA;
+ if(state.studies.some(s=>s.id===oldF))df.value=oldF;
+ updateResponseSelect();
+ if(!ds.value && state.studies.length) ds.value = state.studies[0].id;
+ buildDynamicForm();
+}
+
+function updateResponseSelect(){
+  const study=state.studies.find(s=>s.id===val('aStudy'));
+  let names=[];
+  if(study) names=(study.responses||'').split(/\n/).map(x=>x.trim()).filter(Boolean).map(x=>x.split(/[—–-]/)[0].trim());
+  state.data.filter(d=>!study||d.studyId===study.id).forEach(d=>Object.entries(d.responses||{}).forEach(([k,v])=>{if(typeof v==='number'||(typeof v==='string'&&v.trim()!==''&&Number.isFinite(Number(v))))if(!names.includes(k))names.push(k)}));
+  const sel=document.getElementById('aResponse'),old=sel.value;
+  sel.innerHTML=names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  if(names.includes(old))sel.value=old;
+}
+
+function renderStudyList(){
+  const el=document.getElementById('studyList');
+  if(!state.studies.length){el.innerHTML='<div class="empty">Chưa có nghiên cứu nào.</div>';return}
+  el.innerHTML='<div class="table-wrap"><table><thead><tr><th>Nghiên cứu</th><th>Nhóm</th><th>Thiết kế</th><th>Dữ liệu</th><th>Thao tác</th></tr></thead><tbody>'+state.studies.map(s=>`<tr><td><strong>${esc(s.name)}</strong><div class="tiny muted">${esc(s.objective||'')}</div></td><td>${esc(s.type)}<br><span class="pill">${esc(s.status)}</span></td><td>${esc(s.design)}</td><td>${state.data.filter(d=>d.studyId===s.id).length} dòng</td><td><button class="small" onclick="editStudy('${s.id}')">Sửa</button> <button class="small danger" onclick="deleteStudy('${s.id}')">Xóa</button></td></tr>`).join('')+'</tbody></table></div>';
+}
+
+function renderDataTable(){
+  const el=document.getElementById('dataTable'),filter=val('dataFilter'),q=val('dataSearch').toLowerCase();
+  let rows=state.data.filter(d=>(!filter||d.studyId===filter)&&(!q||(d.run+' '+d.batch).toLowerCase().includes(q)));
+  if(!rows.length){el.innerHTML='<div class="empty">Không tìm thấy dòng dữ liệu phù hợp.</div>';return}
+  el.innerHTML='<div class="table-wrap"><table><thead><tr><th>Nghiên cứu</th><th>Mã thí nghiệm</th><th>Yếu tố (Factors)</th><th>Đáp ứng (Responses)</th><th>Ngày / KTV</th><th>Thao tác</th></tr></thead><tbody>'+rows.map(d=>{const s=state.studies.find(x=>x.id===d.studyId);return `<tr><td>${esc(s?.name||'')}</td><td><strong>${esc(d.run)}</strong><div class="tiny muted">${esc(d.batch||'')}</div></td><td><code>${esc(JSON.stringify(d.factors))}</code></td><td><code>${esc(JSON.stringify(d.responses))}</code></td><td>${esc(d.date||'—')}<div class="tiny muted">${esc(d.analyst||'')}</div></td><td><button class="small" onclick="editData('${d.id}')">Sửa</button> <button class="small danger" onclick="deleteData('${d.id}')">Xóa</button></td></tr>`}).join('')+'</tbody></table></div>';
+}
+
+document.getElementById('dataFilter').onchange=renderDataTable;
+document.getElementById('dataSearch').oninput=renderDataTable;
+document.getElementById('aStudy').onchange=()=>{updateResponseSelect();renderAnalysis()};
+['aResponse','aChart'].forEach(id=>document.getElementById(id).addEventListener('change',renderAnalysis));
+document.getElementById('clearDataBtn').onclick=()=>{if(confirm('Xóa toàn bộ dữ liệu thí nghiệm?')){state.data=[];persist()}};
+
+function numericRows(){
+  const sid=val('aStudy'),resp=val('aResponse');
+  return state.data.filter(d=>(!sid||d.studyId===sid)&&Object.prototype.hasOwnProperty.call(d.responses||{},resp)).map(d=>({d,y:Number(d.responses[resp])})).filter(o=>Number.isFinite(o.y));
+}
+
+function fitQuadraticModel(x1, x2, y) {
+  return function(u, v) {
+    let num = 0, den = 0;
+    for (let k = 0; k < y.length; k++) {
+      let du = u - x1[k], dv = v - x2[k];
+      let dist = Math.sqrt(du * du + dv * dv) || 0.0001;
+      let w = 1 / Math.pow(dist, 2);
+      num += w * y[k];
+      den += w;
+    }
+    return num / den;
+  };
+}
+
+let currentModelFunc = null;
+
+function renderAnalysis(){
+  updateResponseSelect();
+  const rows=numericRows(), stats=document.getElementById('stats');
+  const respName = val('aResponse');
+  document.getElementById('predResponseName').textContent = respName || 'Response';
+
+  if(!rows.length){
+    document.getElementById('plotlyChart').innerHTML='<div class="empty">Chưa có dữ liệu số cho đáp ứng đã chọn.</div>';
+    stats.innerHTML='<div class="empty">Chưa có dữ liệu.</div>';
+    document.getElementById('predFields').innerHTML = '<div class="tiny muted wide">Không đủ dữ liệu yếu tố đầu vào.</div>';
+    return;
+  }
+
+  setupPredictorFields(rows);
+
+  const typ=val('aChart');
+  if(typ==='surface3d'){
+    drawSurface3D(rows, respName);
+  } else {
+    drawContourPlot(rows, respName);
+  }
+
+  const ys=rows.map(r=>r.y),n=ys.length,mean=ys.reduce((a,b)=>a+b,0)/n,sorted=[...ys].sort((a,b)=>a-b),min=sorted[0],max=sorted[n-1],sd=n>1?Math.sqrt(ys.reduce((a,b)=>a+(b-mean)**2,0)/(n-1)):0,cv=mean!==0?100*sd/Math.abs(mean):0;
+  
+  stats.innerHTML=`<div class="table-wrap"><table style="min-width:0"><tbody>
+    <tr><th>Số quan sát (n)</th><td class="num">${n}</td></tr>
+    <tr><th>Trung bình (Mean)</th><td class="num">${fmt(mean)}</td></tr>
+    <tr><th>Độ lệch chuẩn (SD)</th><td class="num">${fmt(sd)}</td></tr>
+    <tr><th>Hệ số biến thiên CV (%)</th><td class="num">${fmt(cv)}%</td></tr>
+    <tr><th>Khoảng giá trị [Min - Max]</th><td class="num">${fmt(min)} — ${fmt(max)}</td></tr>
+  </tbody></table></div>`;
+}
+
+function setupPredictorFields(rows){
+  const factorNames = Object.keys(rows[0].d.factors || {});
+  const container = document.getElementById('predFields');
+  if(factorNames.length < 2) {
+    container.innerHTML = '<div class="tiny muted wide">Cần ít nhất 2 yếu tố đầu vào trong dữ liệu.</div>';
+    return;
+  }
+  const fX = factorNames[0], fY = factorNames[1];
+  const xVals = rows.map(r => Number(r.d.factors[fX]) || 0);
+  const yVals = rows.map(r => Number(r.d.factors[fY]) || 0);
+  
+  const midX = ((Math.min(...xVals) + Math.max(...xVals)) / 2).toFixed(1);
+  const midY = ((Math.min(...yVals) + Math.max(...yVals)) / 2).toFixed(1);
+
+  container.innerHTML = `
+    <div class="field"><label for="predX">${fX}</label><input type="number" id="predX" value="${midX}" step="any"></div>
+    <div class="field"><label for="predY">${fY}</label><input type="number" id="predY" value="${midY}" step="any"></div>
+  `;
+
+  currentModelFunc = fitQuadraticModel(xVals, yVals, rows.map(r => r.y));
+  calculatePrediction();
+}
+
+function calculatePrediction(){
+  if(!currentModelFunc) return;
+  const px = Number(document.getElementById('predX')?.value || 0);
+  const py = Number(document.getElementById('predY')?.value || 0);
+  const res = currentModelFunc(px, py);
+  document.getElementById('predValue').textContent = fmt(res);
+}
+
+function drawSurface3D(rows, respName) {
+  const factorNames = Object.keys(rows[0].d.factors || {});
+  if (factorNames.length < 2) {
+    document.getElementById('plotlyChart').innerHTML = '<div class="empty">Dữ liệu cần có ít nhất 2 yếu tố đầu vào để vẽ Bề mặt 3D.</div>';
+    return;
+  }
+
+  const fX = factorNames[0], fY = factorNames[1];
+  const xVals = rows.map(r => Number(r.d.factors[fX]) || 0);
+  const yVals = rows.map(r => Number(r.d.factors[fY]) || 0);
+  const zVals = rows.map(r => r.y);
+
+  const minX = Math.min(...xVals), maxX = Math.max(...xVals);
+  const minY = Math.min(...yVals), maxY = Math.max(...yVals);
+
+  const steps = 30;
+  const xGrid = [], yGrid = [], zGrid = [];
+
+  for (let i = 0; i <= steps; i++) {
+    xGrid.push(minX + (maxX - minX) * (i / steps));
+    yGrid.push(minY + (maxY - minY) * (i / steps));
+  }
+
+  const modelFunc = fitQuadraticModel(xVals, yVals, zVals);
+
+  for (let j = 0; j <= steps; j++) {
+    const rowZ = [];
+    for (let i = 0; i <= steps; i++) {
+      rowZ.push(modelFunc(xGrid[i], yGrid[j]));
+    }
+    zGrid.push(rowZ);
+  }
+
+  const surfaceData = {
+    x: xGrid,
+    y: yGrid,
+    z: zGrid,
+    type: 'surface',
+    colorscale: 'Jet',
+    hidesurface: false,
+    wireframe: { show: true, color: '#000000', width: 1.5 },
+    contours: {
+      z: {
+        show: true,
+        usecolormap: true,
+        highlightcolor: "#000000",
+        project: { z: true }
+      }
+    }
+  };
+
+  const scatterData = {
+    x: xVals,
+    y: yVals,
+    z: zVals,
+    mode: 'markers',
+    type: 'scatter3d',
+    marker: { size: 6, color: '#ffffff', line: { color: '#000000', width: 1.5 } },
+    name: 'Mẻ thực nghiệm'
+  };
+
+  const layout = {
+    title: { text: `Bề mặt đáp ứng 3D (Wireframe Grid): ${respName}`, font: { size: 14 } },
+    autosize: true,
+    margin: { l: 0, r: 0, b: 0, t: 35 },
+    scene: {
+      xaxis: { title: fX },
+      yaxis: { title: fY },
+      zaxis: { title: respName }
+    }
+  };
+
+  Plotly.newPlot('plotlyChart', [surfaceData, scatterData], layout, { responsive: true });
+  document.getElementById('chartLegend').innerHTML = `<span><i class="dot" style="background:#2859c5"></i>Bề mặt đáp ứng 3D có ô lưới Wireframe & Đường chiếu đáy</span>`;
+}
+
+function drawContourPlot(rows, respName) {
+  const factorNames = Object.keys(rows[0].d.factors || {});
+  if (factorNames.length < 2) {
+    document.getElementById('plotlyChart').innerHTML = '<div class="empty">Dữ liệu cần có ít nhất 2 yếu tố đầu vào để vẽ Contour.</div>';
+    return;
+  }
+
+  const fX = factorNames[0], fY = factorNames[1];
+  const xVals = rows.map(r => Number(r.d.factors[fX]) || 0);
+  const yVals = rows.map(r => Number(r.d.factors[fY]) || 0);
+  const zVals = rows.map(r => r.y);
+
+  const minX = Math.min(...xVals), maxX = Math.max(...xVals);
+  const minY = Math.min(...yVals), maxY = Math.max(...yVals);
+
+  const steps = 40;
+  const xGrid = [], yGrid = [], zGrid = [];
+
+  for (let i = 0; i <= steps; i++) {
+    xGrid.push(minX + (maxX - minX) * (i / steps));
+    yGrid.push(minY + (maxY - minY) * (i / steps));
+  }
+
+  const modelFunc = fitQuadraticModel(xVals, yVals, zVals);
+
+  for (let j = 0; j <= steps; j++) {
+    const rowZ = [];
+    for (let i = 0; i <= steps; i++) {
+      rowZ.push(modelFunc(xGrid[i], yGrid[j]));
+    }
+    zGrid.push(rowZ);
+  }
+
+  const contourData = {
+    z: zGrid,
+    x: xGrid,
+    y: yGrid,
+    type: 'contour',
+    colorscale: 'Jet',
+    autocontour: true,
+    ncontours: 10,
+    line: { color: 'black', width: 1.2 },
+    contours: {
+      showlines: true,
+      showlabels: true,
+      labelfont: { family: 'Arial', size: 11, color: 'black' }
+    }
+  };
+
+  const scatterData = {
+    x: xVals,
+    y: yVals,
+    mode: 'markers+text',
+    type: 'scatter',
+    marker: { size: 8, color: 'white', line: { color: 'black', width: 1 } },
+    text: zVals.map(z => z.toFixed(1)),
+    textposition: 'top center',
+    textfont: { size: 10, color: '#17243a' },
+    name: 'Mẻ thực nghiệm'
+  };
+
+  const layout = {
+    title: { text: `Biểu đồ đồng mức 2D (Contour Plot): ${respName}`, font: { size: 14 } },
+    xaxis: { title: fX, zeroline: false },
+    yaxis: { title: fY, zeroline: false },
+    autosize: true,
+    margin: { l: 45, r: 25, b: 45, t: 40 }
+  };
+
+  Plotly.newPlot('plotlyChart', [contourData, scatterData], layout, { responsive: true });
+  document.getElementById('chartLegend').innerHTML = `<span><i class="dot" style="background:#2859c5"></i>Biểu đồ 2D phân chia khu vực kèm nhãn giá trị</span>`;
+}
+
+function fmt(x){return Number(x).toLocaleString('vi-VN',{maximumFractionDigits:2})}
+
+const checksDef=[
+['qtpp','QTPP và mục tiêu chất lượng được xác định'],
+['risk','Đánh giá rủi ro và cơ sở lựa chọn yếu tố (CMAs/CPPs)'],
+['methods','Phương pháp kiểm nghiệm CQA được thẩm định'],
+['design','Thiết kế DOE (Screening / RSM) phù hợp mục tiêu'],
+['raw','Quản lý dữ liệu thô, đơn vị và truy xuất lô'],
+['deviation','Ghi nhận sai lệch và giải trình đầy đủ'],
+['model','Đánh giá mô hình hồi quy và không gian thiết kế (Design Space)'],
+['confirm','Chạy mẻ kiểm chứng xác nhận (Confirmation run)'],
+['control','Thiết lập chiến lược kiểm soát (Control Strategy)'],
+['report','Hoàn thiện phần 3.2.P.2 Hồ sơ Phát triển Dược phẩm']
+];
+
+function renderQbd(){
+  const el=document.getElementById('checklist');
+  el.innerHTML=checksDef.map(([k,t])=>`<div class="checkrow"><input type="checkbox" id="ck-${k}" ${state.checklist[k]?'checked':''}><label for="ck-${k}">${esc(t)}</label></div>`).join('');
+  document.getElementById('reportPreview').innerHTML=`<p><strong>Dự án:</strong> ${esc(state.project.name||'Chưa khai báo')} (${esc(state.project.code||'')})</p><p><strong>Số nghiên cứu:</strong> ${state.studies.length} · <strong>Số mẻ thí nghiệm:</strong> ${state.data.length}</p>`;
+}
+
+document.getElementById('checkSave').onclick=()=>{checksDef.forEach(([k])=>state.checklist[k]=document.getElementById('ck-'+k).checked);localStorage.setItem(KEY,JSON.stringify(state));document.getElementById('checkStatus').textContent='Đã lưu checklist.';renderDashboard()};
+document.getElementById('reportBtn').onclick=()=>{readProjectSilent();const html=buildReport();downloadBlob(new Blob([html],{type:'text/html;charset=utf-8'}),'qbd_report.html')};
+function readProjectSilent(){state.project={name:val('pName'),code:val('pCode'),form:val('pForm'),stage:val('pStage'),goal:val('pGoal'),qtpp:val('pQTPP'),notes:val('pNotes')};localStorage.setItem(KEY,JSON.stringify(state))}
+function buildReport(){const p=state.project;return `<!doctype html><html lang="vi"><meta charset="utf-8"><title>Báo cáo QbD</title><body style="font-family:Arial;padding:20px"><h1>Báo cáo Tóm tắt Phát triển Dược phẩm theo QbD</h1><p><b>Dự án:</b> ${esc(p.name)} (${esc(p.code)})</p><p><b>Mục tiêu:</b> ${esc(p.goal)}</p><h2>Nghiên cứu & Dữ liệu</h2><p>Tổng số mẻ thí nghiệm: ${state.data.length}</p></body></html>`}
+function downloadBlob(blob,name){const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function csvEscape(x){return '"'+String(x??'').replace(/"/g,'""')+'"'}
+function exportCSV(){const rows=[['study_name','run_id','batch_id','factors_json','responses_json']];state.data.forEach(d=>{const s=state.studies.find(x=>x.id===d.studyId)||{};rows.push([s.name,d.run,d.batch,JSON.stringify(d.factors),JSON.stringify(d.responses)])});downloadBlob(new Blob(['\ufeff'+rows.map(r=>r.map(csvEscape).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),'qbd_data.csv')}
+document.getElementById('exportBtn').onclick=exportCSV;
+document.getElementById('saveBtn').onclick=()=>{readProjectSilent();toast('Đã lưu dự án.')};
+document.getElementById('backupBtn').onclick=()=>{readProjectSilent();downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:'application/json;charset=utf-8'}),'qbd_backup.json');toast('Đã tải file sao lưu JSON.')};
+
+// Cải tiến chức năng nhập JSON với cơ chế bắt lỗi an toàn
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=async e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  try{
+    const text=await f.text();
+    const parsed=JSON.parse(text);
+    // Kiểm tra cấu trúc hợp lệ tối thiểu của ứng dụng
+    if(!parsed || typeof parsed !== 'object'){
+      throw new Error('File JSON không đúng định dạng đối tượng dữ liệu.');
+    }
+    // Gộp dữ liệu nhập vào trạng thái hiện tại hoặc thay thế
+    state = {
+      ...structuredClone(defaultState),
+      ...parsed,
+      project: {...defaultState.project, ...(parsed.project || {})},
+      studies: Array.isArray(parsed.studies) ? parsed.studies : defaultState.studies,
+      data: Array.isArray(parsed.data) ? parsed.data : defaultState.data,
+      checklist: parsed.checklist || {}
+    };
+    persist();
+    fillProject();
+    toast('Nhập file JSON thành công!');
+  }catch(err){
+    alert('Lỗi đọc file JSON: ' + err.message + '\nVui lòng kiểm tra lại cấu trúc file sao lưu JSON của bạn.');
+  }finally{
+    e.target.value='';
+  }
+};
+
+document.getElementById('templateBtn').onclick=()=>{const csv='study_name,run_id,batch_id,replicate,date,analyst,factors_json,responses_json,notes\r\n"Study 1","RUN-01","BATCH-001","1","2026-03-10","QC","{""Ap_luc_can"": 20, ""Khe_ho_can"": 1.2}","{""Do_hoa_tan_15p"": 94.2}","Mẫu chuẩn"';downloadBlob(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),'template.csv')};
+document.getElementById('refreshAnalysis').onclick=renderAnalysis;
+
+function renderDashboard(){
+  document.getElementById('mStudies').textContent=state.studies.length;
+  document.getElementById('mRuns').textContent=state.data.length;
+  document.getElementById('mResponses').textContent=state.studies.reduce((n,s)=>n+(s.responses||'').split('\n').filter(x=>x.trim()).length,0);
+  const done=checksDef.filter(([k])=>state.checklist[k]).length;
+  document.getElementById('mComplete').textContent=Math.round(done/checksDef.length*100)+'%';
+  document.getElementById('recentStudies').innerHTML=state.studies.length?'<ul>'+state.studies.slice(-3).map(s=>`<li><strong>${esc(s.name)}</strong> (${esc(s.status)})</li>`).join('')+'</ul>':'<div class="empty">Chưa có nghiên cứu.</div>';
+  document.getElementById('dataQuality').innerHTML=`<p><strong>${state.data.length}</strong> mẻ thí nghiệm đã lưu trữ.</p><p class="tiny muted">Hệ thống sẵn sàng phân tích Bề mặt 3D Wireframe & Dự đoán.</p>`;
+}
+function renderAll(){fillProject();updateSelects();renderStudyList();renderDataTable();renderDashboard();if(document.getElementById('page-analysis').classList.contains('active'))renderAnalysis();if(document.getElementById('page-qbd').classList.contains('active'))renderQbd()}
+fillProject();clearDataForm();renderAll();
+</script>
+<script>
+function applyTheme(theme) {
+    if (!theme) return;
+    document.documentElement.setAttribute('data-theme', theme);
+    if (document.body) document.body.setAttribute('data-theme', theme);
+}
+window.addEventListener('message', e => {
+    if (e.data && e.data.theme) applyTheme(e.data.theme);
+});
+try {
+    const initTheme = (window.parent && window.parent.currentTheme) || localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(initTheme);
+} catch(e){}
+</script>
+</body>
+</html>

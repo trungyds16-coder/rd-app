@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thẩm định Phương pháp ICH Q2 & Gage R&R — Cổng RD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f9;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --fg: #1f1f1f;
+  --muted: #5f6368;
+  --line: #dce5ef;
+  --grid-line: #cfd9e6;
+  --accent: #1558B0;
+  --accent-soft: #eaf1fa;
+  --ok: #137333;
+  --ok-soft: #e6f4ea;
+  --warn: #b06000;
+  --warn-soft: #fef7e0;
+  --danger: #b3261e;
+  --danger-soft: #fce8e6;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+:root[data-theme="dark"] {
+  --bg: #121316;
+  --surface: #1e1f22;
+  --surface-2: #282a2e;
+  --fg: #e3e3e3;
+  --muted: #9aa0a6;
+  --line: #2d3540;
+  --grid-line: #363f4d;
+  --accent: #3b8cf5;
+  --accent-soft: #162436;
+  --ok: #81c995;
+  --ok-soft: rgba(129, 201, 149, 0.14);
+  --warn: #fdd663;
+  --warn-soft: rgba(253, 214, 99, 0.14);
+  --danger: #f28b82;
+  --danger-soft: rgba(242, 139, 130, 0.14);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.48;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 10px 12px 36px;
+}
+
+/* Navigation Tabs (No language/theme toggles — controlled by parent portal) */
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 5px 6px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tab-btn:hover { background: var(--surface-2); color: var(--fg); }
+.tab-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Cards & Layout */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.card-title { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--fg); }
+.card-sub { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 820px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .app { padding: 8px 8px 28px; }
+  .card { padding: 11px; }
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+/* Controls */
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 11px;
+  min-height: 32px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+.btn-primary:hover { background: var(--accent); color: #ffffff; opacity: 0.9; }
+.btn-sm { padding: 4px 9px; min-height: 28px; font-size: 12px; }
+.btn-xs { padding: 2px 6px; min-height: 22px; font-size: 11px; border-radius: 4px; }
+.btn-danger { color: var(--danger); }
+.btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
+
+.field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+.field label { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-family: inherit;
+  font-size: 12.5px;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+
+.inline-fields {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.inline-fields .field { margin-bottom: 0; flex: 1; min-width: 120px; }
+
+.check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fg);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.seg {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+.seg-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.seg-btn.active { background: var(--accent); color: #ffffff; }
+
+/* Standard Result Tables */
+.tw {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background: var(--surface);
+}
+th, td {
+  padding: 6px 9px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 11.5px;
+}
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.wrap { white-space: normal; min-width: 140px; }
+
+/* =========================================================================
+   COMPACT EXCEL-LIKE SPREADSHEET INPUT GRID
+   ========================================================================= */
+.xl-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+.xl-bar-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.xl-hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+.xl-wrap {
+  width: 100%;
+  max-height: 210px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.xl-wrap.xl-tall { max-height: 240px; }
+.xl-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  font-size: 12px;
+  background: var(--surface);
+}
+.xl-tbl th, .xl-tbl td {
+  border: 1px solid var(--grid-line);
+  padding: 0;
+  height: 26px;
+  vertical-align: middle;
+}
+.xl-tbl thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 0 6px;
+  height: 28px;
+  text-align: center;
+  user-select: none;
+}
+.xl-tbl th.xl-rn, .xl-tbl td.xl-rn {
+  width: 30px;
+  min-width: 30px;
+  max-width: 34px;
+  background: var(--surface-2);
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  user-select: none;
+  padding: 0 4px;
+}
+.xl-th-inner {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.xl-th-in {
+  width: 100%;
+  min-width: 64px;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 11.5px;
+  text-align: center;
+  padding: 3px 4px !important;
+  height: 26px;
+}
+.xl-th-in:focus {
+  background: var(--accent-soft) !important;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.xl-col-del {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.xl-col-del:hover { color: var(--danger); background: var(--danger-soft); }
+
+.xl-cell {
+  width: 100%;
+  min-width: 68px;
+  height: 25px;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Be Vietnam Pro', monospace;
+  font-size: 12px;
+  padding: 2px 6px !important;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.xl-cell.xl-text {
+  font-family: inherit;
+  text-align: left;
+  min-width: 96px;
+}
+.xl-cell.xl-num-sm {
+  min-width: 48px;
+  max-width: 64px;
+  text-align: center;
+}
+.xl-cell:focus {
+  background: var(--accent-soft) !important;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.xl-tbl tbody tr:hover td:not(.xl-rn) {
+  background: color-mix(in srgb, var(--accent-soft) 35%, transparent);
+}
+.xl-td-pad { padding: 2px 6px !important; }
+
+/* KPI & Badges */
+.kpi {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.kpi-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+.kpi-val { font-size: 18px; font-weight: 700; color: var(--fg); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge-ok { background: var(--ok-soft); color: var(--ok); }
+.badge-warn { background: var(--warn-soft); color: var(--warn); }
+.badge-danger { background: var(--danger-soft); color: var(--danger); }
+.badge-info { background: var(--accent-soft); color: var(--accent); }
+
+.alert {
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg);
+}
+.alert-ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.alert-warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.alert-danger { border-left-color: var(--danger); background: var(--danger-soft); }
+
+/* SVG Chart Wrapper */
+.chart-box {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+.chart-box svg { width: 100%; height: auto; display: block; }
+
+/* Paste Box Collapsible */
+.paste-panel {
+  background: var(--surface-2);
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  padding: 9px;
+  margin-bottom: 10px;
+  display: none;
+}
+.paste-panel.open { display: block; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 8px 13px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Subtle Scientific Reference Strip */
+.ref-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-top: 6px;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.ref-lbl {
+  font-weight: 600;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 2px;
+}
+.ref-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--muted);
+  text-decoration: none;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.ref-link:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--accent-soft);
+}
+.ref-ext { font-size: 10px; opacity: 0.7; }
+
+.print-header { display: none; }
+
+@media print {
+  :root, :root[data-theme="dark"] {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --fg: #111111;
+    --muted: #555555;
+    --line: #d0d7de;
+    --grid-line: #c8d1dc;
+    --accent: #1558B0;
+    --accent-soft: #eaf1fa;
+    --ok: #137333;
+    --ok-soft: #e6f4ea;
+    --warn: #b06000;
+    --warn-soft: #fef7e0;
+    --danger: #b3261e;
+    --danger-soft: #fce8e6;
+  }
+  body { background: #ffffff; color: #111111; font-size: 11px; }
+  .app { max-width: 100%; padding: 0; }
+  .nav-wrap, .no-print, .btn, .paste-panel, .toast { display: none !important; }
+  .xl-wrap { max-height: none !important; overflow: visible !important; }
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #1558B0;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .card { box-shadow: none; border: 1px solid #d0d7de; break-inside: avoid; page-break-inside: avoid; }
+  .chart-box, .tw { break-inside: avoid; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="print-header">
+    <div><strong id="printTitle">Thẩm định Phương pháp ICH Q2(R2) &amp; Gage R&amp;R — Báo cáo R&amp;D</strong></div>
+    <div id="printMeta" style="font-size:11px;color:#555;"></div>
+  </div>
+
+
+  <div class="nav-wrap no-print" style="justify-content:space-between;align-items:center;padding:8px 12px;">
+    <span style="font-size:12.5px;font-weight:700;color:var(--accent);" data-i18n="tab3"></span>
+    <button class="btn btn-sm no-print" id="btnPrint" type="button"></button>
+  </div>
+  <section id="panel-t3" class="panel active">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title" data-i18n="t3_title"></h2>
+          <p class="card-sub" data-i18n="t3_sub"></p>
+        </div>
+        <div class="btn-row no-print">
+          <div class="seg" role="group">
+            <button class="seg-btn active" id="t3SubBtnIch" type="button" data-i18n="t3_sub_ich"></button>
+            <button class="seg-btn" id="t3SubBtnGage" type="button" data-i18n="t3_sub_gage"></button>
+          </div>
+          <button class="btn btn-sm" id="t3SampleBtn" type="button" data-i18n="btn_sample"></button>
+          <button class="btn btn-primary btn-sm" id="t3RunBtn" type="button" data-i18n="btn_analyze"></button>
+        </div>
+      </div>
+
+      <!-- Sub-mode 1: ICH Q2(R2) -->
+      <div id="t3IchPanel">
+        <div class="grid-2">
+          <div>
+            <div class="xl-bar">
+              <span class="xl-bar-label" data-i18n="t3_lin_lbl"></span>
+              <div class="btn-row no-print">
+                <button class="btn btn-xs" id="t3LinAddRow" type="button" data-i18n="btn_add_row"></button>
+                <button class="btn btn-xs btn-danger" id="t3LinClear" type="button" data-i18n="btn_clear"></button>
+              </div>
+            </div>
+            <div id="t3LinSheetWrap" class="xl-wrap" style="margin-bottom:8px"></div>
+            <div class="field" style="max-width:230px;margin-bottom:0">
+              <label for="t3NomConc" data-i18n="t3_nom_conc"></label>
+              <input type="number" id="t3NomConc" step="any" value="100">
+            </div>
+          </div>
+          <div>
+            <div class="xl-bar">
+              <span class="xl-bar-label" data-i18n="t3_rec_lbl"></span>
+              <div class="btn-row no-print">
+                <button class="btn btn-xs" id="t3RecAddRow" type="button" data-i18n="btn_add_row"></button>
+                <button class="btn btn-xs btn-danger" id="t3RecClear" type="button" data-i18n="btn_clear"></button>
+              </div>
+            </div>
+            <div id="t3RecSheetWrap" class="xl-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-mode 2: Gage R&R -->
+      <div id="t3GagePanel" style="display:none">
+        <div class="inline-fields">
+          <div class="field" style="max-width:210px">
+            <label for="t3Tol" data-i18n="t3_tol_lbl"></label>
+            <input type="number" id="t3Tol" step="any" value="10.0">
+          </div>
+          <label class="check-label">
+            <input type="checkbox" id="t3PoolInt" checked>
+            <span data-i18n="t3_pool_int"></span>
+          </label>
+        </div>
+        <div class="xl-bar no-print">
+          <span class="xl-bar-label" data-i18n="t3_gage_lbl"></span>
+          <div class="btn-row">
+            <button class="btn btn-xs" id="t3GageAddRow" type="button" data-i18n="btn_add_row"></button>
+            <button class="btn btn-xs btn-danger" id="t3GageClear" type="button" data-i18n="btn_clear"></button>
+          </div>
+        </div>
+        <div id="t3GageSheetWrap" class="xl-wrap xl-tall"></div>
+      </div>
+    </div>
+
+    <div id="t3Output"></div>
+    <footer class="ref-strip" aria-label="References">
+      <span class="ref-lbl"><span aria-hidden="true">&#128214;</span><span data-i18n="ref_title"></span></span>
+      <a class="ref-link" href="https://www.ema.europa.eu/en/scientific-guidelines/ich-q2r2-validation-analytical-procedures" target="_blank" rel="noopener noreferrer">EMA — ICH Q2(R2) Validation of Analytical Procedures<span class="ref-ext">↗</span></a>
+      <a class="ref-link" href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/q2r2-validation-analytical-procedures" target="_blank" rel="noopener noreferrer">FDA — Q2(R2) Guidance<span class="ref-ext">↗</span></a>
+      <a class="ref-link" href="https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/measurement-system-analysis/how-to/gage-study/crossed-gage-r-r-study/methods-and-formulas/anova-table/" target="_blank" rel="noopener noreferrer">Minitab — Crossed Gage R&amp;R ANOVA<span class="ref-ext">↗</span></a>
+      <a class="ref-link" href="https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/measurement-system-analysis/how-to/gage-study/crossed-gage-r-r-study/methods-and-formulas/gage-r-r-table/" target="_blank" rel="noopener noreferrer">Minitab — Gage R&amp;R Variance &amp; %Tolerance<span class="ref-ext">↗</span></a>
+    </footer>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* =========================================================================
+     1. I18N DICTIONARY (VI / EN)
+     ========================================================================= */
+  const I18N = {
+    vi: {
+      tab1: '1. So sánh Công thức (ANOVA)',
+      tab2: '2. Độ đồng đều USP <905>',
+      tab3: '3. Thẩm định ICH Q2 & MSA',
+      tab4: '4. Rủi ro FMEA & Pareto',
+      print: 'In / Xuất PDF',
+      btn_sample: 'Nạp dữ liệu mẫu Dược phẩm',
+      btn_analyze: 'Phân tích',
+      btn_paste_excel: 'Dán nhanh từ Excel',
+      btn_apply_paste: 'Áp dụng dữ liệu dán',
+      btn_close: 'Đóng',
+      btn_add_row: '+ Dòng',
+      btn_clear: 'Xóa bảng',
+      xl_paste_tip: 'Mẹo: Bấm vào bất kỳ ô nào và nhấn Ctrl+V để dán trực tiếp bảng từ Excel (Enter/Mũi tên để di chuyển).',
+      alpha_label: 'Mức ý nghĩa (α)',
+      pass: 'ĐẠT',
+      fail: 'KHÔNG ĐẠT',
+      cond: 'CHẤP NHẬN CÓ ĐIỀU KIỆN',
+      sig_yes: 'Khác biệt có ý nghĩa',
+      sig_no: 'Không khác biệt có ý nghĩa',
+      yes: 'Có',
+      no: 'Không',
+      sample_loaded: 'Đã nạp dữ liệu mẫu dược phẩm',
+      paste_applied: 'Đã dán dữ liệu từ Excel/CSV',
+      err_min_data: 'Không đủ dữ liệu hợp lệ (cần ít nhất 2 nhóm, mỗi nhóm ≥ 2 giá trị số).',
+
+      // Tab 1
+      t1_title: 'So sánh Công thức (Minitab Basic Stat & One-Way ANOVA)',
+      t1_sub: 'Kiểm định 2-Sample t-Test, Paired t-Test, One-Way ANOVA kèm Tukey HSD, Dunnett (so với RLD), Shapiro-Wilk, Levene và Phi tham số.',
+      t1_add_group: '+ Cột nhóm',
+      t1_mode: 'Chế độ kiểm định',
+      t1_mode_anova: 'One-Way ANOVA (Nhiều công thức + Tukey & Dunnett)',
+      t1_mode_2s: '2-Sample t-Test (So sánh 2 công thức độc lập)',
+      t1_mode_paired: 'Paired t-Test (So sánh bắt cặp Trước/Sau)',
+      t1_group_a: 'Nhóm 1',
+      t1_group_b: 'Nhóm 2',
+      t1_ref_group: 'Nhóm Đối chứng / RLD (Dunnett)',
+      t1_welch: 'Dùng Welch\'s t-test (không giả định bằng phương sai)',
+      t1_paste_hint: 'Dán bảng nhiều cột từ Excel (dòng đầu là tên nhóm, phân tách bằng Tab/phẩy):',
+      t1_summary: 'Bảng Tóm tắt Thống kê Mô tả & Kiểm định Phân phối chuẩn',
+      t1_assump: 'Kiểm định Giả định & Phi tham số dự phòng',
+      t1_levene: 'Kiểm định đồng nhất phương sai Levene (Brown-Forsythe)',
+      t1_ftest: 'Kiểm định tỷ số phương sai F-test',
+      t1_norm_warn: 'Cảnh báo vi phạm giả định (p < 0.05): Dữ liệu có dấu hiệu không phân phối chuẩn hoặc phương sai không đồng nhất. Đã tự động tính kết quả Phi tham số tương ứng bên dưới.',
+      t1_norm_ok: 'Các giả định phân phối chuẩn (Shapiro-Wilk) và đồng nhất phương sai (Levene) đều được thỏa mãn (p ≥ 0.05).',
+      t1_anova_tbl: 'Bảng Phân tích Phương sai (One-Way ANOVA)',
+      t1_source: 'Nguồn biến thiên',
+      t1_factor: 'Giữa các nhóm (Factor)',
+      t1_error: 'Trong nhóm (Error)',
+      t1_total: 'Tổng (Total)',
+      t1_tukey: 'Hậu nghiệm Tukey HSD (So sánh tất cả các cặp & Phân nhóm chữ cái)',
+      t1_dunnett: 'Hậu nghiệm Dunnett (So sánh các công thức với Đối chứng/RLD)',
+      t1_nonparam: 'Kết quả Kiểm định Phi tham số',
+      t1_chart_title: 'Biểu đồ Boxplot + Individual Value Plot + Interval Plot (Mean ± 95% CI)',
+      t1_conclusion: 'Kết luận Thống kê',
+      t1_err_paired: 'Paired t-Test yêu cầu 2 nhóm có cùng số lượng mẫu n ≥ 3.',
+      t1_err_2s: 'Cần chọn 2 nhóm khác nhau, mỗi nhóm có ít nhất 2 giá trị hợp lệ.',
+      t1_pair: 'Cặp so sánh',
+      t1_diff: 'Chênh lệch',
+      t1_ci95: '95% CI',
+      t1_padj: 'p hiệu chỉnh',
+      t1_status: 'Kết luận',
+
+      // Tab 2
+      t2_title: 'Độ đồng đều Phân liều USP <905> / DĐVN & Two-Sided Tolerance Interval',
+      t2_sub: 'Tính tự động Giá trị chấp nhận AV (Bước 1: n=10, Bước 2: n=30) theo USP <905> và khoảng dung sai hai phía (Howe).',
+      t2_target: 'Giá trị mục tiêu T (%)',
+      t2_lsl: 'Giới hạn dưới LSL (%)',
+      t2_usl: 'Giới hạn trên USL (%)',
+      t2_conf: 'Độ tin cậy (1−α)',
+      t2_cov: 'Bao phủ quần thể (P)',
+      t2_grid_tip: 'Nhập trực tiếp hoặc dán cột từ Excel: Cột 1 = 10 viên Giai đoạn 1, Cột 2 = 20 viên Giai đoạn 2 (để trống nếu chỉ xét Bước 1).',
+      t2_col_s1: 'Giai đoạn 1 — 10 viên (%)',
+      t2_col_s2: 'Giai đoạn 2 — thêm 20 viên (%)',
+      t2_s1_res: 'Kết quả Giai đoạn 1 (n = 10, k = 2.4)',
+      t2_s2_res: 'Kết quả Giai đoạn 2 (n = 30, k = 2.0)',
+      t2_ti_res: 'Khoảng Dung sai Hai phía (Two-Sided Tolerance Interval — Xấp xỉ Howe)',
+      t2_err_n: 'Vui lòng nhập ít nhất 3 giá trị số hợp lệ ở cột Giai đoạn 1 (chuẩn USP <905> Bước 1 cần đúng 10 viên).',
+      t2_warn_n10: 'Lưu ý: USP <905> Giai đoạn 1 quy định n = 10 viên (hiện tại n = {n}). Kết quả vẫn được tính với k = 2.4 để tham khảo.',
+      t2_warn_n30: 'Lưu ý: USP <905> Giai đoạn 2 quy định tổng n = 30 viên (hiện tại tổng n = {n}). Kết quả vẫn được tính với k = 2.0 để tham khảo.',
+      t2_unit_bounds: 'Giới hạn biên từng đơn vị [0.75M ; 1.25M]',
+      t2_out_units: 'Số đơn vị ngoài biên L2',
+      t2_ti_in_spec: 'Khoảng dung sai nằm gọn trong [LSL, USL] → Quy trình đạt năng lực bao phủ.',
+      t2_ti_out_spec: 'Khoảng dung sai vượt ra ngoài [LSL, USL] → Nguy cơ xuất hiện đơn vị ngoài tiêu chuẩn.',
+
+      // Tab 3
+      t3_title: 'Thẩm định Phương pháp (ICH Q2(R2)) & Phân tích Hệ thống đo Gage R&R (MSA)',
+      t3_sub: 'Hồi quy tuyến tính, Lack-of-Fit, LOD/LOQ, Độ đúng (% Recovery) và Gage R&R Crossed ANOVA chuẩn Minitab.',
+      t3_sub_ich: '1. Thẩm định HPLC / UV (ICH Q2)',
+      t3_sub_gage: '2. Gage R&R (Crossed ANOVA)',
+      t3_lin_lbl: 'Bảng Độ tuyến tính (Ctrl+V dán từ Excel)',
+      t3_nom_conc: 'Nồng độ danh định 100% (tính %Y-intercept)',
+      t3_rec_lbl: 'Bảng Độ đúng — 3 mức nồng độ (Ctrl+V từ Excel)',
+      t3_tol_lbl: 'Dung sai quy cách (USL − LSL)',
+      t3_pool_int: 'Tự động gộp tương tác Part×Operator vào Repeatability nếu p > 0.25 (chuẩn Minitab)',
+      t3_gage_lbl: 'Bảng dữ liệu Gage R&R: Mẫu (Part) | Kiểm nghiệm viên (Operator) | Kết quả đo',
+      t3_col_x: 'Nồng độ (X)',
+      t3_col_y: 'Đáp ứng / Diện tích (Y)',
+      t3_col_lvl: 'Mức (%)',
+      t3_col_spk: 'Lý thuyết',
+      t3_col_fnd: 'Thực đo',
+      t3_col_part: 'Mẫu (Part)',
+      t3_col_op: 'KNV (Operator)',
+      t3_col_meas: 'Kết quả đo',
+      t3_lin_res: 'Kết quả Hồi quy Tuyến tính, Lack-of-Fit & LOD/LOQ',
+      t3_rec_res: 'Kết quả Độ đúng (% Recovery ± 95% CI)',
+      t3_cal_chart: 'Đường chuẩn Tuyến tính (Calibration Curve)',
+      t3_res_chart: 'Biểu đồ Phần dư (Residuals Plot)',
+      t3_gage_anova: 'Bảng Two-Way ANOVA (Crossed Gage R&R)',
+      t3_gage_var: 'Phân tách Phương sai & Đánh giá Hệ thống đo (MSA)',
+      t3_gage_charts: 'Biểu đồ Thành phần Biến thiên & Tương tác Operator × Part',
+      t3_err_lin: 'Cần ít nhất 3 cặp dữ liệu (Nồng độ, Đáp ứng) hợp lệ và nồng độ không đồng nhất.',
+      t3_err_gage: 'Cần dữ liệu cân bằng gồm ≥ 2 Mẫu (Part), ≥ 2 Kiểm nghiệm viên (Operator) và ≥ 2 lần lặp (Replicate).',
+
+      // Tab 4
+      t4_fmea_title: 'Đánh giá Rủi ro Chất lượng ICH Q9 (FMEA)',
+      t4_fmea_sub: 'Chấm điểm S (Nghiêm trọng), O (Tần suất), D (Phát hiện) → Tự tính RPN = S×O×D, phân màu và sắp xếp giảm dần.',
+      t4_add_row: '+ Thêm thông số',
+      t4_sort_rpn: 'Sắp xếp RPN giảm dần',
+      t4_col_param: 'Thông số (CMA/CPP) & Dạng sai lỗi',
+      t4_col_effect: 'Ảnh hưởng tiềm ẩn (CQA)',
+      t4_col_risk: 'Mức rủi ro',
+      t4_col_action: 'Biện pháp kiểm soát / Giảm thiểu',
+      t4_risk_low: 'Thấp (<40)',
+      t4_risk_med: 'Trung bình (40–99)',
+      t4_risk_high: 'Cao (≥100)',
+      t4_pareto_title: 'Biểu đồ Pareto Phân tích Sai lỗi Bào chế',
+      t4_pareto_sub: 'Xác định các lỗi trọng yếu (quy tắc 80/20) với biểu đồ cột + đường % tích lũy chuẩn Minitab.',
+      t4_add_defect: '+ Thêm loại lỗi',
+      t4_col_defect: 'Loại lỗi / Sai hỏng',
+      t4_col_freq: 'Tần suất',
+      t4_col_pct: 'Tỷ lệ (%)',
+      t4_col_cum: 'Tích lũy',
+      t4_col_cumpct: '% Tích lũy',
+      t4_total_items: 'Tổng thông số',
+      t4_high_cnt: 'Rủi ro Cao (≥100)',
+      t4_med_cnt: 'Trung bình (40–99)',
+      t4_max_rpn: 'RPN cao nhất',
+      ref_title: 'Tài liệu tham khảo & Kiểm chứng:'
+    },
+    en: {
+      tab1: '1. Formulation Comparison (ANOVA)',
+      tab2: '2. USP <905> Uniformity',
+      tab3: '3. ICH Q2 & Gage R&R',
+      tab4: '4. ICH Q9 FMEA & Pareto',
+      print: 'Print / PDF',
+      btn_sample: 'Load Pharma Sample Data',
+      btn_analyze: 'Analyze',
+      btn_paste_excel: 'Quick Paste Excel',
+      btn_apply_paste: 'Apply Pasted Data',
+      btn_close: 'Close',
+      btn_add_row: '+ Row',
+      btn_clear: 'Clear Grid',
+      xl_paste_tip: 'Tip: Click any cell and press Ctrl+V to paste directly from Excel (Enter / Arrow keys to navigate).',
+      alpha_label: 'Significance (α)',
+      pass: 'PASS',
+      fail: 'FAIL',
+      cond: 'MARGINAL / CONDITIONAL',
+      sig_yes: 'Statistically Significant',
+      sig_no: 'Not Significant',
+      yes: 'Yes',
+      no: 'No',
+      sample_loaded: 'Pharmaceutical sample data loaded',
+      paste_applied: 'Imported data from Excel/CSV',
+      err_min_data: 'Insufficient valid numeric data (need at least 2 groups with ≥ 2 values each).',
+
+      // Tab 1
+      t1_title: 'Formulation Comparison (Minitab Basic Stat & One-Way ANOVA)',
+      t1_sub: '2-Sample t-Test, Paired t-Test, One-Way ANOVA with Tukey HSD, Dunnett (vs RLD), Shapiro-Wilk, Levene & Non-parametric fallback.',
+      t1_add_group: '+ Column',
+      t1_mode: 'Test Mode',
+      t1_mode_anova: 'One-Way ANOVA (Multiple Formulations + Tukey & Dunnett)',
+      t1_mode_2s: '2-Sample t-Test (Independent Formulations)',
+      t1_mode_paired: 'Paired t-Test (Matched Before/After)',
+      t1_group_a: 'Group 1',
+      t1_group_b: 'Group 2',
+      t1_ref_group: 'Control / RLD Group (Dunnett)',
+      t1_welch: 'Use Welch\'s t-test (unequal variances)',
+      t1_paste_hint: 'Paste multi-column data from Excel (first row as group headers, Tab/comma separated):',
+      t1_summary: 'Descriptive Statistics & Normality Summary',
+      t1_assump: 'Assumption Checks & Non-Parametric Fallback',
+      t1_levene: 'Levene\'s Test for Equal Variances (Brown-Forsythe)',
+      t1_ftest: 'Variance Ratio F-Test',
+      t1_norm_warn: 'Assumption violation detected (p < 0.05): Data departs from normality or equal variance. Corresponding non-parametric results are automatically computed below.',
+      t1_norm_ok: 'Normality (Shapiro-Wilk) and equal variance (Levene) assumptions are met (p ≥ 0.05).',
+      t1_anova_tbl: 'One-Way ANOVA Table',
+      t1_source: 'Source',
+      t1_factor: 'Between Groups (Factor)',
+      t1_error: 'Within Groups (Error)',
+      t1_total: 'Total',
+      t1_tukey: 'Tukey HSD Post-Hoc (All Pairwise Comparisons & Grouping Letters)',
+      t1_dunnett: 'Dunnett\'s Post-Hoc (Formulations vs Control/RLD)',
+      t1_nonparam: 'Non-Parametric Test Results',
+      t1_chart_title: 'Boxplot + Individual Value Plot + Interval Plot (Mean ± 95% CI)',
+      t1_conclusion: 'Statistical Conclusion',
+      t1_err_paired: 'Paired t-Test requires 2 groups with identical sample size n ≥ 3.',
+      t1_err_2s: 'Select 2 distinct groups, each containing at least 2 numeric values.',
+      t1_pair: 'Comparison',
+      t1_diff: 'Difference',
+      t1_ci95: '95% CI',
+      t1_padj: 'Adj. p-value',
+      t1_status: 'Decision',
+
+      // Tab 2
+      t2_title: 'USP <905> Uniformity of Dosage Units & Two-Sided Tolerance Interval',
+      t2_sub: 'Automated Acceptance Value (Stage 1: n=10, Stage 2: n=30) per USP <905> and Minitab-style Howe Tolerance Interval.',
+      t2_target: 'Target Value T (%)',
+      t2_lsl: 'Lower Spec Limit LSL (%)',
+      t2_usl: 'Upper Spec Limit USL (%)',
+      t2_conf: 'Confidence (1−α)',
+      t2_cov: 'Population Coverage (P)',
+      t2_grid_tip: 'Type or Ctrl+V paste from Excel: Col 1 = 10 Stage 1 units, Col 2 = 20 Stage 2 units (leave blank for Stage 1 only).',
+      t2_col_s1: 'Stage 1 — 10 Units (%)',
+      t2_col_s2: 'Stage 2 — +20 Units (%)',
+      t2_s1_res: 'Stage 1 Evaluation (n = 10, k = 2.4)',
+      t2_s2_res: 'Stage 2 Evaluation (n = 30, k = 2.0)',
+      t2_ti_res: 'Two-Sided Tolerance Interval (Howe Approximation)',
+      t2_err_n: 'Enter at least 3 valid numbers in Stage 1 column (USP <905> Stage 1 specifies n = 10 units).',
+      t2_warn_n10: 'Note: USP <905> Stage 1 specifies n = 10 units (current n = {n}). Computed using k = 2.4 for reference.',
+      t2_warn_n30: 'Note: USP <905> Stage 2 specifies total n = 30 units (current total n = {n}). Computed using k = 2.0 for reference.',
+      t2_unit_bounds: 'Individual Unit Bounds [0.75M ; 1.25M]',
+      t2_out_units: 'Units Outside L2 Bounds',
+      t2_ti_in_spec: 'Tolerance interval falls entirely within [LSL, USL] → Process meets coverage capability.',
+      t2_ti_out_spec: 'Tolerance interval extends beyond [LSL, USL] → Risk of out-of-specification units.',
+
+      // Tab 3
+      t3_title: 'Method Validation (ICH Q2(R2)) & Gage R&R Measurement System Analysis (MSA)',
+      t3_sub: 'Linearity regression, Lack-of-Fit, LOD/LOQ, Accuracy (% Recovery) and Minitab-style Crossed ANOVA Gage R&R.',
+      t3_sub_ich: '1. HPLC / UV Validation (ICH Q2)',
+      t3_sub_gage: '2. Gage R&R (Crossed ANOVA)',
+      t3_lin_lbl: 'Linearity Sheet (Ctrl+V from Excel)',
+      t3_nom_conc: 'Nominal 100% Concentration (for %Y-intercept)',
+      t3_rec_lbl: 'Accuracy Sheet — 3 Levels (Ctrl+V from Excel)',
+      t3_tol_lbl: 'Specification Tolerance (USL − LSL)',
+      t3_pool_int: 'Auto-pool Part×Operator interaction into Repeatability if p > 0.25 (Minitab default)',
+      t3_gage_lbl: 'Gage R&R Sheet: Part | Operator | Measurement',
+      t3_col_x: 'Conc. (X)',
+      t3_col_y: 'Response / Area (Y)',
+      t3_col_lvl: 'Level (%)',
+      t3_col_spk: 'Spiked',
+      t3_col_fnd: 'Found',
+      t3_col_part: 'Part',
+      t3_col_op: 'Operator',
+      t3_col_meas: 'Measurement',
+      t3_lin_res: 'Linearity Regression, Lack-of-Fit & LOD/LOQ Summary',
+      t3_rec_res: 'Accuracy Summary (% Recovery ± 95% CI)',
+      t3_cal_chart: 'Calibration Curve (Linearity)',
+      t3_res_chart: 'Residuals Plot',
+      t3_gage_anova: 'Two-Way ANOVA Table (Crossed Gage R&R)',
+      t3_gage_var: 'Variance Components & Gage Evaluation (MSA)',
+      t3_gage_charts: 'Components of Variation & Operator × Part Interaction Plot',
+      t3_err_lin: 'Provide at least 3 valid (Concentration, Response) pairs with non-identical concentrations.',
+      t3_err_gage: 'Provide balanced data with ≥ 2 Parts, ≥ 2 Operators, and ≥ 2 Replicates per cell.',
+
+      // Tab 4
+      t4_fmea_title: 'ICH Q9 Quality Risk Assessment (FMEA)',
+      t4_fmea_sub: 'Score Severity (S), Occurrence (O), Detection (D) → Auto-computes RPN = S×O×D with risk tiers and descending sort.',
+      t4_add_row: '+ Add Parameter',
+      t4_sort_rpn: 'Sort RPN Descending',
+      t4_col_param: 'Parameter (CMA/CPP) & Failure Mode',
+      t4_col_effect: 'Potential Effect (CQA)',
+      t4_col_risk: 'Risk Tier',
+      t4_col_action: 'Mitigation / Control Strategy',
+      t4_risk_low: 'Low (<40)',
+      t4_risk_med: 'Medium (40–99)',
+      t4_risk_high: 'High (≥100)',
+      t4_pareto_title: 'Pharmaceutical Defect Pareto Chart',
+      t4_pareto_sub: 'Identify vital few defects (80/20 rule) with Minitab-style bars and cumulative percentage curve.',
+      t4_add_defect: '+ Add Defect',
+      t4_col_defect: 'Defect Category',
+      t4_col_freq: 'Frequency',
+      t4_col_pct: 'Percent (%)',
+      t4_col_cum: 'Cum. Count',
+      t4_col_cumpct: 'Cum. %',
+      t4_total_items: 'Total Parameters',
+      t4_high_cnt: 'High Risk (≥100)',
+      t4_med_cnt: 'Medium (40–99)',
+      t4_max_rpn: 'Highest RPN',
+      ref_title: 'References & Verification:'
+    }
+  };
+
+  /* =========================================================================
+     2. STATE & PARENT PORTAL SYNCHRONIZATION
+     ========================================================================= */
+  const state = {
+    lang: 'vi',
+    theme: 'light',
+    activeTab: 't1',
+    t3Sub: 'ich',
+    t1Headers: [],
+    t1Rows: [],       // array of row arrays [c0, c1, ...]
+    t2Rows: [],       // array of [s1, s2]
+    t3LinRows: [],    // array of [x, y]
+    t3RecRows: [],    // array of [lvl, spk, fnd]
+    t3GageRows: [],   // array of [part, op, val]
+    fmeaRows: [],
+    paretoRows: []
+  };
+
+  function tr(key) {
+    return (I18N[state.lang] && I18N[state.lang][key]) || I18N.vi[key] || key;
+  }
+
+  function initParentSync() {
+    let pLang = null, pTheme = null;
+    try {
+      if (window.parent && window.parent !== window) {
+        if (window.parent.L === 'vi' || window.parent.L === 'en') pLang = window.parent.L;
+        if (window.parent.currentTheme === 'dark' || window.parent.currentTheme === 'light') pTheme = window.parent.currentTheme;
+      }
+    } catch (e) {}
+
+    if (!pLang) {
+      try {
+        const ls = localStorage.getItem('lang');
+        if (ls === 'vi' || ls === 'en') pLang = ls;
+      } catch (e) {}
+    }
+    if (!pTheme) {
+      try {
+        const ts = localStorage.getItem('theme');
+        if (ts === 'dark' || ts === 'light') pTheme = ts;
+      } catch (e) {}
+    }
+    state.lang = pLang || 'vi';
+    state.theme = pTheme || 'light';
+    applyTheme(state.theme);
+  }
+
+  function applyTheme(theme) {
+    if (theme !== 'dark' && theme !== 'light') return;
+    state.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  window.addEventListener('message', function(e) {
+    if (!e || !e.data || typeof e.data !== 'object') return;
+    let changed = false;
+    if (e.data.theme === 'dark' || e.data.theme === 'light') {
+      applyTheme(e.data.theme);
+      changed = true;
+    }
+    if (e.data.lang === 'vi' || e.data.lang === 'en') {
+      state.lang = e.data.lang;
+      changed = true;
+    }
+    if (changed) {
+      renderAllI18n();
+      renderAllGrids();
+      rerenderActiveOutputs();
+    }
+  });
+
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => el.classList.remove('show'), 2100);
+  }
+
+  /* =========================================================================
+     3. PARSING, FORMATTING & REUSABLE EXCEL-GRID ENGINE
+     ========================================================================= */
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function fmt(x, d = 4) {
+    if (x == null || !Number.isFinite(x)) return '—';
+    return x.toFixed(d);
+  }
+
+  function fmtP(p) {
+    if (p == null || !Number.isFinite(p)) return '—';
+    if (p < 0.0001) return '< 0.0001';
+    return p.toFixed(4);
+  }
+
+  function parseTokenNum(tok) {
+    if (tok == null) return NaN;
+    let s = String(tok).trim().replace(/\s+/g, '');
+    if (!s) return NaN;
+    if (s.includes(',') && s.includes('.')) {
+      if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+      else s = s.replace(/,/g, '');
+    } else if (s.includes(',')) {
+      if (/^[+-]?\d+,\d+$/.test(s)) s = s.replace(',', '.');
+      else s = s.replace(/,/g, '');
+    }
+    const v = Number(s);
+    return Number.isFinite(v) ? v : NaN;
+  }
+
+  function splitRowCells(line) {
+    const t = line.trim();
+    if (!t) return [];
+    if (t.includes('\t')) return t.split('\t').map(s => s.trim());
+    if (t.includes(';')) return t.split(';').map(s => s.trim());
+    if (t.includes('|')) return t.split('|').map(s => s.trim());
+    if (t.includes(',')) {
+      const parts = t.split(',').map(s => s.trim());
+      if (parts.length === 2 && /^[+-]?\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])) return [t];
+      return parts;
+    }
+    return t.split(/\s+/);
+  }
+
+  /**
+   * Renders a compact Excel-style bordered spreadsheet grid into `containerEl`.
+   * Supports direct Ctrl+V multi-cell paste from Excel, Enter/Arrow key nav,
+   * and optional editable column headers (for Tab 1).
+   */
+  function renderExcelGrid(containerEl, cfg) {
+    // cfg: { headers, rows, colTypes, editableHeaders, minCols, onChange, onHeaderChange, onDeleteCol }
+    const nCols = cfg.headers.length;
+    const rows = cfg.rows;
+
+    let thead = '<thead><tr><th class="xl-rn">#</th>';
+    for (let c = 0; c < nCols; c++) {
+      if (cfg.editableHeaders) {
+        thead += `<th><div class="xl-th-inner">
+          <input type="text" class="xl-th-in" data-c="${c}" value="${escHtml(cfg.headers[c])}" aria-label="Column ${c + 1}">
+          ${nCols > (cfg.minCols || 2) ? `<button type="button" class="xl-col-del no-print" data-c="${c}" title="Remove column">×</button>` : ''}
+        </div></th>`;
+      } else {
+        thead += `<th>${escHtml(cfg.headers[c])}</th>`;
+      }
+    }
+    thead += '</tr></thead>';
+
+    let tbody = '<tbody>';
+    for (let r = 0; r < rows.length; r++) {
+      tbody += `<tr><td class="xl-rn">${r + 1}</td>`;
+      for (let c = 0; c < nCols; c++) {
+        const val = rows[r][c] == null ? '' : rows[r][c];
+        const isText = cfg.colTypes && cfg.colTypes[c] === 'text';
+        tbody += `<td><input type="text" class="xl-cell${isText ? ' xl-text' : ''}" data-r="${r}" data-c="${c}" value="${escHtml(val)}" autocomplete="off" spellcheck="false"></td>`;
+      }
+      tbody += '</tr>';
+    }
+    tbody += '</tbody>';
+
+    containerEl.innerHTML = `<table class="xl-tbl">${thead}${tbody}</table>`;
+
+    // Header edits
+    if (cfg.editableHeaders) {
+      containerEl.querySelectorAll('.xl-th-in').forEach(inp => {
+        inp.addEventListener('input', e => {
+          const c = Number(e.target.dataset.c);
+          cfg.headers[c] = e.target.value;
+          if (cfg.onHeaderChange) cfg.onHeaderChange();
+        });
+      });
+      containerEl.querySelectorAll('.xl-col-del').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const c = Number(e.target.dataset.c);
+          if (cfg.onDeleteCol) cfg.onDeleteCol(c);
+        });
+      });
+    }
+
+    // Cell input, keyboard nav & Excel paste
+    const cells = containerEl.querySelectorAll('.xl-cell');
+    cells.forEach(inp => {
+      inp.addEventListener('input', e => {
+        const r = Number(e.target.dataset.r), c = Number(e.target.dataset.c);
+        rows[r][c] = e.target.value;
+        if (cfg.onChange) cfg.onChange();
+      });
+
+      inp.addEventListener('keydown', e => {
+        const r = Number(e.target.dataset.r), c = Number(e.target.dataset.c);
+        let nr = r, nc = c, move = false;
+        if (e.key === 'Enter' || e.key === 'ArrowDown') {
+          nr = r + 1; move = true;
+          if (nr >= rows.length) {
+            rows.push(new Array(nCols).fill(''));
+            renderExcelGrid(containerEl, cfg);
+            const next = containerEl.querySelector(`.xl-cell[data-r="${nr}"][data-c="${nc}"]`);
+            if (next) next.focus();
+            e.preventDefault();
+            return;
+          }
+        } else if (e.key === 'ArrowUp' && r > 0) {
+          nr = r - 1; move = true;
+        }
+        if (move) {
+          e.preventDefault();
+          const target = containerEl.querySelector(`.xl-cell[data-r="${nr}"][data-c="${nc}"]`);
+          if (target) { target.focus(); target.select(); }
+        }
+      });
+
+      inp.addEventListener('paste', e => {
+        const clip = (e.clipboardData || window.clipboardData)?.getData('text');
+        if (!clip) return;
+        // Multi-cell or multi-line paste from Excel
+        if (clip.includes('\n') || clip.includes('\t')) {
+          e.preventDefault();
+          const startR = Number(e.target.dataset.r);
+          const startC = Number(e.target.dataset.c);
+          const pastedLines = clip.replace(/\r/g, '').split('\n').filter((l, i, arr) => l !== '' || i < arr.length - 1);
+          const matrix = pastedLines.map(l => l.includes('\t') ? l.split('\t').map(s => s.trim()) : splitRowCells(l));
+
+          // Expand columns if editableHeaders allows it
+          const maxPasteCols = Math.max(...matrix.map(r => r.length));
+          if (cfg.editableHeaders && startC + maxPasteCols > cfg.headers.length) {
+            while (cfg.headers.length < startC + maxPasteCols) {
+              cfg.headers.push('CT' + cfg.headers.length);
+              rows.forEach(row => row.push(''));
+            }
+          }
+          // Expand rows if needed
+          while (rows.length < startR + matrix.length) {
+            rows.push(new Array(cfg.headers.length).fill(''));
+          }
+          for (let dr = 0; dr < matrix.length; dr++) {
+            for (let dc = 0; dc < matrix[dr].length; dc++) {
+              const cc = startC + dc;
+              if (cc < cfg.headers.length) rows[startR + dr][cc] = matrix[dr][dc];
+            }
+          }
+          renderExcelGrid(containerEl, cfg);
+          if (cfg.onHeaderChange) cfg.onHeaderChange();
+          if (cfg.onChange) cfg.onChange();
+          showToast(tr('paste_applied'));
+        }
+      });
+    });
+  }
+
+  /* =========================================================================
+     4. STATISTICAL ENGINE (PURE JS, ZERO EXTERNAL DEPS)
+     ========================================================================= */
+  const Stat = (function() {
+    function sum(a) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i]; return s; }
+    function mean(a) { return a.length ? sum(a) / a.length : NaN; }
+    function variance(a) {
+      if (a.length < 2) return NaN;
+      const m = mean(a);
+      let s = 0;
+      for (let i = 0; i < a.length; i++) { const d = a[i] - m; s += d * d; }
+      return s / (a.length - 1);
+    }
+    function sd(a) { const v = variance(a); return Number.isFinite(v) ? Math.sqrt(Math.max(0, v)) : NaN; }
+    function quantile(sorted, p) {
+      const n = sorted.length;
+      if (!n) return NaN;
+      if (n === 1) return sorted[0];
+      const pos = (n - 1) * p;
+      const lo = Math.floor(pos), hi = Math.ceil(pos);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (pos - lo) * (sorted[hi] - sorted[lo]);
+    }
+    function median(a) {
+      const s = a.slice().sort((x, y) => x - y);
+      return quantile(s, 0.5);
+    }
+
+    function logGamma(z) {
+      const g = 7;
+      const C = [
+        0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+        771.32342877765313, -176.61502916214059, 12.507343278686905,
+        -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+      ];
+      if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - logGamma(1 - z);
+      z -= 1;
+      let x = C[0];
+      for (let i = 1; i < g + 2; i++) x += C[i] / (z + i);
+      const t = z + g + 0.5;
+      return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+    }
+
+    function betacf(a, b, x) {
+      const MAXIT = 200, EPS = 3e-12, FPMIN = 1e-30;
+      const qab = a + b, qap = a + 1, qam = a - 1;
+      let c = 1, d = 1 - qab * x / qap;
+      if (Math.abs(d) < FPMIN) d = FPMIN;
+      d = 1 / d;
+      let h = d;
+      for (let m = 1; m <= MAXIT; m++) {
+        const m2 = 2 * m;
+        let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+        d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+        c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+        d = 1 / d; h *= d * c;
+        aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+        d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+        c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+        d = 1 / d;
+        const del = d * c;
+        h *= del;
+        if (Math.abs(del - 1) < EPS) break;
+      }
+      return h;
+    }
+
+    function betainc(x, a, b) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      const bt = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+      if (x < (a + 1) / (a + b + 2)) return bt * betacf(a, b, x) / a;
+      return 1 - bt * betacf(b, a, 1 - x) / b;
+    }
+
+    function gammap(a, x) {
+      if (x <= 0) return 0;
+      if (a <= 0) return 1;
+      const gln = logGamma(a);
+      if (x < a + 1) {
+        let ap = a, del = 1 / a, sumVal = del;
+        for (let n = 1; n <= 200; n++) {
+          ap += 1;
+          del *= x / ap;
+          sumVal += del;
+          if (Math.abs(del) < Math.abs(sumVal) * 3e-12) break;
+        }
+        return Math.min(1, Math.max(0, sumVal * Math.exp(-x + a * Math.log(x) - gln)));
+      } else {
+        let b = x + 1 - a, c = 1 / 1e-30, d = 1 / b, h = d;
+        for (let i = 1; i <= 200; i++) {
+          const an = -i * (i - a);
+          b += 2;
+          d = an * d + b; if (Math.abs(d) < 1e-30) d = 1e-30;
+          c = b + an / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+          d = 1 / d;
+          const del = d * c;
+          h *= del;
+          if (Math.abs(del - 1) < 3e-12) break;
+        }
+        return Math.min(1, Math.max(0, 1 - Math.exp(-x + a * Math.log(x) - gln) * h));
+      }
+    }
+
+    function normCDF(z) {
+      const sign = z < 0 ? -1 : 1;
+      const x = Math.abs(z) / Math.SQRT2;
+      const t = 1 / (1 + 0.3275911 * x);
+      const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+      return 0.5 * (1 + sign * y);
+    }
+
+    function normInv(p) {
+      if (p <= 0) return -Infinity;
+      if (p >= 1) return Infinity;
+      if (p === 0.5) return 0;
+      const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+      const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+      const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+      const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+      const plow = 0.02425, phigh = 1 - plow;
+      let q, r;
+      if (p < plow) {
+        q = Math.sqrt(-2 * Math.log(p));
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+      }
+      if (p <= phigh) {
+        q = p - 0.5; r = q * q;
+        return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+      }
+      q = Math.sqrt(-2 * Math.log(1 - p));
+      return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    }
+
+    function tPValue(t, df) {
+      if (!Number.isFinite(t) || df <= 0) return NaN;
+      const x = df / (df + t * t);
+      return Math.min(1, Math.max(0, betainc(x, df / 2, 0.5)));
+    }
+
+    function tInv(p, df) {
+      if (p <= 0 || p >= 1 || df <= 0) return NaN;
+      if (p < 0.5) return -tInv(1 - p, df);
+      if (p === 0.5) return 0;
+      let lo = 0, hi = Math.max(10, normInv(p) * 3);
+      while (1 - 0.5 * tPValue(hi, df) < p && hi < 1e6) hi *= 2;
+      for (let i = 0; i < 70; i++) {
+        const mid = 0.5 * (lo + hi);
+        const cdf = 1 - 0.5 * tPValue(mid, df);
+        if (cdf < p) lo = mid; else hi = mid;
+      }
+      return 0.5 * (lo + hi);
+    }
+
+    function fPValue(F, df1, df2) {
+      if (!Number.isFinite(F) || F < 0 || df1 <= 0 || df2 <= 0) return NaN;
+      if (F === 0) return 1;
+      const x = df2 / (df2 + df1 * F);
+      return Math.min(1, Math.max(0, betainc(x, df2 / 2, df1 / 2)));
+    }
+
+    function chi2PValue(x, df) {
+      if (!Number.isFinite(x) || x < 0 || df <= 0) return NaN;
+      return Math.min(1, Math.max(0, 1 - gammap(df / 2, x / 2)));
+    }
+
+    function chi2Inv(p, df) {
+      if (p <= 0 || p >= 1 || df <= 0) return NaN;
+      let lo = 0, hi = Math.max(df + 10 * Math.sqrt(2 * df), 50);
+      while (gammap(df / 2, hi / 2) < p && hi < 1e7) hi *= 2;
+      for (let i = 0; i < 80; i++) {
+        const mid = 0.5 * (lo + hi);
+        if (gammap(df / 2, mid / 2) < p) lo = mid; else hi = mid;
+      }
+      return 0.5 * (lo + hi);
+    }
+
+    function shapiroWilk(arr) {
+      const n = arr.length;
+      if (n < 3) return { W: NaN, p: NaN };
+      const x = arr.slice().sort((a, b) => a - b);
+      if (x[n - 1] - x[0] === 0) return { W: 1, p: 1 };
+
+      const m = new Array(n);
+      let m2 = 0;
+      for (let i = 0; i < n; i++) {
+        m[i] = normInv((i + 1 - 0.375) / (n + 0.25));
+        m2 += m[i] * m[i];
+      }
+      const u = 1 / Math.sqrt(n);
+      const poly = (c, v) => c.reduce((acc, ci) => acc * v + ci, 0);
+      const a = new Array(n).fill(0);
+
+      if (n === 3) {
+        const s = 1 / Math.SQRT2;
+        a[0] = -s; a[1] = 0; a[2] = s;
+      } else {
+        const c1 = [-2.706056, 4.434685, -2.071190, -0.147981, 0.221157, m[n - 1] / Math.sqrt(m2)];
+        const c2 = [-3.582633, 5.682633, -1.752461, -0.293762, 0.042981, m[n - 2] / Math.sqrt(m2)];
+        a[n - 1] = poly(c1, u);
+        a[0] = -a[n - 1];
+        let phi;
+        if (n <= 5) {
+          phi = (m2 - 2 * m[n - 1] * m[n - 1]) / (1 - 2 * a[n - 1] * a[n - 1]);
+          const sqrtPhi = Math.sqrt(Math.max(1e-12, phi));
+          for (let i = 1; i < n - 1; i++) a[i] = m[i] / sqrtPhi;
+        } else {
+          a[n - 2] = poly(c2, u);
+          a[1] = -a[n - 2];
+          phi = (m2 - 2 * m[n - 1] * m[n - 1] - 2 * m[n - 2] * m[n - 2]) /
+                (1 - 2 * a[n - 1] * a[n - 1] - 2 * a[n - 2] * a[n - 2]);
+          const sqrtPhi = Math.sqrt(Math.max(1e-12, phi));
+          for (let i = 2; i < n - 2; i++) a[i] = m[i] / sqrtPhi;
+        }
+      }
+
+      const xm = mean(x);
+      let num = 0, den = 0;
+      for (let i = 0; i < n; i++) {
+        num += a[i] * x[i];
+        den += (x[i] - xm) * (x[i] - xm);
+      }
+      const W = Math.min(1, Math.max(0, (num * num) / den));
+
+      let p;
+      if (n === 3) {
+        const sq = Math.sqrt(Math.max(0, W));
+        p = Math.max(0, Math.min(1, (6 / Math.PI) * (Math.asin(sq) - Math.asin(Math.sqrt(0.75)))));
+      } else if (n <= 11) {
+        const gamma = 0.459 * n - 2.273;
+        const y = -Math.log(Math.max(1e-15, gamma - Math.log(Math.max(1e-15, 1 - W))));
+        const mu = -0.0006714 * n * n * n + 0.025054 * n * n - 0.39978 * n + 0.5440;
+        const sigma = Math.exp(-0.0020322 * n * n * n + 0.062767 * n * n - 0.77857 * n + 1.3822);
+        p = 1 - normCDF((y - mu) / sigma);
+      } else {
+        const ln = Math.log(n);
+        const y = Math.log(Math.max(1e-15, 1 - W));
+        const mu = 0.0038915 * ln * ln * ln - 0.083751 * ln * ln - 0.31082 * ln - 1.5861;
+        const sigma = Math.exp(0.0030302 * ln * ln - 0.082676 * ln - 0.4803);
+        p = 1 - normCDF((y - mu) / sigma);
+      }
+      return { W, p: Math.min(1, Math.max(0, p)) };
+    }
+
+    function leveneTest(groups) {
+      const zGroups = groups.map(g => {
+        const med = median(g);
+        return g.map(v => Math.abs(v - med));
+      });
+      const res = oneWayAnovaCore(zGroups);
+      return { F: res.F, p: res.p, df1: res.dfBetween, df2: res.dfWithin };
+    }
+
+    function oneWayAnovaCore(groups) {
+      const k = groups.length;
+      let N = 0, grandSum = 0;
+      for (const g of groups) { N += g.length; grandSum += sum(g); }
+      if (k < 2 || N <= k) return { F: NaN, p: NaN, dfBetween: k - 1, dfWithin: Math.max(0, N - k), ssBetween: 0, ssWithin: 0, ssTotal: 0, msBetween: 0, msWithin: 0, r2: 0 };
+      const grandMean = grandSum / N;
+      let ssBetween = 0, ssWithin = 0;
+      for (const g of groups) {
+        const gm = mean(g);
+        ssBetween += g.length * (gm - grandMean) * (gm - grandMean);
+        for (const v of g) ssWithin += (v - gm) * (v - gm);
+      }
+      const dfBetween = k - 1, dfWithin = N - k;
+      const msBetween = ssBetween / dfBetween, msWithin = ssWithin / dfWithin;
+      const F = msWithin > 0 ? msBetween / msWithin : (msBetween === 0 ? 0 : Infinity);
+      const p = Number.isFinite(F) ? fPValue(F, dfBetween, dfWithin) : 0;
+      const ssTotal = ssBetween + ssWithin;
+      const r2 = ssTotal > 0 ? ssBetween / ssTotal : 0;
+      return { k, N, dfBetween, dfWithin, dfTotal: N - 1, ssBetween, ssWithin, ssTotal, msBetween, msWithin, F, p, r2, sPooled: Math.sqrt(Math.max(0, msWithin)) };
+    }
+
+    function rankWithTies(values) {
+      const n = values.length;
+      const idx = values.map((v, i) => ({ v, i })).sort((a, b) => a.v - b.v);
+      const ranks = new Array(n);
+      let tieSum = 0, i = 0;
+      while (i < n) {
+        let j = i;
+        while (j + 1 < n && idx[j + 1].v === idx[i].v) j++;
+        const avgRank = (i + j) / 2 + 1;
+        const t = j - i + 1;
+        if (t > 1) tieSum += t * t * t - t;
+        for (let m = i; m <= j; m++) ranks[idx[m].i] = avgRank;
+        i = j + 1;
+      }
+      return { ranks, tieSum };
+    }
+
+    function mannWhitneyU(a, b) {
+      const n1 = a.length, n2 = b.length, N = n1 + n2;
+      if (n1 < 1 || n2 < 1) return { U: NaN, z: NaN, p: NaN };
+      const all = a.concat(b);
+      const { ranks, tieSum } = rankWithTies(all);
+      let R1 = 0;
+      for (let i = 0; i < n1; i++) R1 += ranks[i];
+      const U1 = R1 - n1 * (n1 + 1) / 2, U2 = n1 * n2 - U1, U = Math.min(U1, U2);
+      const mu = n1 * n2 / 2;
+      const sigma = Math.sqrt(Math.max(0, (n1 * n2 / 12) * ((N + 1) - tieSum / (N * (N - 1)))));
+      if (sigma === 0) return { U, z: 0, p: 1 };
+      const z = (Math.abs(U - mu) - 0.5) / sigma;
+      return { U, U1, U2, z: (U1 - mu) / sigma, p: Math.min(1, Math.max(0, 2 * (1 - normCDF(Math.max(0, z))))) };
+    }
+
+    function wilcoxonSignedRank(a, b) {
+      const diffs = [];
+      for (let i = 0; i < Math.min(a.length, b.length); i++) {
+        const d = a[i] - b[i];
+        if (d !== 0) diffs.push(d);
+      }
+      const n = diffs.length;
+      if (n < 1) return { W: 0, z: 0, p: 1, nNonZero: 0 };
+      const { ranks, tieSum } = rankWithTies(diffs.map(Math.abs));
+      let wPlus = 0, wMinus = 0;
+      for (let i = 0; i < n; i++) { if (diffs[i] > 0) wPlus += ranks[i]; else wMinus += ranks[i]; }
+      const W = Math.min(wPlus, wMinus);
+      const mu = n * (n + 1) / 4;
+      const sigma = Math.sqrt(Math.max(0, n * (n + 1) * (2 * n + 1) / 24 - tieSum / 48));
+      if (sigma === 0) return { W, z: 0, p: 1, nNonZero: n };
+      const z = (Math.abs(W - mu) - 0.5) / sigma;
+      return { W, wPlus, wMinus, z: (wPlus - mu) / sigma, p: Math.min(1, Math.max(0, 2 * (1 - normCDF(Math.max(0, z))))), nNonZero: n };
+    }
+
+    function kruskalWallis(groups) {
+      const k = groups.length, all = [];
+      groups.forEach(g => g.forEach(v => all.push(v)));
+      const N = all.length;
+      if (k < 2 || N <= k) return { H: NaN, df: k - 1, p: NaN };
+      const { ranks, tieSum } = rankWithTies(all);
+      let offset = 0, sumR2n = 0;
+      for (const g of groups) {
+        let Rg = 0;
+        for (let i = 0; i < g.length; i++) Rg += ranks[offset + i];
+        sumR2n += (Rg * Rg) / g.length;
+        offset += g.length;
+      }
+      let H = (12 / (N * (N + 1))) * sumR2n - 3 * (N + 1);
+      const denom = 1 - tieSum / (N * N * N - N);
+      H = denom > 0 ? H / denom : 0;
+      return { H, df: k - 1, p: chi2PValue(Math.max(0, H), k - 1) };
+    }
+
+    const GL16_X = [
+      -0.9894009349916499, -0.9445750230732326, -0.8656312023878318, -0.7554044083550030,
+      -0.6178762444026438, -0.4580167776572274, -0.2816035507792589, -0.0950125098376374,
+       0.0950125098376374,  0.2816035507792589,  0.4580167776572274,  0.6178762444026438,
+       0.7554044083550030,  0.8656312023878318,  0.9445750230732326,  0.9894009349916499
+    ];
+    const GL16_W = [
+      0.0271524594117541, 0.0622535239386479, 0.0951585116824928, 0.1246289712555339,
+      0.1495959888165767, 0.1691565193950025, 0.1826034150449236, 0.1894506104550685,
+      0.1894506104550685, 0.1826034150449236, 0.1691565193950025, 0.1495959888165767,
+      0.1246289712555339, 0.0951585116824928, 0.0622535239386479, 0.0271524594117541
+    ];
+
+    function studentizedRangeCDF(q, k, df) {
+      if (q <= 0) return 0;
+      if (k < 2) return 1;
+      const rangeCDF = (w) => {
+        if (w <= 0) return 0;
+        let acc = 0;
+        for (let i = 0; i < 16; i++) {
+          const z = 6 * GL16_X[i];
+          const phi = Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+          const diff = Math.max(0, normCDF(z + w) - normCDF(z));
+          acc += GL16_W[i] * phi * Math.pow(diff, k - 1);
+        }
+        return Math.min(1, Math.max(0, k * 6 * acc));
+      };
+      if (df > 500) return rangeCDF(q);
+      const v2 = df / 2, logC = v2 * Math.log(v2) - logGamma(v2) + Math.log(2);
+      const spread = 1 / Math.sqrt(2 * df);
+      const sLo = Math.max(1e-4, 1 - 6 * spread), sHi = 1 + 7 * spread;
+      const mid = 0.5 * (sLo + sHi), half = 0.5 * (sHi - sLo);
+      let total = 0;
+      for (let i = 0; i < 16; i++) {
+        const s = mid + half * GL16_X[i];
+        const pdf = Math.exp(logC + (df - 1) * Math.log(s) - v2 * s * s);
+        total += GL16_W[i] * pdf * rangeCDF(q * s);
+      }
+      return Math.min(1, Math.max(0, half * total));
+    }
+
+    function tukeyQCrit(alpha, k, df) {
+      let lo = 0, hi = 12;
+      while (studentizedRangeCDF(hi, k, df) < 1 - alpha && hi < 200) hi *= 2;
+      for (let i = 0; i < 45; i++) {
+        const mid = 0.5 * (lo + hi);
+        if (studentizedRangeCDF(mid, k, df) < 1 - alpha) lo = mid; else hi = mid;
+      }
+      return 0.5 * (lo + hi);
+    }
+
+    function dunnettCDF(d, nTreats, nCtrl, df) {
+      if (d <= 0) return 0;
+      const m = nTreats.length;
+      if (m === 0) return 1;
+      const lam = nTreats.map(ni => Math.sqrt(ni / (ni + nCtrl)));
+      const inner = (ds) => {
+        let acc = 0;
+        for (let i = 0; i < 16; i++) {
+          const z = 6 * GL16_X[i];
+          const phi = Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+          let prod = 1;
+          for (let j = 0; j < m; j++) {
+            const denom = Math.sqrt(Math.max(1e-12, 1 - lam[j] * lam[j]));
+            prod *= Math.max(0, normCDF((ds + lam[j] * z) / denom) - normCDF((-ds + lam[j] * z) / denom));
+          }
+          acc += GL16_W[i] * phi * prod;
+        }
+        return Math.min(1, Math.max(0, 6 * acc));
+      };
+      if (df > 500) return inner(d);
+      const v2 = df / 2, logC = v2 * Math.log(v2) - logGamma(v2) + Math.log(2);
+      const spread = 1 / Math.sqrt(2 * df);
+      const sLo = Math.max(1e-4, 1 - 6 * spread), sHi = 1 + 7 * spread;
+      const mid = 0.5 * (sLo + sHi), half = 0.5 * (sHi - sLo);
+      let total = 0;
+      for (let i = 0; i < 16; i++) {
+        const s = mid + half * GL16_X[i];
+        const pdf = Math.exp(logC + (df - 1) * Math.log(s) - v2 * s * s);
+        total += GL16_W[i] * pdf * inner(d * s);
+      }
+      return Math.min(1, Math.max(0, half * total));
+    }
+
+    function dunnettCrit(alpha, nTreats, nCtrl, df) {
+      let lo = 0, hi = 10;
+      while (dunnettCDF(hi, nTreats, nCtrl, df) < 1 - alpha && hi < 200) hi *= 2;
+      for (let i = 0; i < 45; i++) {
+        const mid = 0.5 * (lo + hi);
+        if (dunnettCDF(mid, nTreats, nCtrl, df) < 1 - alpha) lo = mid; else hi = mid;
+      }
+      return 0.5 * (lo + hi);
+    }
+
+    function howeK2(n, conf, cov) {
+      if (n < 2) return NaN;
+      const df = n - 1;
+      const zp = normInv((1 + cov) / 2);
+      const chi2 = chi2Inv(1 - conf, df);
+      const r = zp * Math.sqrt(1 + 1 / n);
+      const u = Math.sqrt(df / chi2);
+      const k2 = r * u * Math.sqrt(1 + (df - 3 - chi2) / (2 * (n + 1) * (n + 1)));
+      return Number.isFinite(k2) ? k2 : r * u;
+    }
+
+    return {
+      sum, mean, variance, sd, quantile, median,
+      normCDF, normInv, tPValue, tInv, fPValue, chi2PValue, chi2Inv,
+      shapiroWilk, leveneTest, oneWayAnovaCore,
+      mannWhitneyU, wilcoxonSignedRank, kruskalWallis,
+      studentizedRangeCDF, tukeyQCrit, dunnettCDF, dunnettCrit, howeK2
+    };
+  })();
+
+  /* =========================================================================
+     5. SVG CHART HELPERS (THEME-AWARE)
+     ========================================================================= */
+  function themeColors() {
+    const cs = getComputedStyle(document.documentElement);
+    return {
+      bg: cs.getPropertyValue('--surface-2').trim() || '#f8fafc',
+      fg: cs.getPropertyValue('--fg').trim() || '#1f1f1f',
+      muted: cs.getPropertyValue('--muted').trim() || '#5f6368',
+      line: cs.getPropertyValue('--line').trim() || '#dce5ef',
+      accent: cs.getPropertyValue('--accent').trim() || '#1558B0',
+      ok: cs.getPropertyValue('--ok').trim() || '#137333',
+      warn: cs.getPropertyValue('--warn').trim() || '#b06000',
+      danger: cs.getPropertyValue('--danger').trim() || '#b3261e',
+      palette: ['#1558B0', '#137333', '#b06000', '#7b1fa2', '#00838f', '#b3261e', '#5c6bc0', '#2e7d32']
+    };
+  }
+
+  function niceTicks(minV, maxV, count = 5) {
+    if (!Number.isFinite(minV) || !Number.isFinite(maxV)) return [0, 1];
+    if (minV === maxV) { minV -= 1; maxV += 1; }
+    const range = maxV - minV;
+    const rawStep = range / Math.max(1, count);
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / mag;
+    let step = mag;
+    if (norm > 5) step = 10 * mag;
+    else if (norm > 2) step = 5 * mag;
+    else if (norm > 1) step = 2 * mag;
+    const start = Math.floor(minV / step) * step;
+    const end = Math.ceil(maxV / step) * step;
+    const ticks = [];
+    for (let v = start; v <= end + step * 0.001; v += step) {
+      ticks.push(Number(v.toFixed(10)));
+      if (ticks.length > 20) break;
+    }
+    return ticks;
+  }
+
+  /* =========================================================================
+     8. TAB 3 — ICH Q2(R2) & GAGE R&R (EXCEL GRIDS + CROSSED ANOVA)
+     ========================================================================= */
+  function loadT3Sample() {
+    if (state.t3Sub === 'ich') {
+      document.getElementById('t3NomConc').value = '100';
+      state.t3LinRows = [
+        ['50','124850'],['50','125410'],['50','125120'],
+        ['80','199620'],['80','200350'],['80','199890'],
+        ['100','249780'],['100','250420'],['100','249910'],
+        ['120','299850'],['120','300610'],['120','300120'],
+        ['150','374920'],['150','375480'],['150','375110']
+      ];
+      state.t3RecRows = [
+        ['80%','80.0','79.6'],['80%','80.0','80.4'],['80%','80.0','79.9'],
+        ['100%','100.0','100.3'],['100%','100.0','99.7'],['100%','100.0','100.1'],
+        ['120%','120.0','119.5'],['120%','120.0','120.6'],['120%','120.0','119.8']
+      ];
+      renderT3Grids();
+    } else {
+      document.getElementById('t3Tol').value = '10.0';
+      document.getElementById('t3PoolInt').checked = true;
+      state.t3GageRows = [
+        ['P1','OpA','97.2'],['P1','OpA','97.4'],['P1','OpB','97.5'],['P1','OpB','97.3'],['P1','OpC','97.1'],['P1','OpC','97.4'],
+        ['P2','OpA','99.8'],['P2','OpA','100.1'],['P2','OpB','100.2'],['P2','OpB','99.9'],['P2','OpC','99.7'],['P2','OpC','100.0'],
+        ['P3','OpA','102.4'],['P3','OpA','102.6'],['P3','OpB','102.8'],['P3','OpB','102.5'],['P3','OpC','102.3'],['P3','OpC','102.6'],
+        ['P4','OpA','98.5'],['P4','OpA','98.7'],['P4','OpB','98.9'],['P4','OpB','98.6'],['P4','OpC','98.4'],['P4','OpC','98.7'],
+        ['P5','OpA','101.1'],['P5','OpA','101.3'],['P5','OpB','101.5'],['P5','OpB','101.2'],['P5','OpC','101.0'],['P5','OpC','101.3']
+      ];
+      renderT3Grids();
+    }
+    runT3();
+    showToast(tr('sample_loaded'));
+  }
+
+  function renderT3Grids() {
+    renderExcelGrid(document.getElementById('t3LinSheetWrap'), {
+      headers: [tr('t3_col_x'), tr('t3_col_y')],
+      rows: state.t3LinRows,
+      editableHeaders: false
+    });
+    renderExcelGrid(document.getElementById('t3RecSheetWrap'), {
+      headers: [tr('t3_col_lvl'), tr('t3_col_spk'), tr('t3_col_fnd')],
+      rows: state.t3RecRows,
+      colTypes: ['text', 'num', 'num'],
+      editableHeaders: false
+    });
+    renderExcelGrid(document.getElementById('t3GageSheetWrap'), {
+      headers: [tr('t3_col_part'), tr('t3_col_op'), tr('t3_col_meas')],
+      rows: state.t3GageRows,
+      colTypes: ['text', 'text', 'num'],
+      editableHeaders: false
+    });
+  }
+
+  function renderScatterSvg(pts, opts) {
+    const C = themeColors();
+    const W = 420, H = 250, pad = { l: 58, r: 18, t: 22, b: 38 };
+    const pw = W - pad.l - pad.r, ph = H - pad.t - pad.b;
+
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+    let minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+    if (opts.zeroLine) { minY = Math.min(minY, 0); maxY = Math.max(maxY, 0); }
+    const sx = (maxX - minX) || 1, sy = (maxY - minY) || 1;
+    minX -= sx * 0.06; maxX += sx * 0.06; minY -= sy * 0.12; maxY += sy * 0.12;
+
+    const xt = niceTicks(minX, maxX, 5), yt = niceTicks(minY, maxY, 5);
+    const xLo = xt[0], xHi = xt[xt.length - 1], yLo = yt[0], yHi = yt[yt.length - 1];
+    const xScale = v => pad.l + ((v - xLo) / (xHi - xLo)) * pw;
+    const yScale = v => pad.t + ph - ((v - yLo) / (yHi - yLo)) * ph;
+
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="${C.bg}" rx="6"/>`;
+    yt.forEach(t => {
+      const y = yScale(t);
+      svg += `<line x1="${pad.l}" y1="${y}" x2="${W - pad.r}" y2="${y}" stroke="${C.line}" stroke-dasharray="3,3"/>`;
+      const lbl = Math.abs(t) >= 10000 ? (t / 1000).toFixed(0) + 'k' : fmt(t, 1);
+      svg += `<text x="${pad.l - 6}" y="${y + 4}" text-anchor="end" fill="${C.muted}" font-size="10">${lbl}</text>`;
+    });
+    xt.forEach(t => {
+      svg += `<text x="${xScale(t)}" y="${pad.t + ph + 16}" text-anchor="middle" fill="${C.muted}" font-size="10">${fmt(t, 1)}</text>`;
+    });
+    svg += `<line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t + ph}" stroke="${C.muted}"/>`;
+    svg += `<line x1="${pad.l}" y1="${pad.t + ph}" x2="${W - pad.r}" y2="${pad.t + ph}" stroke="${C.muted}"/>`;
+
+    if (opts.line) {
+      const { a, b } = opts.line;
+      svg += `<line x1="${xScale(xLo)}" y1="${yScale(a * xLo + b)}" x2="${xScale(xHi)}" y2="${yScale(a * xHi + b)}" stroke="${C.accent}" stroke-width="2"/>`;
+    }
+    if (opts.zeroLine) {
+      const y0 = yScale(0);
+      svg += `<line x1="${pad.l}" y1="${y0}" x2="${W - pad.r}" y2="${y0}" stroke="${C.danger}" stroke-width="1.4" stroke-dasharray="5,3"/>`;
+    }
+    pts.forEach(p => {
+      svg += `<circle cx="${xScale(p.x)}" cy="${yScale(p.y)}" r="3.5" fill="${opts.zeroLine ? C.warn : C.accent}" fill-opacity="0.85"/>`;
+    });
+    svg += `<text x="${W / 2}" y="${H - 6}" text-anchor="middle" fill="${C.muted}" font-size="11">${escHtml(opts.xLabel || 'X')}</text></svg>`;
+    return svg;
+  }
+
+  function runT3Ich() {
+    const out = document.getElementById('t3Output');
+    const nomConc = parseFloat(document.getElementById('t3NomConc').value);
+    const pts = [];
+    state.t3LinRows.forEach(r => {
+      const x = parseTokenNum(r[0]), y = parseTokenNum(r[1]);
+      if (Number.isFinite(x) && Number.isFinite(y)) pts.push({ x, y });
+    });
+    if (pts.length < 3) {
+      out.innerHTML = `<div class="alert alert-danger">${tr('t3_err_lin')}</div>`;
+      return;
+    }
+
+    const n = pts.length, xm = Stat.mean(pts.map(p => p.x)), ym = Stat.mean(pts.map(p => p.y));
+    let sxx = 0, sxy = 0, syy = 0;
+    pts.forEach(p => { sxx += (p.x - xm) * (p.x - xm); sxy += (p.x - xm) * (p.y - ym); syy += (p.y - ym) * (p.y - ym); });
+    if (sxx === 0) {
+      out.innerHTML = `<div class="alert alert-danger">${tr('t3_err_lin')}</div>`;
+      return;
+    }
+
+    const slope = sxy / sxx, intercept = ym - slope * xm;
+    const resPts = pts.map(p => ({ x: p.x, y: p.y - (slope * p.x + intercept) }));
+    const sse = Stat.sum(resPts.map(p => p.y * p.y));
+    const r2 = syy > 0 ? 1 - sse / syy : 1;
+    const r = Math.sqrt(Math.max(0, r2)) * (slope >= 0 ? 1 : -1);
+    const syx = Math.sqrt(Math.max(0, sse / (n - 2)));
+    const seInt = syx * Math.sqrt(1 / n + (xm * xm) / sxx);
+    const refX = Number.isFinite(nomConc) && nomConc > 0 ? nomConc : xm;
+    const yAt100 = slope * refX + intercept;
+    const pctYInt = yAt100 !== 0 ? (Math.abs(intercept) / Math.abs(yAt100)) * 100 : NaN;
+    const lod = slope !== 0 ? (3.3 * syx) / Math.abs(slope) : NaN;
+    const loq = slope !== 0 ? (10.0 * syx) / Math.abs(slope) : NaN;
+
+    const byX = new Map();
+    pts.forEach(p => {
+      const key = p.x.toFixed(8);
+      if (!byX.has(key)) byX.set(key, []);
+      byX.get(key).push(p.y);
+    });
+    let ssPure = 0;
+    byX.forEach(ys => { const m = Stat.mean(ys); ys.forEach(y => { ssPure += (y - m) * (y - m); }); });
+    const dfPure = n - byX.size, dfLof = byX.size - 2, ssLof = Math.max(0, sse - ssPure);
+    let fLof = NaN, pLof = NaN;
+    if (dfPure > 0 && dfLof > 0 && ssPure > 0) {
+      fLof = (ssLof / dfLof) / (ssPure / dfPure);
+      pLof = Stat.fPValue(fLof, dfLof, dfPure);
+    }
+
+    let html = `<div class="card"><div class="card-head">
+      <h3 class="card-title">${tr('t3_lin_res')}</h3>
+      <span class="badge ${r2 >= 0.995 ? 'badge-ok' : 'badge-warn'}">R² = ${fmt(r2, 5)}</span>
+    </div>
+    <div class="grid-4" style="margin-bottom:10px">
+      <div class="kpi"><div class="kpi-label">Regression (y = ax + b)</div><div class="kpi-val" style="font-size:13.5px">y = ${fmt(slope, 2)}x ${intercept >= 0 ? '+' : '−'} ${fmt(Math.abs(intercept), 2)}</div><div class="kpi-sub">r = ${fmt(r, 5)} | S(y/x) = ${fmt(syx, 2)}</div></div>
+      <div class="kpi"><div class="kpi-label">% Y-Intercept (@ ${refX})</div><div class="kpi-val" style="color:${pctYInt <= 2 ? 'var(--ok)' : 'var(--warn)'}">${fmt(pctYInt, 2)}%</div><div class="kpi-sub">SE(b) = ${fmt(seInt, 2)}</div></div>
+      <div class="kpi"><div class="kpi-label">Lack-of-Fit p-value</div><div class="kpi-val">${Number.isFinite(pLof) ? fmtP(pLof) : 'N/A'}</div><div class="kpi-sub">${Number.isFinite(fLof) ? 'F = ' + fmt(fLof, 3) + ` (df ${dfLof},${dfPure})` : 'Need replicates'}</div></div>
+      <div class="kpi"><div class="kpi-label">LOD / LOQ (ICH Q2)</div><div class="kpi-val" style="font-size:15px">${fmt(lod, 3)} / ${fmt(loq, 3)}</div><div class="kpi-sub">3.3σ/S &amp; 10σ/S</div></div>
+    </div>
+    <div class="grid-2">
+      <div><div style="font-size:12px;font-weight:700;margin-bottom:4px">${tr('t3_cal_chart')}</div><div class="chart-box">${renderScatterSvg(pts, { line: { a: slope, b: intercept }, xLabel: 'Concentration' })}</div></div>
+      <div><div style="font-size:12px;font-weight:700;margin-bottom:4px">${tr('t3_res_chart')}</div><div class="chart-box">${renderScatterSvg(resPts, { zeroLine: true, xLabel: 'Concentration' })}</div></div>
+    </div></div>`;
+
+    // Recovery
+    const levels = new Map(), allRec = [];
+    state.t3RecRows.forEach(r => {
+      const lvl = (r[0] || '').trim();
+      const spk = parseTokenNum(r[1]), fnd = parseTokenNum(r[2]);
+      let rec = NaN;
+      if (Number.isFinite(spk) && spk > 0 && Number.isFinite(fnd)) rec = (fnd / spk) * 100;
+      else if (Number.isFinite(spk) && !Number.isFinite(fnd)) rec = spk;
+      if (lvl && Number.isFinite(rec)) {
+        if (!levels.has(lvl)) levels.set(lvl, []);
+        levels.get(lvl).push(rec);
+        allRec.push(rec);
+      }
+    });
+    if (allRec.length >= 2) {
+      const renderRecRow = (lbl, arr, bold = false) => {
+        const m = Stat.mean(arr), s = Stat.sd(arr), rsd = m ? (s / m) * 100 : NaN;
+        const tC = arr.length > 1 ? Stat.tInv(0.975, arr.length - 1) : NaN;
+        const half = Number.isFinite(tC) && Number.isFinite(s) ? tC * s / Math.sqrt(arr.length) : NaN;
+        return `<tr><td>${bold ? '<strong>' + escHtml(lbl) + '</strong>' : escHtml(lbl)}</td>
+          <td class="num">${arr.length}</td><td class="num">${fmt(m, 2)}%</td><td class="num">${fmt(s, 3)}</td>
+          <td class="num">${fmt(rsd, 2)}%</td><td class="num">${Number.isFinite(half) ? '[' + fmt(m - half, 2) + '%, ' + fmt(m + half, 2) + '%]' : '—'}</td></tr>`;
+      };
+      html += `<div class="card"><div class="card-head"><h3 class="card-title">${tr('t3_rec_res')}</h3></div>
+        <div class="tw"><table><thead><tr>
+          <th>Level</th><th class="num">n</th><th class="num">Mean %Recovery</th><th class="num">SD</th><th class="num">%RSD</th><th class="num">95% CI</th>
+        </tr></thead><tbody>`;
+      levels.forEach((arr, lvl) => { html += renderRecRow(lvl, arr, false); });
+      html += renderRecRow('Overall', allRec, true) + `</tbody></table></div></div>`;
+    }
+    out.innerHTML = html;
+  }
+
+  function renderGageCharts(varRows, parts, ops, cellMeans) {
+    const C = themeColors();
+    const W1 = 420, H1 = 240, pad1 = { l: 44, r: 16, t: 28, b: 40 };
+    const pw1 = W1 - pad1.l - pad1.r, ph1 = H1 - pad1.t - pad1.b;
+    const cats = varRows.slice(0, 4);
+    const maxPct = Math.max(100, ...cats.flatMap(r => [r.pctContrib, r.pctStudy, r.pctTol || 0]));
+    const yS1 = v => pad1.t + ph1 - (Math.min(maxPct, Math.max(0, v)) / maxPct) * ph1;
+
+    let svg1 = `<svg viewBox="0 0 ${W1} ${H1}" xmlns="http://www.w3.org/2000/svg"><rect width="${W1}" height="${H1}" fill="${C.bg}" rx="6"/>`;
+    [0, 25, 50, 75, 100].forEach(t => {
+      const y = yS1(t);
+      svg1 += `<line x1="${pad1.l}" y1="${y}" x2="${W1 - pad1.r}" y2="${y}" stroke="${C.line}" stroke-dasharray="3,3"/>`;
+      svg1 += `<text x="${pad1.l - 6}" y="${y + 4}" text-anchor="end" fill="${C.muted}" font-size="10">${t}%</text>`;
+    });
+    const grpW = pw1 / cats.length;
+    cats.forEach((r, idx) => {
+      const gx = pad1.l + idx * grpW + grpW * 0.14, bw = Math.min(18, (grpW * 0.72) / 3);
+      [{ v: r.pctContrib, col: C.accent }, { v: r.pctStudy, col: C.warn }, { v: r.pctTol || 0, col: C.ok }].forEach((b, bi) => {
+        const y = yS1(b.v);
+        svg1 += `<rect x="${gx + bi * (bw + 2)}" y="${y}" width="${bw}" height="${Math.max(1, pad1.t + ph1 - y)}" fill="${b.col}" rx="2"/>`;
+      });
+      svg1 += `<text x="${pad1.l + (idx + 0.5) * grpW}" y="${pad1.t + ph1 + 16}" text-anchor="middle" fill="${C.fg}" font-size="10">${escHtml(r.short)}</text>`;
+    });
+    svg1 += `<g font-size="10" fill="${C.muted}">
+      <rect x="${pad1.l}" y="6" width="10" height="10" fill="${C.accent}"/><text x="${pad1.l + 14}" y="15">%Contrib</text>
+      <rect x="${pad1.l + 82}" y="6" width="10" height="10" fill="${C.warn}"/><text x="${pad1.l + 96}" y="15">%StudyVar</text>
+      <rect x="${pad1.l + 172}" y="6" width="10" height="10" fill="${C.ok}"/><text x="${pad1.l + 186}" y="15">%Tolerance</text>
+    </g></svg>`;
+
+    const W2 = 420, H2 = 240, pad2 = { l: 50, r: 18, t: 28, b: 40 };
+    const pw2 = W2 - pad2.l - pad2.r, ph2 = H2 - pad2.t - pad2.b;
+    const allM = [];
+    parts.forEach(p => ops.forEach(o => allM.push(cellMeans.get(p + '||' + o))));
+    let lo = Math.min(...allM), hi = Math.max(...allM);
+    const sp = (hi - lo) || 1; lo -= sp * 0.12; hi += sp * 0.12;
+    const yt2 = niceTicks(lo, hi, 4);
+    const yLo2 = yt2[0], yHi2 = yt2[yt2.length - 1];
+    const yS2 = v => pad2.t + ph2 - ((v - yLo2) / (yHi2 - yLo2)) * ph2;
+    const xS2 = idx => pad2.l + (parts.length > 1 ? (idx / (parts.length - 1)) * pw2 : pw2 / 2);
+
+    let svg2 = `<svg viewBox="0 0 ${W2} ${H2}" xmlns="http://www.w3.org/2000/svg"><rect width="${W2}" height="${H2}" fill="${C.bg}" rx="6"/>`;
+    yt2.forEach(t => {
+      const y = yS2(t);
+      svg2 += `<line x1="${pad2.l}" y1="${y}" x2="${W2 - pad2.r}" y2="${y}" stroke="${C.line}" stroke-dasharray="3,3"/>`;
+      svg2 += `<text x="${pad2.l - 6}" y="${y + 4}" text-anchor="end" fill="${C.muted}" font-size="10">${fmt(t, 1)}</text>`;
+    });
+    parts.forEach((p, idx) => { svg2 += `<text x="${xS2(idx)}" y="${pad2.t + ph2 + 16}" text-anchor="middle" fill="${C.fg}" font-size="10">${escHtml(p)}</text>`; });
+    ops.forEach((o, oi) => {
+      const col = C.palette[oi % C.palette.length];
+      let linePts = '';
+      parts.forEach((p, pi) => {
+        const x = xS2(pi), y = yS2(cellMeans.get(p + '||' + o));
+        linePts += `${x.toFixed(1)},${y.toFixed(1)} `;
+        svg2 += `<circle cx="${x}" cy="${y}" r="3.4" fill="${col}"/>`;
+      });
+      svg2 += `<polyline points="${linePts.trim()}" fill="none" stroke="${col}" stroke-width="1.8"/>`;
+      svg2 += `<rect x="${pad2.l + oi * 74}" y="6" width="10" height="10" fill="${col}"/><text x="${pad2.l + oi * 74 + 14}" y="15" font-size="10" fill="${C.muted}">${escHtml(o)}</text>`;
+    });
+    svg2 += `</svg>`;
+    return { svg1, svg2 };
+  }
+
+  function runT3Gage() {
+    const out = document.getElementById('t3Output');
+    const tol = parseFloat(document.getElementById('t3Tol').value);
+    const autoPool = document.getElementById('t3PoolInt').checked;
+
+    const rows = [];
+    state.t3GageRows.forEach(r => {
+      const p = (r[0] || '').trim(), o = (r[1] || '').trim(), y = parseTokenNum(r[2]);
+      if (p && o && Number.isFinite(y)) rows.push({ p, o, y });
+    });
+
+    const parts = [...new Set(rows.map(r => r.p))], ops = [...new Set(rows.map(r => r.o))];
+    const P = parts.length, O = ops.length;
+    if (P < 2 || O < 2) { out.innerHTML = `<div class="alert alert-danger">${tr('t3_err_gage')}</div>`; return; }
+
+    const cells = new Map();
+    rows.forEach(r => { const k = r.p + '||' + r.o; if (!cells.has(k)) cells.set(k, []); cells.get(k).push(r.y); });
+    let repCount = null;
+    for (const p of parts) {
+      for (const o of ops) {
+        const arr = cells.get(p + '||' + o);
+        if (!arr || arr.length < 2 || (repCount !== null && arr.length !== repCount)) {
+          out.innerHTML = `<div class="alert alert-danger">${tr('t3_err_gage')}</div>`;
+          return;
+        }
+        repCount = arr.length;
+      }
+    }
+
+    const R = repCount, N = P * O * R, grandMean = Stat.mean(rows.map(r => r.y));
+    const partMeans = new Map(), opMeans = new Map(), cellMeans = new Map();
+    parts.forEach(p => partMeans.set(p, Stat.mean(rows.filter(r => r.p === p).map(r => r.y))));
+    ops.forEach(o => opMeans.set(o, Stat.mean(rows.filter(r => r.o === o).map(r => r.y))));
+    cells.forEach((arr, k) => cellMeans.set(k, Stat.mean(arr)));
+
+    let ssP = 0, ssO = 0, ssPO = 0, ssE = 0;
+    parts.forEach(p => { ssP += O * R * Math.pow(partMeans.get(p) - grandMean, 2); });
+    ops.forEach(o => { ssO += P * R * Math.pow(opMeans.get(o) - grandMean, 2); });
+    parts.forEach(p => ops.forEach(o => {
+      const cm = cellMeans.get(p + '||' + o);
+      ssPO += R * Math.pow(cm - partMeans.get(p) - opMeans.get(o) + grandMean, 2);
+      cells.get(p + '||' + o).forEach(v => { ssE += Math.pow(v - cm, 2); });
+    }));
+
+    const dfP = P - 1, dfO = O - 1, dfPO = (P - 1) * (O - 1), dfE = P * O * (R - 1);
+    const msP = ssP / dfP, msO = ssO / dfO, msPO = ssPO / dfPO, msE = ssE / dfE;
+    const fPO = msE > 0 ? msPO / msE : 0, pPO = Stat.fPValue(fPO, dfPO, dfE);
+
+    const pooled = autoPool && pPO > 0.25;
+    let msEquip, dfEquip, varRep, varOp, varInt, varPart, fP, pP, fO, pO;
+    if (pooled) {
+      dfEquip = dfE + dfPO; msEquip = (ssE + ssPO) / dfEquip;
+      fP = msEquip > 0 ? msP / msEquip : 0; pP = Stat.fPValue(fP, dfP, dfEquip);
+      fO = msEquip > 0 ? msO / msEquip : 0; pO = Stat.fPValue(fO, dfO, dfEquip);
+      varRep = msEquip; varOp = Math.max(0, (msO - msEquip) / (P * R)); varInt = 0; varPart = Math.max(0, (msP - msEquip) / (O * R));
+    } else {
+      dfEquip = dfE; msEquip = msE;
+      fP = msPO > 0 ? msP / msPO : 0; pP = Stat.fPValue(fP, dfP, dfPO);
+      fO = msPO > 0 ? msO / msPO : 0; pO = Stat.fPValue(fO, dfO, dfPO);
+      varRep = msE; varInt = Math.max(0, (msPO - msE) / R); varOp = Math.max(0, (msO - msPO) / (P * R)); varPart = Math.max(0, (msP - msPO) / (O * R));
+    }
+
+    const varReprod = varOp + varInt, varGRR = varRep + varReprod, varTotal = varGRR + varPart;
+    const sdGRR = Math.sqrt(varGRR), sdPart = Math.sqrt(varPart), sdTot = Math.sqrt(varTotal);
+    const pctStudyGRR = sdTot > 0 ? (sdGRR / sdTot) * 100 : 0;
+    const pctTolGRR = (Number.isFinite(tol) && tol > 0) ? (6 * sdGRR / tol) * 100 : NaN;
+    const ndc = sdGRR > 0 ? Math.max(1, Math.floor(1.41 * (sdPart / sdGRR))) : 99;
+
+    const evalMetric = Number.isFinite(pctTolGRR) ? pctTolGRR : pctStudyGRR;
+    let statusCls = 'badge-ok', statusLbl = tr('pass') + ' (<10%)';
+    if (evalMetric > 30) { statusCls = 'badge-danger'; statusLbl = tr('fail') + ' (>30%)'; }
+    else if (evalMetric >= 10) { statusCls = 'badge-warn'; statusLbl = tr('cond') + ' (10–30%)'; }
+
+    const varRows = [
+      { name: 'Total Gage R&R', short: 'Gage R&R', v: varGRR },
+      { name: '  Repeatability', short: 'Repeat', v: varRep },
+      { name: '  Reproducibility', short: 'Reprod', v: varReprod },
+      { name: 'Part-to-Part', short: 'Part-Part', v: varPart },
+      { name: 'Total Variation', short: 'Total', v: varTotal }
+    ].map(r => {
+      const sd = Math.sqrt(Math.max(0, r.v));
+      return { ...r, sd, sv: 6 * sd, pctContrib: varTotal > 0 ? (r.v / varTotal) * 100 : 0, pctStudy: sdTot > 0 ? (sd / sdTot) * 100 : 0, pctTol: (Number.isFinite(tol) && tol > 0) ? (6 * sd / tol) * 100 : NaN };
+    });
+
+    const charts = renderGageCharts(varRows, parts, ops, cellMeans);
+    out.innerHTML = `<div class="card"><div class="card-head">
+      <h3 class="card-title">${tr('t3_gage_var')} (${P} Parts × ${O} Operators × ${R} Reps)</h3>
+      <span class="badge ${statusCls}">${statusLbl}</span>
+    </div>
+    <div class="grid-4" style="margin-bottom:10px">
+      <div class="kpi"><div class="kpi-label">%Study Var (Gage R&amp;R)</div><div class="kpi-val">${fmt(pctStudyGRR, 2)}%</div><div class="kpi-sub">6×SD = ${fmt(6 * sdGRR, 4)}</div></div>
+      <div class="kpi"><div class="kpi-label">%Tolerance (USL−LSL)</div><div class="kpi-val">${Number.isFinite(pctTolGRR) ? fmt(pctTolGRR, 2) + '%' : '—'}</div><div class="kpi-sub">Tol = ${fmt(tol, 2)}</div></div>
+      <div class="kpi"><div class="kpi-label">ndc (Distinct Categories)</div><div class="kpi-val" style="color:${ndc >= 5 ? 'var(--ok)' : 'var(--danger)'}">${ndc}</div><div class="kpi-sub">AIAG Target ≥ 5</div></div>
+      <div class="kpi"><div class="kpi-label">Model Used</div><div class="kpi-val" style="font-size:14px">${pooled ? 'Reduced (Pooled)' : 'With Interaction'}</div><div class="kpi-sub">Interaction p = ${fmtP(pPO)}</div></div>
+    </div>
+    <div class="tw"><table><thead><tr>
+      <th>Source</th><th class="num">VarComp</th><th class="num">%Contrib</th><th class="num">SD</th><th class="num">Study Var (6×SD)</th><th class="num">%Study Var</th><th class="num">%Tolerance</th>
+    </tr></thead><tbody>
+      ${varRows.map((r, i) => `<tr>
+        <td>${i === 0 || i === 4 ? '<strong>' + escHtml(r.name) + '</strong>' : escHtml(r.name)}</td>
+        <td class="num">${fmt(r.v, 5)}</td><td class="num">${fmt(r.pctContrib, 2)}%</td><td class="num">${fmt(r.sd, 4)}</td>
+        <td class="num">${fmt(r.sv, 4)}</td><td class="num">${fmt(r.pctStudy, 2)}%</td>
+        <td class="num">${Number.isFinite(r.pctTol) ? fmt(r.pctTol, 2) + '%' : '—'}</td>
+      </tr>`).join('')}
+    </tbody></table></div></div>
+    <div class="card"><div class="card-head"><h3 class="card-title">${tr('t3_gage_anova')}</h3></div>
+      <div class="tw"><table><thead><tr>
+        <th>Source</th><th class="num">DF</th><th class="num">SS</th><th class="num">MS</th><th class="num">F</th><th class="num">p-value</th>
+      </tr></thead><tbody>
+        <tr><td>Part</td><td class="num">${dfP}</td><td class="num">${fmt(ssP, 4)}</td><td class="num">${fmt(msP, 4)}</td><td class="num">${fmt(fP, 3)}</td><td class="num">${fmtP(pP)}</td></tr>
+        <tr><td>Operator</td><td class="num">${dfO}</td><td class="num">${fmt(ssO, 4)}</td><td class="num">${fmt(msO, 4)}</td><td class="num">${fmt(fO, 3)}</td><td class="num">${fmtP(pO)}</td></tr>
+        ${!pooled ? `<tr><td>Part × Operator</td><td class="num">${dfPO}</td><td class="num">${fmt(ssPO, 4)}</td><td class="num">${fmt(msPO, 4)}</td><td class="num">${fmt(fPO, 3)}</td><td class="num">${fmtP(pPO)}</td></tr>` : ''}
+        <tr><td>Repeatability${pooled ? ' (Pooled)' : ''}</td><td class="num">${dfEquip}</td><td class="num">${fmt(pooled ? ssE + ssPO : ssE, 4)}</td><td class="num">${fmt(msEquip, 4)}</td><td class="num">—</td><td class="num">—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num">${N - 1}</td><td class="num">${fmt(ssP + ssO + ssPO + ssE, 4)}</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+      </tbody></table></div></div>
+    <div class="card"><div class="card-head"><h3 class="card-title">${tr('t3_gage_charts')}</h3></div>
+      <div class="grid-2"><div class="chart-box">${charts.svg1}</div><div class="chart-box">${charts.svg2}</div></div></div>`;
+  }
+
+  function runT3() { if (state.t3Sub === 'ich') runT3Ich(); else runT3Gage(); }
+
+
+  function renderAllI18n() {
+    document.documentElement.lang = state.lang;
+    const bp = document.getElementById('btnPrint');
+    if (bp) bp.textContent = tr('print');
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = tr(el.dataset.i18n); });
+  }
+
+  function renderAllGrids() {
+    renderT3Grids();
+  }
+
+  function rerenderActiveOutputs() {
+    runT3();
+  }
+
+  function bindEvents() {
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      document.getElementById('printMeta').textContent = new Date().toLocaleString(state.lang === 'vi' ? 'vi-VN' : 'en-US');
+      window.print();
+    });
+    function switchT3Sub(sub) {
+      state.t3Sub = sub;
+      document.getElementById('t3SubBtnIch').classList.toggle('active', sub === 'ich');
+      document.getElementById('t3SubBtnGage').classList.toggle('active', sub === 'gage');
+      document.getElementById('t3IchPanel').style.display = sub === 'ich' ? '' : 'none';
+      document.getElementById('t3GagePanel').style.display = sub === 'gage' ? '' : 'none';
+      if ((sub === 'ich' && !state.t3LinRows.length) || (sub === 'gage' && !state.t3GageRows.length)) loadT3Sample();
+      else runT3();
+    }
+    document.getElementById('t3SubBtnIch').addEventListener('click', () => switchT3Sub('ich'));
+    document.getElementById('t3SubBtnGage').addEventListener('click', () => switchT3Sub('gage'));
+    document.getElementById('t3SampleBtn').addEventListener('click', loadT3Sample);
+    document.getElementById('t3RunBtn').addEventListener('click', runT3);
+    document.getElementById('t3LinAddRow').addEventListener('click', () => { state.t3LinRows.push(['', '']); renderT3Grids(); });
+    document.getElementById('t3LinClear').addEventListener('click', () => { state.t3LinRows = Array.from({ length: 6 }, () => ['', '']); renderT3Grids(); });
+    document.getElementById('t3RecAddRow').addEventListener('click', () => { state.t3RecRows.push(['', '', '']); renderT3Grids(); });
+    document.getElementById('t3RecClear').addEventListener('click', () => { state.t3RecRows = Array.from({ length: 6 }, () => ['', '', '']); renderT3Grids(); });
+    document.getElementById('t3GageAddRow').addEventListener('click', () => { state.t3GageRows.push(['', '', '']); renderT3Grids(); });
+    document.getElementById('t3GageClear').addEventListener('click', () => { state.t3GageRows = Array.from({ length: 8 }, () => ['', '', '']); renderT3Grids(); });
+  }
+
+  window.__MINITAB_RD_STAT__ = Stat;
+
+  initParentSync();
+  renderAllI18n();
+  bindEvents();
+  loadT3Sample();
+})();
+</script>
+</body>
+</html>

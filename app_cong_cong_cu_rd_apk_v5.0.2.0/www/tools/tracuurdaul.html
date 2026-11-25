@@ -1,0 +1,2119 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tra cứu RDA & UL - RNI/UL Lookup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f9; --surface: #ffffff; --surface-alt: #f8fafc;
+  --fg: #1f1f1f; --fg-muted: #5f6368;
+  --accent: #0b57d0; --accent-light: #e8f0fe;
+  --danger: #b3261e; --danger-light: #fce8e6;
+  --warning: #b06000; --warning-light: #fef7e0;
+  --ok: #137333; --ok-light: #e6f4ea;
+  --info: #0b57d0; --info-light: #e8f0fe;
+  --border: #e3e3e3; --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121316; --surface: #1e1f22; --surface-alt: #282a2e;
+    --fg: #e3e3e3; --fg-muted: #9aa0a6;
+    --accent: #8ab4f8; --accent-light: #1e293b;
+    --danger: #f28b82; --danger-light: #371d1b;
+    --warning: #fdd663; --warning-light: #332b00;
+    --ok: #81c995; --ok-light: #0d2b17;
+    --info: #8ab4f8; --info-light: #1e293b;
+    --border: #333538; --shadow: 0 1px 3px rgba(0,0,0,0.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121316; --surface: #1e1f22; --surface-alt: #282a2e;
+  --fg: #e3e3e3; --fg-muted: #9aa0a6;
+  --accent: #8ab4f8; --accent-light: #1e293b;
+  --danger: #f28b82; --danger-light: #371d1b;
+  --warning: #fdd663; --warning-light: #332b00;
+  --ok: #81c995; --ok-light: #0d2b17;
+  --info: #8ab4f8; --info-light: #1e293b;
+  --border: #333538; --shadow: 0 1px 3px rgba(0,0,0,0.2);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  line-height: 1.55; margin: 0; padding: 0;
+}
+* { box-sizing: border-box; }
+
+header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--surface); color: var(--fg);
+  padding: 12px 24px; border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+}
+.brand-wrap { display: flex; align-items: center; gap: 12px; }
+.brand-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--accent-light); color: var(--accent);
+  display: grid; place-items: center; flex-shrink: 0;
+}
+header h1 { font-size: 16px; font-weight: 700; margin: 0; color: var(--fg); }
+header .subtitle { font-size: 11.5px; color: var(--fg-muted); margin-top: 2px; }
+
+.hbtn {
+  border: 1px solid var(--border); background: var(--surface); color: var(--fg);
+  padding: 6px 14px; border-radius: 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+  transition: background .15s, border-color .15s;
+}
+.hbtn:hover { background: var(--bg); border-color: var(--fg-muted); }
+
+.main-grid {
+  display: grid; grid-template-columns: 370px 1fr;
+  gap: 20px; max-width: 1400px; margin: 12px auto 28px; padding: 0 16px;
+}
+@media (max-width: 860px) {
+  .main-grid { grid-template-columns: 1fr; padding: 0 10px; margin: 8px auto 16px; }
+}
+@media (max-width: 860px) { .main-grid { grid-template-columns: 1fr; padding: 0 12px; } }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+}
+.panel h2 {
+  font-size: 13px; font-weight: 700; margin: 0 0 12px;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent);
+}
+
+.field { margin-bottom: 12px; }
+.field label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--fg-muted); margin-bottom: 4px;
+}
+.field select, .field input[type="number"], .field input[type="text"] {
+  width: 100%; padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg);
+  color: var(--fg); font-family: inherit; font-size: 13.5px; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.field select:focus, .field input:focus {
+  border-color: var(--accent); background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.age-group-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px 10px; max-height: 250px; overflow-y: auto;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 8px 12px; background: var(--bg);
+}
+.age-group-grid label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 400; color: var(--fg);
+  cursor: pointer; padding: 3px 0; margin-bottom: 0;
+}
+.age-group-grid input[type="checkbox"] {
+  accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0;
+}
+.age-shortcuts { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.age-shortcuts button {
+  font-size: 11.5px; padding: 4px 10px; font-weight: 500;
+  background: var(--surface); color: var(--fg-muted);
+  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.age-shortcuts button:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+.selected-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; min-height: 24px; }
+.tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 12px;
+  background: var(--accent-light); color: var(--accent); font-weight: 500;
+}
+.blocked-legend {
+  margin-top: 6px; font-size: 11px; color: var(--danger);
+  background: var(--danger-light); padding: 4px 8px; border-radius: 4px;
+}
+
+.ac-wrap { position: relative; }
+.ac-list {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); max-height: 240px; overflow-y: auto;
+  z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+.ac-item {
+  padding: 8px 12px; cursor: pointer; font-size: 13px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.active { background: var(--accent-light); color: var(--accent); }
+.ac-item .sub { font-size: 11px; color: var(--fg-muted); }
+
+.add-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; align-items: end; margin-top: 8px;
+}
+.add-row .btn-add { grid-column: 1 / -1; }
+
+.btn-add {
+  background: var(--accent); color: #fff; border: 0;
+  border-radius: var(--radius-sm); padding: 9px 14px;
+  font-size: 13px; font-weight: 600; cursor: pointer; width: 100%;
+  transition: opacity .15s; margin-top: 4px;
+}
+.btn-add:hover { opacity: .9; }
+.btn-optimize {
+  background: var(--surface-alt); color: var(--accent);
+  border: 1px solid var(--accent); border-radius: var(--radius-sm);
+  padding: 8px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  width: 100%; margin-top: 10px; transition: background .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-optimize:hover { background: var(--accent-light); }
+
+/* Summary Cards */
+.summary-cards {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 18px;
+}
+@media (max-width: 600px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } }
+.summary-card {
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px; text-align: center;
+}
+.summary-card .value { font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.summary-card .label { font-size: 11.5px; color: var(--fg-muted); font-weight: 500; margin-top: 2px; }
+
+.table-wrap { overflow-x: auto; margin-bottom: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.formula-table {
+  width: 100%; border-collapse: collapse; font-size: 12.5px;
+}
+.formula-table th, .formula-table td {
+  padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border);
+}
+.formula-table th {
+  background: var(--surface-alt); font-weight: 600; font-size: 11.5px; color: var(--fg-muted);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.formula-table tr:last-child td { border-bottom: none; }
+.formula-table td.num { font-family: 'JetBrains Mono', monospace; }
+
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 12px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-ok { background: var(--ok-light); color: var(--ok); }
+.badge-warning { background: var(--warning-light); color: var(--warning); }
+.badge-danger { background: var(--danger-light); color: var(--danger); }
+.badge-info { background: var(--info-light); color: var(--info); }
+
+.btn-del {
+  background: transparent; border: 0; color: var(--fg-muted);
+  cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px;
+}
+.btn-del:hover { color: var(--danger); background: var(--danger-light); }
+
+.empty-state {
+  text-align: center; padding: 36px 20px; color: var(--fg-muted);
+}
+.empty-state svg { margin: 0 auto 10px; color: var(--fg-muted); display: block; }
+
+.detail-card {
+  background: var(--surface-alt); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px; margin-top: 14px; font-size: 12.5px;
+}
+.detail-card h3 { margin: 0 0 8px; font-size: 13.5px; color: var(--fg); }
+
+.source-note {
+  margin-top: 20px; font-size: 11.5px; line-height: 1.6;
+  color: var(--fg-muted); border-top: 1px solid var(--border); padding-top: 14px;
+}
+.source-note strong { color: var(--fg); }
+.opt-result {
+  margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-sm);
+  background: var(--surface-alt); border: 1px solid var(--border); font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+
+
+<div class="main-grid">
+  <!-- LEFT: Config -->
+  <div class="panel" id="configPanel">
+    <h2 id="lblPopTitle">Đối tượng sử dụng (chọn nhiều)</h2>
+    <div class="age-group-grid" id="ageGroupGrid"></div>
+    <div id="blockedLegend" class="blocked-legend" hidden></div>
+    <div class="age-shortcuts">
+      <button id="btnAdults" onclick="selectPreset('adults')">Người lớn</button>
+      <button id="btnChildren" onclick="selectPreset('children')">Trẻ em</button>
+      <button id="btnAll" onclick="selectPreset('all')">Tất cả</button>
+      <button id="btnNone" onclick="selectPreset('none')">Bỏ chọn</button>
+    </div>
+    <div class="selected-tags" id="selectedTags"></div>
+
+    <h2 style="margin-top:20px" id="lblAddTitle">Thêm thành phần</h2>
+    <div class="field">
+      <label id="lblNutrient">Chất dinh dưỡng <span style="font-weight:400;font-size:11px;color:var(--fg-muted)" id="lblNutHint">(gõ để tìm)</span></label>
+      <div class="ac-wrap">
+        <input type="text" id="nutrientSearch" placeholder="VD: vitamin C, kẽm, calcium..." autocomplete="off">
+        <input type="hidden" id="nutrientSelected" value="">
+        <div class="ac-list" id="acList" hidden></div>
+      </div>
+    </div>
+    <div id="ageWarn"></div>
+    <div id="convNote"></div>
+    <div class="add-row">
+      <div class="field">
+        <label for="servingsPerDay" id="lblServings">Số lần/ngày</label>
+        <input type="number" id="servingsPerDay" value="1" min="1" max="10" step="1">
+      </div>
+      <div class="field">
+        <label for="amountInput" id="lblAmount">Hàm lượng / lần</label>
+        <input type="number" id="amountInput" placeholder="Để trống → tối ưu" min="0" step="any">
+      </div>
+      <div class="field">
+        <label id="lblUnit">Đơn vị</label>
+        <input type="text" id="unitDisplay" readonly
+          style="background:var(--surface-alt);text-align:center;padding:8px 4px;width:100%;
+                 border:1px solid var(--border);border-radius:var(--radius-sm);
+                 font-family:inherit;font-size:13.5px;color:var(--fg)">
+      </div>
+      <button class="btn-add" id="btnAdd" onclick="addToFormula()">+ Thêm</button>
+    </div>
+    <button class="btn-optimize" id="btnOpt" onclick="runOptimize()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="lblOptText">Tối ưu hóa liều & số lần</span>
+    </button>
+    <div id="optResult"></div>
+  </div>
+
+  <!-- RIGHT: Formula -->
+  <div class="panel" style="min-width:0">
+    <h2 id="lblFormulaTitle">Công thức sản phẩm</h2>
+    <div class="summary-cards">
+      <div class="summary-card"><div class="value" id="totalItems">0</div><div class="label" id="lblTotalItems">Thành phần</div></div>
+      <div class="summary-card"><div class="value" id="totalOk" style="color:var(--ok)">0</div><div class="label" id="lblTotalOk">Đạt</div></div>
+      <div class="summary-card"><div class="value" id="totalWarning" style="color:var(--warning)">0</div><div class="label" id="lblTotalWarning">Cảnh báo</div></div>
+      <div class="summary-card"><div class="value" id="totalDanger" style="color:var(--danger)">0</div><div class="label" id="lblTotalDanger">Vượt UL</div></div>
+    </div>
+    <div id="bioNote"></div>
+    <div class="table-wrap">
+      <table class="formula-table" id="formulaTable">
+        <thead><tr>
+          <th id="thNutrient">Thành phần</th>
+          <th id="thAmount">Hàm lượng</th>
+          <th id="thServings">Lần</th>
+          <th id="thDaily">Hàm lượng/ngày</th>
+          <th id="thRni">RNI (min–max)</th>
+          <th id="thHardest">%RNI khó nhất</th>
+          <th id="thUl">UL thấp nhất</th>
+          <th id="thEval">Đánh giá</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="formulaBody"></tbody>
+      </table>
+    </div>
+    <div id="emptyState" class="empty-state">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+      <p id="emptyText">Chọn đối tượng và thêm thành phần để kiểm tra</p>
+    </div>
+    <div id="detailPanel"></div>
+    <div class="source-note" id="sourceNote">
+      <strong>Nguồn:</strong> TT 43/2014/TT-BYT — Phụ lục 01 (RNI) & Phụ lục 02 (UL); NQ 66/13/2026/NQ-CP — Điều 8 & 9 (quy tắc ≥15% RNI).<br>
+      <strong>KC</strong> = Không đủ dữ liệu xác định UL (không có nghĩa là an toàn ở mọi liều).<br>
+      <strong>Sắt:</strong> RDA tự động chuyển cột sinh học theo Vitamin C trong công thức (TT43 chú thích 1-3). PN mang thai: RDA cộng thêm vào nữ trưởng thành.<br>
+      <strong>Kẽm:</strong> 3 cột hấp thu (50%/30%/15%). Mặc định 30%.<br>
+      <strong>UL Ca, P:</strong> Theo IOM (2011) — TT43 không có UL cho Ca, P.<br>
+      <strong>B5, Biotin, Choline, Cu, Mn, Cr, Mo, F, K:</strong> Nguồn IOM/NAM DRI & VAFF P1 — không có trong TT43. Giá trị AI (đủ) thay cho RDA nếu chưa đủ dữ liệu.<br>
+      <strong>Thành phần khác</strong> (EPA, DHA, CoQ10, Lutein, Collagen...): Nguồn PubMed, EFSA, JECFA — chỉ có dữ liệu người lớn. <span style="color:var(--info);font-size:0.7rem">AI</span> = Adequate Intake.
+    </div>
+  </div>
+</div>
+
+<script>
+let currentLang = 'vi';
+try {
+  if (window.parent && window.parent.L) currentLang = window.parent.L;
+  else currentLang = localStorage.getItem('rda_lang') || 'vi';
+} catch(e){}
+
+const I18N_RDA = {
+  vi: {
+    btn: "EN",
+    hdr_title: "Tra cứu RDA & UL — TPCN Việt Nam",
+    hdr_sub: "Theo TT 43/2014/TT-BYT · Phụ lục 01 & 02 · NQ 66/13/2026/NQ-CP (≥15% RNI)",
+    pop_title: "Đối tượng sử dụng (chọn nhiều)",
+    adults: "Người lớn", children: "Trẻ em", all: "Tất cả", none: "Bỏ chọn",
+    add_title: "Thêm thành phần",
+    nutrient: "Chất dinh dưỡng",
+    nut_hint: "(gõ để tìm)",
+    search_ph: "VD: vitamin C, kẽm, calcium...",
+    servings: "Số lần/ngày",
+    amount: "Hàm lượng / lần",
+    amount_ph: "Để trống → tối ưu",
+    unit: "Đơn vị",
+    btn_add: "+ Thêm",
+    btn_opt: "Tối ưu hóa liều & số lần",
+    formula_title: "Công thức sản phẩm",
+    total_items: "Thành phần",
+    total_ok: "Đạt",
+    total_warn: "Cảnh báo",
+    total_danger: "Vượt UL",
+    th_nut: "Thành phần",
+    th_amt: "Hàm lượng",
+    th_srv: "Lần",
+    th_daily: "Hàm lượng/ngày",
+    th_rni: "RNI (min–max)",
+    th_hardest: "%RNI khó nhất",
+    th_ul: "UL thấp nhất",
+    th_eval: "Đánh giá",
+    empty_text: "Chọn đối tượng và thêm thành phần để kiểm tra",
+    pass: "Đạt",
+    warn_under: "Dưới 15% RNI",
+    danger_over: "Vượt UL",
+    kc: "KC"
+  },
+  en: {
+    pop_title: "Target Population (multiple select)",
+    adults: "Adults", children: "Children", all: "Select all", none: "Deselect",
+    add_title: "Add Ingredient / Nutrient",
+    nutrient: "Nutrient",
+    nut_hint: "(type to search)",
+    search_ph: "e.g. Vitamin C, zinc, calcium...",
+    servings: "Servings / day",
+    amount: "Amount / serving",
+    amount_ph: "Leave blank to optimize",
+    unit: "Unit",
+    btn_add: "+ Add",
+    btn_opt: "Optimize Dosage & Servings",
+    formula_title: "Product Formula",
+    total_items: "Ingredients",
+    total_ok: "Compliant",
+    total_warn: "Warning",
+    total_danger: "Exceeds UL",
+    th_nut: "Ingredient",
+    th_amt: "Amount",
+    th_srv: "Servings",
+    th_daily: "Daily Intake",
+    th_rni: "RNI (min–max)",
+    th_hardest: "% RNI (hardest)",
+    th_ul: "Lowest UL",
+    th_eval: "Evaluation",
+    empty_text: "Select target population and add ingredients to evaluate",
+    pass: "Pass",
+    warn_under: "Under 15% RNI",
+    danger_over: "Exceeds UL",
+    kc: "No limit",
+    bio_label_default: "10% (default)",
+    bio_label_5: "5% (Vit C < 25mg)",
+    bio_label_15: "15% (Vit C > 75mg)",
+    iron_title: "Iron — Bioavailability: ",
+    iron_vitc_auto: " · Vitamin C = {amt}mg/day → automatically selected {col} column",
+    iron_vitc_hint: " · Add Vitamin C to formula to automatically adjust bioavailability",
+    opt_title: "Optimal Dosage Plan — {srv} servings/day",
+    opt_srv_label: "/serving",
+    opt_day_label: "/day",
+    opt_ul_label: "UL: {ul}",
+    opt_no_ul: "UL: No limit",
+    opt_warn: "Some nutrients cannot reach 100% RNI without exceeding UL.",
+    opt_danger: "Resolution 66/13/2026: Nutrient < 15% RNI → ineligible for registration.",
+    adults_badge: "Adults only",
+    age_warn: "has no RDA/AI data for: ",
+    blocked_legend: "groups locked because formula ingredients lack RDA/AI data",
+    group_empty_warn: "Please select at least 1 population group",
+    formula_empty_warn: "Add ingredients to formula to evaluate"
+  }
+};
+
+const AGE_GROUPS = [
+  { id:"infant_0_6m", label:"Trẻ em < 6 tháng", label_en:"Infants < 6 months", cat:"children" },
+  { id:"infant_6_11m", label:"Trẻ em 6–11 tháng", label_en:"Infants 6–11 months", cat:"children" },
+  { id:"child_1_3", label:"Trẻ nhỏ 1–3 tuổi", label_en:"Children 1–3 years", cat:"children" },
+  { id:"child_4_6", label:"Trẻ nhỏ 4–6 tuổi", label_en:"Children 4–6 years", cat:"children" },
+  { id:"child_7_9", label:"Trẻ nhỏ 7–9 tuổi", label_en:"Children 7–9 years", cat:"children" },
+  { id:"male_10_12", label:"Nam 10–12 tuổi", label_en:"Males 10–12 years", cat:"adults" },
+  { id:"male_13_15", label:"Nam 13–15 tuổi", label_en:"Males 13–15 years", cat:"adults" },
+  { id:"male_16_18", label:"Nam 16–18 tuổi", label_en:"Males 16–18 years", cat:"adults" },
+  { id:"male_19_50", label:"Nam 19–50 tuổi", label_en:"Males 19–50 years", cat:"adults" },
+  { id:"male_51_60", label:"Nam 51–60 tuổi", label_en:"Males 51–60 years", cat:"adults" },
+  { id:"male_60plus", label:"Nam >60 tuổi", label_en:"Males >60 years", cat:"adults" },
+  { id:"female_10_12", label:"Nữ 10–12 tuổi", label_en:"Females 10–12 years", cat:"adults" },
+  { id:"female_13_15", label:"Nữ 13–15 tuổi", label_en:"Females 13–15 years", cat:"adults" },
+  { id:"female_16_18", label:"Nữ 16–18 tuổi", label_en:"Females 16–18 years", cat:"adults" },
+  { id:"female_19_50", label:"Nữ 19–50 tuổi", label_en:"Females 19–50 years", cat:"adults" },
+  { id:"female_51_60", label:"Nữ 51–60 tuổi", label_en:"Females 51–60 years", cat:"adults" },
+  { id:"female_60plus", label:"Nữ >60 tuổi", label_en:"Females >60 years", cat:"adults" },
+  { id:"pregnant", label:"PN mang thai", label_en:"Pregnant women", cat:"adults" },
+  { id:"lactating", label:"Bà mẹ cho con bú", label_en:"Lactating mothers", cat:"adults" },
+];
+
+function getULGroup(ageId) {
+  const m = {
+    infant_0_6m:"ul_0_6m", infant_6_11m:"ul_6_12m",
+    child_1_3:"ul_1_3", child_4_6:"ul_4_8", child_7_9:"ul_4_8",
+    male_10_12:"ul_9_13", male_13_15:"ul_9_13", male_16_18:"ul_14_18",
+    male_19_50:"ul_19_50", male_51_60:"ul_51", male_60plus:"ul_51",
+    female_10_12:"ul_9_13", female_13_15:"ul_9_13", female_16_18:"ul_14_18",
+    female_19_50:"ul_19_50", female_51_60:"ul_51", female_60plus:"ul_51",
+    pregnant:"ul_pregnant", lactating:"ul_lactating",
+  };
+  return m[ageId] || "ul_19_50";
+}
+
+const IRON_BIO = {
+  // Column 5%: Vitamin C < 25mg/day
+  bio5: {
+    infant_0_6m:0.93, infant_6_11m:18.6, child_1_3:11.6, child_4_6:12.6, child_7_9:17.8,
+    male_10_12:29.2, male_13_15:29.2, male_16_18:37.6,
+    male_19_50:27.4, male_51_60:null, male_60plus:null,
+    female_10_12:28.0, female_13_15:28.0, female_16_18:65.4,
+    female_19_50:58.8, female_51_60:22.6, female_60plus:22.6,
+    pregnant:null, lactating:null, // pregnant = additive
+  },
+  // Column 10%: Vitamin C 25-75mg/day (default)
+  bio10: {
+    infant_0_6m:null, infant_6_11m:12.4, child_1_3:7.7, child_4_6:8.4, child_7_9:11.9,
+    male_10_12:19.5, male_13_15:19.5, male_16_18:25.1,
+    male_19_50:18.3, male_51_60:null, male_60plus:null,
+    female_10_12:18.7, female_13_15:18.7, female_16_18:43.6,
+    female_19_50:39.2, female_51_60:15.1, female_60plus:15.1,
+    pregnant:null, lactating:null,
+  },
+  // Column 15%: Vitamin C > 75mg/day
+  bio15: {
+    infant_0_6m:null, infant_6_11m:9.3, child_1_3:5.8, child_4_6:6.3, child_7_9:8.9,
+    male_10_12:14.6, male_13_15:14.6, male_16_18:18.8,
+    male_19_50:13.7, male_51_60:null, male_60plus:null,
+    female_10_12:14.0, female_13_15:14.0, female_16_18:32.7,
+    female_19_50:29.4, female_51_60:11.3, female_60plus:11.3,
+    pregnant:null, lactating:null,
+  },
+  // Additive values for pregnant (+5%/+10%/+15%)
+  pregnantAdd: { bio5: 30.0, bio10: 20.0, bio15: 15.0 },
+};
+
+// ===== ZINC: 3 bioavailability columns =====
+const ZINC_BIO = {
+  // Good absorption (50%): high animal protein
+  bio50: {
+    infant_0_6m:1.1, infant_6_11m:2.5, child_1_3:2.4, child_4_6:3.1, child_7_9:3.3,
+    male_10_12:5.7, male_13_15:5.7, male_16_18:5.7,
+    male_19_50:4.2, male_51_60:3.0, male_60plus:3.0,
+    female_10_12:4.6, female_13_15:4.6, female_16_18:4.6,
+    female_19_50:3.0, female_51_60:3.0, female_60plus:3.0,
+    pregnant:null, lactating:null,
+  },
+  // Moderate absorption (30%): default
+  bio30: {
+    infant_0_6m:2.8, infant_6_11m:4.1, child_1_3:4.1, child_4_6:5.1, child_7_9:5.6,
+    male_10_12:9.7, male_13_15:9.7, male_16_18:9.7,
+    male_19_50:7.0, male_51_60:4.9, male_60plus:4.9,
+    female_10_12:7.8, female_13_15:7.8, female_16_18:7.8,
+    female_19_50:4.9, female_51_60:4.9, female_60plus:4.9,
+    pregnant:null, lactating:null,
+  },
+  // Poor absorption (15%): low animal protein, high phytate
+  bio15: {
+    infant_0_6m:6.5, infant_6_11m:8.3, child_1_3:8.4, child_4_6:10.3, child_7_9:11.3,
+    male_10_12:19.2, male_13_15:19.2, male_16_18:19.2,
+    male_19_50:14.0, male_51_60:9.8, male_60plus:9.8,
+    female_10_12:15.5, female_13_15:15.5, female_16_18:15.5,
+    female_19_50:9.8, female_51_60:9.8, female_60plus:9.8,
+    pregnant:null, lactating:null,
+  },
+};
+
+// ===== ALL 18 NUTRIENTS =====
+const NUTRIENTS = {
+  // ────── VITAMINS ──────
+  vitamin_a: {
+    name:"Vitamin A", unit:"mcg", group:"vitamin",
+    rda:{
+      infant_0_6m:375, infant_6_11m:400, child_1_3:400, child_4_6:450, child_7_9:500,
+      male_10_12:600, male_13_15:600, male_16_18:600,
+      male_19_50:600, male_51_60:600, male_60plus:600,
+      female_10_12:600, female_13_15:600, female_16_18:600,
+      female_19_50:500, female_51_60:500, female_60plus:500,
+      pregnant:600, lactating:850,
+    },
+    ul:{
+      ul_0_6m:600, ul_6_12m:600, ul_1_3:600, ul_4_8:900,
+      ul_9_13:1700, ul_14_18:2800,
+      ul_19_50:3000, ul_51:3000, ul_pregnant:3000, ul_lactating:3000,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: {
+      title: "Quy đổi Vitamin A",
+      lines: [
+        "1 mcg retinol = 1 RE (đương lượng retinol)",
+        "1 IU = 0,3 mcg vitamin A",
+        "1 mcg β-caroten = 0,167 mcg vitamin A",
+        "1 mcg caroten khác = 0,084 mcg vitamin A",
+        "TT43 dùng mcg RAE. Nhiều nhãn TPCN ghi IU."
+      ]
+    },
+  },
+  vitamin_d: {
+    name:"Vitamin D", unit:"mcg", group:"vitamin",
+    rda:{
+      infant_0_6m:5, infant_6_11m:5, child_1_3:5, child_4_6:5, child_7_9:5,
+      male_10_12:5, male_13_15:5, male_16_18:5,
+      male_19_50:5, male_51_60:10, male_60plus:15,
+      female_10_12:5, female_13_15:5, female_16_18:5,
+      female_19_50:5, female_51_60:10, female_60plus:15,
+      pregnant:5, lactating:5,
+    },
+    ul:{
+      ul_0_6m:25, ul_6_12m:38, ul_1_3:63, ul_4_8:75,
+      ul_9_13:100, ul_14_18:100,
+      ul_19_50:100, ul_51:100, ul_pregnant:100, ul_lactating:100,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: {
+      title: "Quy đổi Vitamin D: IU ↔ mcg",
+      lines: [
+        "1 mcg vitamin D₃ = 40 IU",
+        "1 IU = 0,025 mcg",
+        "Ví dụ: 400 IU = 10 mcg; 200 IU = 5 mcg",
+        "TT43 sử dụng đơn vị mcg."
+      ]
+    },
+  },
+  vitamin_e: {
+    name:"Vitamin E", unit:"mg", group:"vitamin",
+    rda:{
+      infant_0_6m:3, infant_6_11m:4, child_1_3:5, child_4_6:6, child_7_9:7,
+      male_10_12:10, male_13_15:12, male_16_18:13,
+      male_19_50:12, male_51_60:12, male_60plus:12,
+      female_10_12:11, female_13_15:12, female_16_18:12,
+      female_19_50:12, female_51_60:12, female_60plus:12,
+      pregnant:12, lactating:18,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:200, ul_4_8:300,
+      ul_9_13:600, ul_14_18:800,
+      ul_19_50:1000, ul_51:1000, ul_pregnant:1000, ul_lactating:1000,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: {
+      title: "Quy đổi Vitamin E (α-tocopherol)",
+      lines: [
+        "1 mg α-tocopherol tự nhiên (d-) = 1.49 IU",
+        "1 mg α-tocopherol tổng hợp (dl-) = 1.1 IU",
+        "TT43 dùng đơn vị mg α-tocopherol."
+      ]
+    },
+  },
+  vitamin_k: {
+    name:"Vitamin K", unit:"mcg", group:"vitamin",
+    rda:{
+      infant_0_6m:6, infant_6_11m:9, child_1_3:13, child_4_6:19, child_7_9:24,
+      male_10_12:34, male_13_15:50, male_16_18:58,
+      male_19_50:59, male_51_60:59, male_60plus:59,
+      female_10_12:35, female_13_15:49, female_16_18:50,
+      female_19_50:51, female_51_60:51, female_60plus:51,
+      pregnant:51, lactating:51,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"TT43 Phụ lục 01 (RDA); UL: KC (TT43 Phụ lục 02)",
+    conversion: null,
+  },
+  vitamin_c: {
+    name:"Vitamin C", unit:"mg", group:"vitamin",
+    rda:{
+      infant_0_6m:25, infant_6_11m:30, child_1_3:30, child_4_6:30, child_7_9:35,
+      male_10_12:65, male_13_15:65, male_16_18:65,
+      male_19_50:70, male_51_60:70, male_60plus:70,
+      female_10_12:65, female_13_15:65, female_16_18:65,
+      female_19_50:70, female_51_60:70, female_60plus:70,
+      pregnant:80, lactating:95,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:400, ul_4_8:650,
+      ul_9_13:1200, ul_14_18:1800,
+      ul_19_50:2000, ul_51:2000, ul_pregnant:2000, ul_lactating:2000,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: null,
+  },
+  vitamin_b1: {
+    name:"Vitamin B1 (Thiamin)", unit:"mg", group:"vitamin",
+    rda:{
+      infant_0_6m:0.2, infant_6_11m:0.3, child_1_3:0.5, child_4_6:0.6, child_7_9:0.9,
+      male_10_12:1.2, male_13_15:1.2, male_16_18:1.2,
+      male_19_50:1.2, male_51_60:1.2, male_60plus:1.2,
+      female_10_12:1.1, female_13_15:1.1, female_16_18:1.1,
+      female_19_50:1.1, female_51_60:1.1, female_60plus:1.1,
+      pregnant:1.4, lactating:1.5,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"TT43 Phụ lục 01; UL: KC",
+    conversion: null,
+  },
+  vitamin_b2: {
+    name:"Vitamin B2 (Riboflavin)", unit:"mg", group:"vitamin",
+    rda:{
+      infant_0_6m:0.3, infant_6_11m:0.4, child_1_3:0.5, child_4_6:0.6, child_7_9:0.9,
+      male_10_12:1.3, male_13_15:1.3, male_16_18:1.3,
+      male_19_50:1.3, male_51_60:1.3, male_60plus:1.3,
+      female_10_12:1.1, female_13_15:1.1, female_16_18:1.1,
+      female_19_50:1.1, female_51_60:1.1, female_60plus:1.1,
+      pregnant:1.4, lactating:1.6,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"TT43 Phụ lục 01; UL: KC",
+    conversion: null,
+  },
+  vitamin_b3: {
+    name:"Vitamin B3 (Niacin)", unit:"mg NE", group:"vitamin",
+    rda:{
+      infant_0_6m:2, infant_6_11m:4, child_1_3:6, child_4_6:8, child_7_9:12,
+      male_10_12:16, male_13_15:16, male_16_18:16,
+      male_19_50:16, male_51_60:16, male_60plus:16,
+      female_10_12:14, female_13_15:14, female_16_18:14,
+      female_19_50:14, female_51_60:14, female_60plus:14,
+      pregnant:18, lactating:17,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:10, ul_4_8:15,
+      ul_9_13:20, ul_14_18:30,
+      ul_19_50:35, ul_51:35, ul_pregnant:35, ul_lactating:35,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: {
+      title: "Niacin Equivalents (NE)",
+      lines: [
+        "1 mg NE = 1 mg niacin = 60 mg tryptophan",
+        "UL áp dụng cho niacin bổ sung, không tính từ thực phẩm."
+      ]
+    },
+  },
+  vitamin_b6: {
+    name:"Vitamin B6", unit:"mg", group:"vitamin",
+    rda:{
+      infant_0_6m:0.1, infant_6_11m:0.3, child_1_3:0.5, child_4_6:0.6, child_7_9:1.0,
+      male_10_12:1.3, male_13_15:1.3, male_16_18:1.3,
+      male_19_50:1.3, male_51_60:1.7, male_60plus:1.7,
+      female_10_12:1.2, female_13_15:1.2, female_16_18:1.2,
+      female_19_50:1.3, female_51_60:1.5, female_60plus:1.5,
+      pregnant:1.9, lactating:2.0,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:30, ul_4_8:40,
+      ul_9_13:60, ul_14_18:80,
+      ul_19_50:100, ul_51:100, ul_pregnant:100, ul_lactating:100,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: null,
+  },
+  vitamin_b9: {
+    name:"Vitamin B9 (Folate)", unit:"mcg DFE", group:"vitamin",
+    rda:{
+      infant_0_6m:80, infant_6_11m:80, child_1_3:160, child_4_6:200, child_7_9:300,
+      male_10_12:400, male_13_15:400, male_16_18:400,
+      male_19_50:400, male_51_60:400, male_60plus:400,
+      female_10_12:400, female_13_15:400, female_16_18:400,
+      female_19_50:400, female_51_60:400, female_60plus:400,
+      pregnant:600, lactating:500,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:300, ul_4_8:400,
+      ul_9_13:600, ul_14_18:800,
+      ul_19_50:1000, ul_51:1000, ul_pregnant:1000, ul_lactating:1000,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: {
+      title: "Quy đổi Folate / Acid Folic",
+      lines: [
+        "1 DFE = 1 mcg folate thực phẩm",
+        "1 DFE = 0,6 mcg acid folic tổng hợp (khi dùng cùng thực phẩm)",
+        "1 mcg acid folic tổng hợp = 1,7 DFE",
+        "Công thức: DFE = folate thực phẩm + (1,7 × acid folic tổng hợp)",
+        "Lưu ý: PN mang thai: RDA=600 mcg DFE. Bổ sung 400mcg acid folic/ngày khuyến nghị."
+      ]
+    },
+  },
+  vitamin_b12: {
+    name:"Vitamin B12", unit:"mcg", group:"vitamin",
+    rda:{
+      infant_0_6m:0.3, infant_6_11m:0.4, child_1_3:0.9, child_4_6:1.2, child_7_9:1.8,
+      male_10_12:2.4, male_13_15:2.4, male_16_18:2.4,
+      male_19_50:2.4, male_51_60:2.4, male_60plus:2.4,
+      female_10_12:2.4, female_13_15:2.4, female_16_18:2.4,
+      female_19_50:2.4, female_51_60:2.4, female_60plus:2.4,
+      pregnant:2.6, lactating:2.8,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"TT43 Phụ lục 01; UL: KC",
+    conversion: null,
+  },
+
+  // ────── MINERALS ──────
+  calcium: {
+    name:"Calcium (Ca)", name_en: "Calcium (Ca)", unit:"mg", group:"mineral",
+    rda:{
+      infant_0_6m:300, infant_6_11m:400, child_1_3:500, child_4_6:600, child_7_9:700,
+      male_10_12:1000, male_13_15:1000, male_16_18:1000,
+      male_19_50:700, male_51_60:1000, male_60plus:1000,
+      female_10_12:1000, female_13_15:1000, female_16_18:1000,
+      female_19_50:700, female_51_60:1000, female_60plus:1000,
+      pregnant:1000, lactating:1000,
+    },
+    ul:{
+      ul_0_6m:1000, ul_6_12m:1500, ul_1_3:2500, ul_4_8:2500,
+      ul_9_13:3000, ul_14_18:3000,
+      ul_19_50:2500, ul_51:2000, ul_pregnant:2500, ul_lactating:2500,
+    },
+    source:"RDA: TT43 Phụ lục 01. UL: IOM (2011) — TT43 không có UL Ca",
+    conversion: null,
+  },
+  iron: {
+    name:"Sắt (Fe)", name_en: "Iron (Fe)", unit:"mg", group:"mineral",
+    // RDA set dynamically based on bioavailability
+    rda:{
+      infant_0_6m:null, infant_6_11m:12.4, child_1_3:7.7, child_4_6:8.4, child_7_9:11.9,
+      male_10_12:19.5, male_13_15:19.5, male_16_18:25.1,
+      male_19_50:18.3, male_51_60:null, male_60plus:null,
+      female_10_12:18.7, female_13_15:18.7, female_16_18:43.6,
+      female_19_50:39.2, female_51_60:15.1, female_60plus:15.1,
+      pregnant:59.2, lactating:null,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:40, ul_4_8:40,
+      ul_9_13:40, ul_14_18:45,
+      ul_19_50:45, ul_51:45, ul_pregnant:45, ul_lactating:45,
+    },
+    source:"TT43 Phụ lục 01 (cột sinh học 10%) & Phụ lục 02",
+    conversion: {
+      title: "Lưu ý quan trọng về Sắt",
+      lines: [
+        "RDA tự động thay đổi theo Vitamin C trong công thức:",
+        "• Vit C < 25mg/ngày → cột 5% (RDA cao nhất)",
+        "• Vit C 25–75mg/ngày → cột 10% (mặc định)",
+        "• Vit C > 75mg/ngày → cột 15% (RDA thấp nhất)",
+        "PN mang thai: RDA = nữ TT + bổ sung (+20mg ở 10%).",
+        "PN cho con bú: TT43 không có RDA (bảng trống).",
+      ]
+    },
+  },
+  zinc: {
+    name:"Kẽm (Zn)", name_en: "Zinc (Zn)", unit:"mg", group:"mineral",
+    rda:{
+      infant_0_6m:2.8, infant_6_11m:4.1, child_1_3:4.1, child_4_6:5.1, child_7_9:5.6,
+      male_10_12:9.7, male_13_15:9.7, male_16_18:9.7,
+      male_19_50:7.0, male_51_60:4.9, male_60plus:4.9,
+      female_10_12:7.8, female_13_15:7.8, female_16_18:7.8,
+      female_19_50:4.9, female_51_60:4.9, female_60plus:4.9,
+      pregnant:null, lactating:null,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:7, ul_4_8:12,
+      ul_9_13:23, ul_14_18:34,
+      ul_19_50:40, ul_51:40, ul_pregnant:40, ul_lactating:40,
+    },
+    source:"TT43 Phụ lục 01 (cột Hấp thu vừa 30%) & Phụ lục 02",
+    conversion: {
+      title: "Quy đổi giá trị sinh học Kẽm",
+      lines: [
+        "RDA phụ thuộc mức hấp thu kẽm:",
+        "• Hấp thu tốt (50%): nhiều protein động vật → RDA thấp hơn",
+        "• Hấp thu vừa (30%): mặc định",
+        "• Hấp thu kém (15%): ít protein → RDA cao hơn ~2×",
+        "Lưu ý: Trẻ 1-3: RDA=4.1mg, UL=7mg → khoảng an toàn hẹp!"
+      ]
+    },
+  },
+  magnesium: {
+    name:"Magie (Mg)", name_en: "Magnesium (Mg)", unit:"mg", group:"mineral",
+    rda:{
+      infant_0_6m:36, infant_6_11m:54, child_1_3:65, child_4_6:76, child_7_9:100,
+      male_10_12:155, male_13_15:225, male_16_18:260,
+      male_19_50:205, male_51_60:205, male_60plus:205,
+      female_10_12:160, female_13_15:220, female_16_18:240,
+      female_19_50:205, female_51_60:205, female_60plus:205,
+      pregnant:205, lactating:250,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:65, ul_4_8:110,
+      ul_9_13:350, ul_14_18:350,
+      ul_19_50:350, ul_51:350, ul_pregnant:350, ul_lactating:350,
+    },
+    source:"TT43 Phụ lục 01 & 02. UL chỉ áp dụng cho Mg từ TPCN, không tính thực phẩm.",
+    conversion: {
+      title: "Lưu ý UL Magie",
+      lines: [
+        "UL chỉ áp dụng cho Magie từ thực phẩm chức năng/bổ sung.",
+        "Magie từ thực phẩm tự nhiên KHÔNG giới hạn.",
+        "Lưu ý: UL thấp hơn RDA ở một số nhóm tuổi (ví dụ: RDA=205, UL=350 từ TPCN)."
+      ]
+    },
+  },
+  phosphorus: {
+    name:"Phospho (P)", name_en: "Phosphorus (P)", unit:"mg", group:"mineral",
+    rda:{
+      infant_0_6m:90, infant_6_11m:275, child_1_3:460, child_4_6:500, child_7_9:500,
+      male_10_12:1250, male_13_15:1250, male_16_18:1250,
+      male_19_50:700, male_51_60:700, male_60plus:700,
+      female_10_12:1250, female_13_15:1250, female_16_18:1250,
+      female_19_50:700, female_51_60:700, female_60plus:700,
+      pregnant:700, lactating:700,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:3000, ul_4_8:3000,
+      ul_9_13:4000, ul_14_18:4000,
+      ul_19_50:4000, ul_51:3000, ul_pregnant:3500, ul_lactating:4000,
+    },
+    source:"RDA: TT43 Phụ lục 01. UL: IOM (1997) — TT43 không có UL P",
+    conversion: null,
+  },
+  iodine: {
+    name:"Iốt (I)", name_en: "Iodine (I)", unit:"mcg", group:"mineral",
+    rda:{
+      infant_0_6m:90, infant_6_11m:90, child_1_3:90, child_4_6:90, child_7_9:90,
+      male_10_12:120, male_13_15:120, male_16_18:150,
+      male_19_50:150, male_51_60:150, male_60plus:150,
+      female_10_12:120, female_13_15:120, female_16_18:150,
+      female_19_50:150, female_51_60:150, female_60plus:150,
+      pregnant:200, lactating:200,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:200, ul_4_8:300,
+      ul_9_13:600, ul_14_18:900,
+      ul_19_50:1100, ul_51:1100, ul_pregnant:1100, ul_lactating:1100,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: null,
+  },
+  selenium: {
+    name:"Selen (Se)", name_en: "Selenium (Se)", unit:"mcg", group:"mineral",
+    rda:{
+      infant_0_6m:6, infant_6_11m:10, child_1_3:17, child_4_6:22, child_7_9:21,
+      male_10_12:32, male_13_15:32, male_16_18:32,
+      male_19_50:34, male_51_60:34, male_60plus:33,
+      female_10_12:26, female_13_15:26, female_16_18:26,
+      female_19_50:26, female_51_60:26, female_60plus:25,
+      pregnant:30, lactating:42,
+    },
+    ul:{
+      ul_0_6m:45, ul_6_12m:60, ul_1_3:90, ul_4_8:150,
+      ul_9_13:280, ul_14_18:400,
+      ul_19_50:400, ul_51:400, ul_pregnant:400, ul_lactating:400,
+    },
+    source:"TT43 Phụ lục 01 & 02",
+    conversion: null,
+  },
+
+  // ── Các chất bổ sung từ VAFF P1 & IOM/NAM DRI ──
+
+  vitamin_b5: {
+    name:"Vitamin B5", altNames:["Acid pantothenic","Pantothenic acid","B5"],
+    unit:"mg", group:"vitamin", isAI:true,
+    rda:{
+      infant_0_6m:1.7, infant_6_11m:1.8,
+      child_1_3:2, child_4_6:3, child_7_9:3,
+      male_10_12:4, male_13_15:5, male_16_18:5,
+      male_19_50:5, male_51_60:5, male_60plus:5,
+      female_10_12:4, female_13_15:5, female_16_18:5,
+      female_19_50:5, female_51_60:5, female_60plus:5,
+      pregnant:6, lactating:7,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"AI: IOM (2001). VAFF P1 tr.335: 3–10 mg/ngày",
+    conversion: null,
+  },
+
+  biotin: {
+    name:"Biotin", altNames:["Vitamin B7","Vitamin B8","Vitamin H"],
+    unit:"mcg", group:"vitamin", isAI:true,
+    rda:{
+      infant_0_6m:5, infant_6_11m:6,
+      child_1_3:8, child_4_6:12, child_7_9:12,
+      male_10_12:20, male_13_15:25, male_16_18:25,
+      male_19_50:30, male_51_60:30, male_60plus:30,
+      female_10_12:20, female_13_15:25, female_16_18:25,
+      female_19_50:30, female_51_60:30, female_60plus:30,
+      pregnant:30, lactating:35,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"AI: IOM (2001). VAFF P1 tr.337: 35–300 mcg/ngày",
+    conversion: null,
+  },
+
+  choline: {
+    name:"Choline", altNames:["Cholin"],
+    unit:"mg", group:"vitamin", isAI:true,
+    rda:{
+      infant_0_6m:125, infant_6_11m:150,
+      child_1_3:200, child_4_6:250, child_7_9:250,
+      male_10_12:375, male_13_15:375, male_16_18:550,
+      male_19_50:550, male_51_60:550, male_60plus:550,
+      female_10_12:375, female_13_15:375, female_16_18:400,
+      female_19_50:425, female_51_60:425, female_60plus:425,
+      pregnant:450, lactating:550,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:1000, ul_4_8:1000,
+      ul_9_13:2000, ul_14_18:3000,
+      ul_19_50:3500, ul_51:3500, ul_pregnant:3500, ul_lactating:3500,
+    },
+    source:"AI: IOM (1998). UL: IOM. VAFF P1: 250–600 mg/ngày",
+    conversion: null,
+  },
+
+  copper: {
+    name:"Đồng (Cu)", name_en: "Copper (Cu)", altNames:["Copper","Cu","Đồng"],
+    unit:"mg", group:"mineral",
+    rda:{
+      infant_0_6m:0.2, infant_6_11m:0.22,
+      child_1_3:0.34, child_4_6:0.44, child_7_9:0.44,
+      male_10_12:0.7, male_13_15:0.89, male_16_18:0.89,
+      male_19_50:0.9, male_51_60:0.9, male_60plus:0.9,
+      female_10_12:0.7, female_13_15:0.89, female_16_18:0.89,
+      female_19_50:0.9, female_51_60:0.9, female_60plus:0.9,
+      pregnant:1.0, lactating:1.3,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:1, ul_4_8:3,
+      ul_9_13:5, ul_14_18:8,
+      ul_19_50:10, ul_51:10, ul_pregnant:10, ul_lactating:10,
+    },
+    source:"RDA: IOM (2001). UL: IOM. VAFF P1 tr.363: 0.5–3.0 mg/ngày",
+    conversion: null,
+  },
+
+  manganese: {
+    name:"Mangan (Mn)", name_en: "Manganese (Mn)", altNames:["Manganese","Mn","Mangan"],
+    unit:"mg", group:"mineral", isAI:true,
+    rda:{
+      infant_0_6m:0.003, infant_6_11m:0.6,
+      child_1_3:1.2, child_4_6:1.5, child_7_9:1.5,
+      male_10_12:1.9, male_13_15:2.2, male_16_18:2.2,
+      male_19_50:2.3, male_51_60:2.3, male_60plus:2.3,
+      female_10_12:1.6, female_13_15:1.6, female_16_18:1.6,
+      female_19_50:1.8, female_51_60:1.8, female_60plus:1.8,
+      pregnant:2.0, lactating:2.6,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:2, ul_4_8:3,
+      ul_9_13:6, ul_14_18:9,
+      ul_19_50:11, ul_51:11, ul_pregnant:11, ul_lactating:11,
+    },
+    source:"AI: IOM (2001). UL: IOM. VAFF P1 tr.366: 6–8 mg/ngày (người lớn)",
+    conversion: null,
+  },
+
+  chromium: {
+    name:"Crom (Cr)", name_en: "Chromium (Cr)", altNames:["Chromium","Cr","Crom"],
+    unit:"mcg", group:"mineral", isAI:true,
+    rda:{
+      infant_0_6m:0.2, infant_6_11m:5.5,
+      child_1_3:11, child_4_6:15, child_7_9:15,
+      male_10_12:25, male_13_15:35, male_16_18:35,
+      male_19_50:35, male_51_60:30, male_60plus:30,
+      female_10_12:21, female_13_15:24, female_16_18:24,
+      female_19_50:25, female_51_60:20, female_60plus:20,
+      pregnant:30, lactating:45,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"AI: IOM (2001). VAFF P1 tr.369: 50–200 mcg/ngày (bổ sung)",
+    conversion: null,
+  },
+
+  molybdenum: {
+    name:"Molypden (Mo)", name_en: "Molybdenum (Mo)", altNames:["Molybdenum","Mo","Molypden"],
+    unit:"mcg", group:"mineral",
+    rda:{
+      infant_0_6m:2, infant_6_11m:3,
+      child_1_3:17, child_4_6:22, child_7_9:22,
+      male_10_12:34, male_13_15:43, male_16_18:43,
+      male_19_50:45, male_51_60:45, male_60plus:45,
+      female_10_12:34, female_13_15:43, female_16_18:43,
+      female_19_50:45, female_51_60:45, female_60plus:45,
+      pregnant:50, lactating:50,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:300, ul_4_8:600,
+      ul_9_13:1100, ul_14_18:1700,
+      ul_19_50:2000, ul_51:2000, ul_pregnant:2000, ul_lactating:2000,
+    },
+    source:"RDA: IOM (2001). UL: IOM. VAFF P1 tr.375: 30–150 mcg/ngày",
+    conversion: null,
+  },
+
+  fluoride: {
+    name:"Fluor (F)", name_en: "Fluoride (F)", altNames:["Fluoride","F","Fluor"],
+    unit:"mg", group:"mineral", isAI:true,
+    rda:{
+      infant_0_6m:0.01, infant_6_11m:0.5,
+      child_1_3:0.7, child_4_6:1, child_7_9:1,
+      male_10_12:2, male_13_15:3, male_16_18:3,
+      male_19_50:4, male_51_60:4, male_60plus:4,
+      female_10_12:2, female_13_15:3, female_16_18:3,
+      female_19_50:3, female_51_60:3, female_60plus:3,
+      pregnant:3, lactating:3,
+    },
+    ul:{
+      ul_0_6m:0.7, ul_6_12m:0.9, ul_1_3:1.3, ul_4_8:2.2,
+      ul_9_13:10, ul_14_18:10,
+      ul_19_50:10, ul_51:10, ul_pregnant:10, ul_lactating:10,
+    },
+    source:"AI: IOM (1997). UL: IOM. VAFF P1 tr.367: 0.25–1.0 mg/ngày",
+    conversion: null,
+  },
+
+  potassium: {
+    name:"Kali (K)", name_en: "Potassium (K)", altNames:["Potassium","K","Kali"],
+    unit:"mg", group:"mineral", isAI:true,
+    rda:{
+      infant_0_6m:400, infant_6_11m:860,
+      child_1_3:2000, child_4_6:2300, child_7_9:2300,
+      male_10_12:2500, male_13_15:3000, male_16_18:3000,
+      male_19_50:3400, male_51_60:3400, male_60plus:3400,
+      female_10_12:2300, female_13_15:2300, female_16_18:2300,
+      female_19_50:2600, female_51_60:2600, female_60plus:2600,
+      pregnant:2900, lactating:2800,
+    },
+    ul:{
+      ul_0_6m:null, ul_6_12m:null, ul_1_3:null, ul_4_8:null,
+      ul_9_13:null, ul_14_18:null,
+      ul_19_50:null, ul_51:null, ul_pregnant:null, ul_lactating:null,
+    },
+    source:"AI: IOM/NASEM (2019)",
+    conversion: null,
+  },
+
+  // ── Thành phần khác (dữ liệu người lớn, nguồn PubMed/IOM/EFSA) ──
+
+  omega3_epa: {
+    name:"EPA (Omega-3)", altNames:["Eicosapentaenoic acid","EPA","Omega-3 EPA"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:250, male_51_60:250, male_60plus:250,
+      female_19_50:250, female_51_60:250, female_60plus:250,
+      pregnant:250, lactating:250,
+    },
+    ul:{
+      ul_19_50:5000, ul_51:5000, ul_pregnant:5000, ul_lactating:5000,
+    },
+    source:"EFSA (2012): EPA+DHA ≥250 mg/ngày. UL: EFSA 5g EPA+DHA/ngày",
+    sourceUrls:[
+      {label:"EFSA 2012", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2012.2815"},
+    ],
+    conversion: null,
+  },
+
+  omega3_dha: {
+    name:"DHA (Omega-3)", altNames:["Docosahexaenoic acid","DHA","Omega-3 DHA"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:250, male_51_60:250, male_60plus:250,
+      female_19_50:250, female_51_60:250, female_60plus:250,
+      pregnant:300, lactating:300,
+    },
+    ul:{
+      ul_19_50:5000, ul_51:5000, ul_pregnant:5000, ul_lactating:5000,
+    },
+    source:"EFSA (2012). PN có thai: +200 mg DHA (EFSA 2014)",
+    sourceUrls:[
+      {label:"EFSA 2014", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2014.3840"},
+    ],
+    conversion: null,
+  },
+
+  coenzyme_q10: {
+    name:"Coenzyme Q10", altNames:["CoQ10","Ubiquinone","Ubiquinol"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:100, male_51_60:100, male_60plus:100,
+      female_19_50:100, female_51_60:100, female_60plus:100,
+    },
+    ul:{
+      ul_19_50:1200, ul_51:1200,
+    },
+    source:"Liều thông dụng 100–200 mg/ngày. NOAEL 1200 mg/ngày (Hidaka 2008)",
+    sourceUrls:[
+      {label:"PubMed", url:"https://pubmed.ncbi.nlm.nih.gov/18272335/"},
+    ],
+    conversion: null,
+  },
+
+  lutein: {
+    name:"Lutein", altNames:["Lutein","Zeaxanthin"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:10, male_51_60:10, male_60plus:10,
+      female_19_50:10, female_51_60:10, female_60plus:10,
+    },
+    ul:{
+      ul_19_50:20, ul_51:20,
+    },
+    source:"AREDS2: 10 mg lutein + 2 mg zeaxanthin/ngày. UL: EFSA 2011",
+    sourceUrls:[
+      {label:"AREDS2", url:"https://pubmed.ncbi.nlm.nih.gov/23644932/"},
+      {label:"EFSA", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2011.2260"},
+    ],
+    conversion: null,
+  },
+
+  lycopene: {
+    name:"Lycopene", altNames:["Lycopen"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:10, male_51_60:10, male_60plus:10,
+      female_19_50:10, female_51_60:10, female_60plus:10,
+    },
+    ul:{
+      ul_19_50:15, ul_51:15,
+    },
+    source:"Liều thông dụng 6–15 mg/ngày. UL: EFSA ADI 0.5 mg/kg",
+    sourceUrls:[
+      {label:"EFSA", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2011.2031"},
+    ],
+    conversion: null,
+  },
+
+  collagen: {
+    name:"Collagen", altNames:["Collagen peptide","Collagen thủy phân"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:5000, male_51_60:5000, male_60plus:5000,
+      female_19_50:5000, female_51_60:5000, female_60plus:5000,
+    },
+    ul:{
+      ul_19_50:15000, ul_51:15000,
+    },
+    source:"Liều lâm sàng 2.5–15 g/ngày (Bello 2006, Clark 2008)",
+    sourceUrls:[
+      {label:"PubMed", url:"https://pubmed.ncbi.nlm.nih.gov/16539194/"},
+    ],
+    conversion: null,
+  },
+
+  glucosamine: {
+    name:"Glucosamine", altNames:["Glucosamin","Glucosamine sulfate","Glucosamine HCl"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:1500, male_51_60:1500, male_60plus:1500,
+      female_19_50:1500, female_51_60:1500, female_60plus:1500,
+    },
+    ul:{
+      ul_19_50:3000, ul_51:3000,
+    },
+    source:"Liều chuẩn 1500 mg/ngày (Cochrane 2005). NOAEL 2000–3000 mg (EFSA)",
+    sourceUrls:[
+      {label:"Cochrane", url:"https://pubmed.ncbi.nlm.nih.gov/15846645/"},
+      {label:"EFSA", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.1264"},
+    ],
+    conversion: null,
+  },
+
+  curcumin: {
+    name:"Curcumin", altNames:["Curcuma","Tinh chất nghệ","Turmeric extract"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:500, male_51_60:500, male_60plus:500,
+      female_19_50:500, female_51_60:500, female_60plus:500,
+    },
+    ul:{
+      ul_19_50:3000, ul_51:3000,
+    },
+    source:"Liều lâm sàng 500–2000 mg/ngày. ADI 3 mg/kg (JECFA 2004)",
+    sourceUrls:[
+      {label:"PubMed", url:"https://pubmed.ncbi.nlm.nih.gov/17569205/"},
+      {label:"JECFA", url:"https://apps.who.int/food-additives-contaminants-jecfa-database/Home/Chemical/817"},
+    ],
+    conversion: null,
+  },
+
+  resveratrol: {
+    name:"Resveratrol", altNames:["Trans-resveratrol"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:150, male_51_60:150, male_60plus:150,
+      female_19_50:150, female_51_60:150, female_60plus:150,
+    },
+    ul:{
+      ul_19_50:1000, ul_51:1000,
+    },
+    source:"Liều lâm sàng 150–500 mg/ngày. NOAEL 300 mg/kg (Crowell 2004)",
+    sourceUrls:[
+      {label:"PubMed", url:"https://pubmed.ncbi.nlm.nih.gov/14769489/"},
+    ],
+    conversion: null,
+  },
+
+  probiotics: {
+    name:"Probiotics", altNames:["Men vi sinh","Lợi khuẩn","Lactobacillus","Bifidobacterium"],
+    unit:"tỷ CFU", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:1, male_51_60:1, male_60plus:1,
+      female_19_50:1, female_51_60:1, female_60plus:1,
+    },
+    ul:{
+      ul_19_50:null, ul_51:null,
+    },
+    source:"WHO/FAO 2002: ≥10⁹ CFU/ngày. Liều thông dụng 1–100 tỷ CFU",
+    sourceUrls:[
+      {label:"WHO/FAO", url:"https://www.who.int/publications/i/item/9241546743"},
+    ],
+    conversion: null,
+  },
+
+  taurine: {
+    name:"Taurine", altNames:["Taurin"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:500, male_51_60:500, male_60plus:500,
+      female_19_50:500, female_51_60:500, female_60plus:500,
+    },
+    ul:{
+      ul_19_50:3000, ul_51:3000,
+    },
+    source:"Liều thông dụng 500–2000 mg/ngày. NOAEL 1000 mg/kg (EFSA 2009)",
+    sourceUrls:[
+      {label:"EFSA", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2009.908"},
+    ],
+    conversion: null,
+  },
+
+  l_carnitine: {
+    name:"L-Carnitine", altNames:["Carnitine","L-carnitin","Acetyl-L-Carnitine"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:500, male_51_60:500, male_60plus:500,
+      female_19_50:500, female_51_60:500, female_60plus:500,
+    },
+    ul:{
+      ul_19_50:3000, ul_51:3000,
+    },
+    source:"Liều lâm sàng 500–2000 mg/ngày. NOAEL 2000 mg (EFSA)",
+    sourceUrls:[
+      {label:"PubMed", url:"https://pubmed.ncbi.nlm.nih.gov/27335245/"},
+      {label:"EFSA", url:"https://efsa.onlinelibrary.wiley.com/doi/10.2903/j.efsa.2012.2727"},
+    ],
+    conversion: null,
+  },
+
+  inositol: {
+    name:"Inositol", altNames:["Myo-inositol"],
+    unit:"mg", group:"other",
+    adultsOnly:true,
+    rda:{
+      male_19_50:500, male_51_60:500, male_60plus:500,
+      female_19_50:500, female_51_60:500, female_60plus:500,
+    },
+    ul:{
+      ul_19_50:4000, ul_51:4000,
+    },
+    source:"Liều lâm sàng 500–4000 mg/ngày. PCOS: 2000–4000 mg/ngày",
+    sourceUrls:[
+      {label:"PubMed", url:"https://pubmed.ncbi.nlm.nih.gov/28485220/"},
+    ],
+    conversion: null,
+  },
+};
+
+// ===== STATE =====
+
+
+let formula = []; // [{nutrientId, amountPerServing}]
+
+function getSelectedGroups() {
+  return [...document.querySelectorAll('#ageGroupGrid input:checked')].map(c => c.value);
+}
+
+// ===== BIOAVAILABILITY AUTO-SWITCH =====
+function getIronBioColumn() {
+  // Check total daily Vitamin C in formula
+  const servings = parseInt(document.getElementById("servingsPerDay").value) || 1;
+  const vitCItem = formula.find(f => f.nutrientId === "vitamin_c");
+  if (!vitCItem || vitCItem.amountPerServing === null) return "bio10"; // default
+  const dailyVitC = vitCItem.amountPerServing * servings;
+  if (dailyVitC > 75) return "bio15";
+  if (dailyVitC >= 25) return "bio10";
+  return "bio5";
+}
+
+function getEffectiveIronRDA() {
+  const col = getIronBioColumn();
+  const bioData = IRON_BIO[col];
+  const rda = {};
+  for (const key in bioData) {
+    rda[key] = bioData[key];
+  }
+  // Pregnant: add to female base
+  if (rda.pregnant === null) {
+    const femaleBase = bioData.female_19_50;
+    const addVal = IRON_BIO.pregnantAdd[col];
+    rda.pregnant = femaleBase !== null ? femaleBase + addVal : null;
+  }
+  return rda;
+}
+
+function getIronBioLabel() {
+  const col = getIronBioColumn();
+  if (currentLang === "en") {
+    if (col === "bio5") return "5% (Vit C < 25mg)";
+    if (col === "bio15") return "15% (Vit C > 75mg)";
+    return "10% (default)";
+  }
+  if (col === "bio5") return "5% (Vit C < 25mg)";
+  if (col === "bio15") return "15% (Vit C > 75mg)";
+  return "10% (mặc định)";
+}
+
+// ===== INIT =====
+function init() {
+  const grid = document.getElementById("ageGroupGrid");
+  AGE_GROUPS.forEach(g => {
+    const lbl = document.createElement("label");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.value = g.id;
+    cb.addEventListener("change", () => { updateTags(); renderFormula(); });
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(" " + g.label));
+    grid.appendChild(lbl);
+  });
+  ["male_19_50","female_19_50"].forEach(id => {
+    const cb = grid.querySelector(`input[value="${id}"]`);
+    if (cb) cb.checked = true;
+  });
+  updateTags();
+
+  // Autocomplete search
+  const searchInput = document.getElementById("nutrientSearch");
+  const acList = document.getElementById("acList");
+  const hiddenSel = document.getElementById("nutrientSelected");
+  let acIdx = -1;
+
+  function buildSearchIndex() {
+    return Object.entries(NUTRIENTS).map(([id, n]) => {
+      const terms = [n.name.toLowerCase(), ...(n.altNames||[]).map(a=>a.toLowerCase())];
+      return { id, name: n.name, unit: n.unit, group: n.group, isAI: n.isAI, adultsOnly: n.adultsOnly, terms };
+    });
+  }
+  const searchIdx = buildSearchIndex();
+
+  function filterNutrients(q) {
+    q = q.toLowerCase().trim();
+    if (!q) return searchIdx;
+    return searchIdx.filter(s => s.terms.some(t => t.includes(q)));
+  }
+
+  function renderAC(results) {
+    acList.innerHTML = "";
+    if (results.length === 0) {
+      acList.innerHTML = '<div style="padding:8px 10px;font-size:0.78rem;color:var(--fg-muted)">Không tìm thấy</div>';
+      acList.hidden = false; return;
+    }
+    const groups = { vitamin:"Vitamin", mineral:"Khoáng chất", other:"Thành phần khác" };
+    for (const gKey of ["vitamin","mineral","other"]) {
+      const items = results.filter(r => r.group === gKey);
+      if (items.length === 0) continue;
+      const hdr = document.createElement("div");
+      hdr.className = "ac-group"; hdr.textContent = groups[gKey];
+      acList.appendChild(hdr);
+      items.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "ac-item";
+        div.dataset.id = r.id;
+        let badges = `<span class="ac-unit">${r.unit}</span>`;
+        if (r.isAI) badges += `<span class="ac-ai">AI</span>`;
+        if (r.adultsOnly) badges += `<span class="ac-limited">${currentLang === "en" ? "Adults only" : "Dành cho người lớn"}</span>`;
+        div.innerHTML = `<span>${r.name}</span><span>${badges}</span>`;
+        div.addEventListener("mousedown", e => { e.preventDefault(); selectNutrient(r.id); });
+        acList.appendChild(div);
+      });
+    }
+    acList.hidden = false;
+    acIdx = -1;
+  }
+
+  function selectNutrient(nutId) {
+    const nut = NUTRIENTS[nutId];
+    if (!nut) return;
+    hiddenSel.value = nutId;
+    searchInput.value = nut.name;
+    acList.hidden = true;
+    updateUnitDisplay();
+    showConvNote();
+    showAgeWarn(nutId);
+  }
+
+  function showAgeWarn(nutId) {
+    const el = document.getElementById("ageWarn");
+    const nut = NUTRIENTS[nutId];
+    if (!nut) { el.innerHTML = ""; return; }
+    const selectedGroups = getSelectedGroups();
+    const missing = selectedGroups.filter(gid => nut.rda[gid] === undefined || nut.rda[gid] === null);
+    if (missing.length > 0 && selectedGroups.length > 0) {
+      const names = missing.map(gid => {
+        const g = AGE_GROUPS.find(a => a.id === gid);
+        return g ? g.label : gid;
+      }).join(", ");
+      el.innerHTML = `<div class="age-warn">[Lưu ý] <strong>${nut.name}</strong> không có dữ liệu RDA/AI cho: ${names}. Khi thêm vào, các nhóm này sẽ bị khóa.</div>`;
+    } else {
+      el.innerHTML = "";
+    }
+  }
+
+  searchInput.addEventListener("input", () => {
+    const q = searchInput.value;
+    hiddenSel.value = "";
+    renderAC(filterNutrients(q));
+  });
+  searchInput.addEventListener("focus", () => {
+    renderAC(filterNutrients(searchInput.value));
+  });
+  searchInput.addEventListener("blur", () => {
+    setTimeout(() => { acList.hidden = true; }, 150);
+  });
+  searchInput.addEventListener("keydown", e => {
+    const items = acList.querySelectorAll(".ac-item");
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      acIdx = Math.min(acIdx + 1, items.length - 1);
+      items.forEach((it,i) => it.classList.toggle("ac-active", i === acIdx));
+      if (items[acIdx]) items[acIdx].scrollIntoView({block:"nearest"});
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      acIdx = Math.max(acIdx - 1, 0);
+      items.forEach((it,i) => it.classList.toggle("ac-active", i === acIdx));
+      if (items[acIdx]) items[acIdx].scrollIntoView({block:"nearest"});
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (acIdx >= 0 && items[acIdx]) {
+        selectNutrient(items[acIdx].dataset.id);
+      } else if (hiddenSel.value) {
+        addToFormula();
+      }
+    } else if (e.key === "Escape") {
+      acList.hidden = true;
+    }
+  });
+
+  document.getElementById("servingsPerDay").addEventListener("input", renderFormula);
+  document.getElementById("amountInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") addToFormula();
+  });
+  renderFormula();
+}
+
+function updateTags() {
+  const tags = document.getElementById("selectedTags");
+  const sel = getSelectedGroups();
+  if (sel.length === 0) { tags.innerHTML = '<span style="font-size:0.75rem;color:var(--fg-muted)">Chưa chọn đối tượng</span>'; return; }
+  tags.innerHTML = sel.map(id => {
+    const g = AGE_GROUPS.find(a => a.id === id);
+    const lbl = g ? (currentLang === "en" ? (g.label_en || g.label) : g.label) : id;
+    return `<span class="tag">${lbl}</span>`;
+  }).join("");
+}
+
+function selectPreset(preset) {
+  const cbs = document.querySelectorAll('#ageGroupGrid input');
+  cbs.forEach(cb => {
+    const g = AGE_GROUPS.find(a => a.id === cb.value);
+    if (preset === "all") cb.checked = true;
+    else if (preset === "none") cb.checked = false;
+    else if (preset === "adults") cb.checked = g && g.cat === "adults";
+    else if (preset === "children") cb.checked = g && g.cat === "children";
+  });
+  updateTags(); renderFormula();
+}
+
+function updateUnitDisplay() {
+  const nutId = document.getElementById("nutrientSelected").value;
+  document.getElementById("unitDisplay").value = NUTRIENTS[nutId]?.unit || "";
+}
+
+function showConvNote() {
+  const nutId = document.getElementById("nutrientSelected").value;
+  const nut = NUTRIENTS[nutId];
+  const el = document.getElementById("convNote");
+  if (nut && nut.conversion) {
+    el.innerHTML = `<div class="conv-callout"><strong>[Lưu ý] ${nut.conversion.title}</strong><br>${nut.conversion.lines.join("<br>")}</div>`;
+  } else {
+    el.innerHTML = "";
+  }
+}
+
+function addToFormula() {
+  const nutId = document.getElementById("nutrientSelected").value;
+  const amountStr = document.getElementById("amountInput").value;
+  const amount = amountStr === "" ? null : parseFloat(amountStr);
+  if (!nutId) return;
+  if (amount !== null && (isNaN(amount) || amount < 0)) return;
+
+  const existing = formula.find(f => f.nutrientId === nutId);
+  if (existing) {
+    existing.amountPerServing = amount;
+  } else {
+    formula.push({ nutrientId: nutId, amountPerServing: amount });
+  }
+  document.getElementById("amountInput").value = "";
+  document.getElementById("nutrientSearch").value = "";
+  document.getElementById("nutrientSelected").value = "";
+  document.getElementById("unitDisplay").value = "";
+  document.getElementById("ageWarn").innerHTML = "";
+  document.getElementById("convNote").innerHTML = "";
+  updateAgeGroupBlocking();
+  renderFormula();
+}
+
+function removeFromFormula(idx) {
+  formula.splice(idx, 1);
+  updateAgeGroupBlocking();
+  renderFormula();
+}
+
+// Get effective RDA for a nutrient (handles iron/zinc bioavailability)
+function getEffectiveRDA(nutId) {
+  if (nutId === "iron") return getEffectiveIronRDA();
+  // Zinc uses default bio30 column (stored in NUTRIENTS.zinc.rda)
+  return NUTRIENTS[nutId].rda;
+}
+
+function getGroupStats(nutId) {
+  const nut = NUTRIENTS[nutId];
+  if (!nut) return null;
+  const groups = getSelectedGroups();
+  if (groups.length === 0) return null;
+
+  const effectiveRDA = getEffectiveRDA(nutId);
+
+  let rdaMin = Infinity, rdaMax = -Infinity, rdaMaxGroup = "", rdaMinGroup = "";
+  let ulMin = Infinity, ulMinGroup = "", allULNull = true;
+
+  groups.forEach(gid => {
+    const rda = effectiveRDA[gid];
+    const ulGrp = getULGroup(gid);
+    const ul = nut.ul[ulGrp];
+    const gLabel = AGE_GROUPS.find(a => a.id === gid)?.label || gid;
+
+    if (rda !== null && rda !== undefined) {
+      if (rda < rdaMin) { rdaMin = rda; rdaMinGroup = gLabel; }
+      if (rda > rdaMax) { rdaMax = rda; rdaMaxGroup = gLabel; }
+    }
+    if (ul !== null && ul !== undefined) {
+      allULNull = false;
+      if (ul < ulMin) { ulMin = ul; ulMinGroup = gLabel; }
+    }
+  });
+
+  return {
+    rdaMin: rdaMin === Infinity ? null : rdaMin,
+    rdaMax: rdaMax === -Infinity ? null : rdaMax,
+    rdaMaxGroup, rdaMinGroup,
+    ulMin: allULNull ? null : ulMin,
+    ulMinGroup, allULNull,
+  };
+}
+
+function updateAgeGroupBlocking() {
+  const grid = document.getElementById("ageGroupGrid");
+  const legend = document.getElementById("blockedLegend");
+  const labels = grid.querySelectorAll("label");
+  const blockedGroups = new Map(); // gid -> [nutrient names]
+
+  if (formula.length === 0) {
+    labels.forEach(lbl => { lbl.classList.remove("blocked"); lbl.querySelector("input").disabled = false; });
+    legend.hidden = true;
+    return;
+  }
+
+  // Collect which groups are missing for which nutrients
+  formula.forEach(item => {
+    const nut = NUTRIENTS[item.nutrientId];
+    if (!nut) return;
+    const effectiveRDA = getEffectiveRDA(item.nutrientId);
+    AGE_GROUPS.forEach(g => {
+      if (effectiveRDA[g.id] === undefined || effectiveRDA[g.id] === null) {
+        if (!blockedGroups.has(g.id)) blockedGroups.set(g.id, []);
+        blockedGroups.get(g.id).push(nut.name);
+      }
+    });
+  });
+
+  let blockedCount = 0;
+  labels.forEach(lbl => {
+    const cb = lbl.querySelector("input");
+    const gid = cb.value;
+    if (blockedGroups.has(gid)) {
+      lbl.classList.add("blocked");
+      cb.disabled = true;
+      cb.checked = false;
+      lbl.title = `Không có dữ liệu: ${blockedGroups.get(gid).join(", ")}`;
+      blockedCount++;
+    } else {
+      lbl.classList.remove("blocked");
+      cb.disabled = false;
+      lbl.title = "";
+    }
+  });
+
+  if (blockedCount > 0) {
+    legend.hidden = false;
+    legend.innerHTML = `[Lưu ý] ${blockedCount} nhóm bị khóa do thành phần trong công thức không có dữ liệu RDA/AI`;
+  } else {
+    legend.hidden = true;
+  }
+  updateTags();
+}
+
+function renderFormula() {
+  const body = document.getElementById("formulaBody");
+  const emptyState = document.getElementById("emptyState");
+  const servings = parseInt(document.getElementById("servingsPerDay").value) || 1;
+  const groups = getSelectedGroups();
+
+  // Show bioavailability note if iron is in formula
+  const bioNoteEl = document.getElementById("bioNote");
+  const hasIron = formula.some(f => f.nutrientId === "iron");
+  if (hasIron) {
+    const bioCol = getIronBioColumn();
+    const hasVitC = formula.some(f => f.nutrientId === "vitamin_c" && f.amountPerServing !== null);
+    let bioHtml = `<div class="bio-note"><strong>Sắt — Sinh học: ${getIronBioLabel()}</strong>`;
+    if (hasVitC) {
+      const vitCDaily = formula.find(f => f.nutrientId === "vitamin_c").amountPerServing * servings;
+      bioHtml += ` · Vitamin C = ${fmt(vitCDaily)}mg/ngày → tự động chọn cột ${bioCol === "bio5" ? "5%" : bioCol === "bio15" ? "15%" : "10%"}`;
+    } else {
+      bioHtml += ` · Thêm Vitamin C vào công thức để tự động chuyển cột`;
+    }
+    bioHtml += `</div>`;
+    bioNoteEl.innerHTML = bioHtml;
+  } else {
+    bioNoteEl.innerHTML = "";
+  }
+
+  if (formula.length === 0 || groups.length === 0) {
+    body.innerHTML = "";
+    emptyState.hidden = false;
+    if (groups.length === 0) emptyState.querySelector("p").textContent = "Vui lòng chọn ít nhất 1 đối tượng";
+    else emptyState.querySelector("p").textContent = "Thêm thành phần vào công thức để kiểm tra";
+    ["totalItems","totalOk","totalWarning","totalDanger"].forEach(id => document.getElementById(id).textContent = "0");
+    return;
+  }
+
+  emptyState.hidden = true;
+  let html = "", okCount = 0, warnCount = 0, dangerCount = 0;
+
+  formula.forEach((item, idx) => {
+    const nut = NUTRIENTS[item.nutrientId];
+    if (!nut) return;
+
+    const perServing = item.amountPerServing;
+    const daily = perServing !== null ? perServing * servings : null;
+    const stats = getGroupStats(item.nutrientId);
+
+    let status = "ok", badgeClass = "badge-ok", badgeText = "—";
+
+    if (daily !== null && stats) {
+      if (stats.ulMin !== null && daily > stats.ulMin) {
+        status = "danger"; badgeClass = "badge-danger";
+        badgeText = `Vượt UL (${stats.ulMinGroup})`;
+        dangerCount++;
+      } else if (stats.rdaMax !== null) {
+        const pctWorst = (daily / stats.rdaMax) * 100;
+        if (pctWorst > 300) {
+          status = "warning"; badgeClass = "badge-warning";
+          badgeText = `>${pctWorst.toFixed(0)}% RNI`;
+          warnCount++;
+        } else {
+          status = "ok"; badgeClass = "badge-ok";
+          badgeText = "Đạt"; okCount++;
+        }
+      } else { okCount++; badgeText = "Đạt"; }
+    } else if (daily === null) {
+      badgeText = "Chưa nhập liều"; badgeClass = "badge-warning"; warnCount++;
+    }
+
+    // NQ 66/13/2026
+    let nq66Badge = "";
+    if (daily !== null && stats && stats.rdaMin !== null) {
+      const pctOfLowest = (daily / stats.rdaMin) * 100;
+      if (pctOfLowest < 15) {
+        nq66Badge = `<span class="badge badge-danger" style="font-size:0.62rem;margin-left:4px">< 15% RNI (NQ66)</span>`;
+        if (status !== "danger") { status = "warning"; }
+      }
+    }
+
+    const fillColor = status === "danger" ? "var(--danger)" :
+                      status === "warning" ? "var(--warning)" : "var(--accent)";
+
+    let pctWorstDisplay = "—", barWidth = 0;
+    if (daily !== null && stats && stats.rdaMax) {
+      const pct = (daily / stats.rdaMax) * 100;
+      pctWorstDisplay = pct.toFixed(0) + "%";
+      barWidth = Math.min(pct, 100);
+    }
+
+    let rdaRange = "—";
+    if (stats && stats.rdaMin !== null && stats.rdaMax !== null) {
+      rdaRange = stats.rdaMin === stats.rdaMax
+        ? fmt(stats.rdaMin)
+        : `${fmt(stats.rdaMin)}–${fmt(stats.rdaMax)}`;
+    }
+
+    let ulDisplay = stats && stats.ulMin !== null
+      ? fmt(stats.ulMin)
+      : '<span style="color:var(--fg-muted)">KC</span>';
+
+    const convIcon = nut.conversion
+      ? `<span class="info-tip" tabindex="0" style="color:var(--warning);font-weight:700">[i]<span class="tip-text">${nut.conversion.title}: ${nut.conversion.lines[0]}</span></span>`
+      : "";
+
+    let srcLinks = "";
+    if (nut.sourceUrls && nut.sourceUrls.length > 0) {
+      srcLinks = `<div class="source-links">${nut.sourceUrls.map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label}</a>`).join("")}</div>`;
+    }
+
+    html += `<tr${status==="danger"?" class='worst-row'":""}>
+      <td>
+        <span class="nutrient-name"${nut.source ? ` title="${nut.source}"` : ""}>${nut.name}</span> ${convIcon}${nut.isAI ? ' <span style="font-size:0.6rem;color:var(--fg-muted);vertical-align:super">AI</span>' : ''}<br>
+        <span class="nutrient-unit">${nut.unit}</span>${srcLinks}
+      </td>
+      <td class="amount">${daily !== null ? fmt(perServing) : '<span style="color:var(--warning)">—</span>'}</td>
+      <td class="amount">${servings}</td>
+      <td class="amount" style="font-weight:700">${daily !== null ? fmt(daily) : '<span style="color:var(--warning)">—</span>'}</td>
+      <td class="amount">${rdaRange}</td>
+      <td>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" style="width:${barWidth}%;background:${fillColor}"></div></div>
+          <span class="progress-pct" style="color:${fillColor}">${pctWorstDisplay}</span>
+        </div>
+      </td>
+      <td class="amount">${ulDisplay}</td>
+      <td><span class="badge ${badgeClass}">${badgeText}</span>${nq66Badge}</td>
+      <td><button class="btn-remove" onclick="removeFromFormula(${idx})">✕</button></td>
+    </tr>`;
+  });
+
+  // Warnings
+  let warnings = [];
+  formula.forEach(item => {
+    const nut = NUTRIENTS[item.nutrientId];
+    if (!nut) return;
+    const daily = item.amountPerServing !== null ? item.amountPerServing * servings : null;
+
+    if (item.nutrientId === "iron" && groups.includes("pregnant")) {
+      warnings.push({ type:"info",
+        text:`<strong>Sắt — PN mang thai:</strong> RDA cộng thêm vào RDA nữ trưởng thành. TT43⁴: <em>"PN có thai được khuyến nghị bổ sung viên sắt suốt thai kỳ."</em>`
+      });
+    }
+    if (item.nutrientId === "iron" && groups.includes("lactating")) {
+      warnings.push({ type:"warning",
+        text:`<strong>Sắt — Cho con bú:</strong> TT43 không có RDA cụ thể (bảng trống). Gợi ý: "Tham khảo ý kiến bác sĩ" cho phụ nữ cho con bú.`
+      });
+    }
+    if (item.nutrientId === "zinc" && groups.includes("child_1_3") && daily !== null && daily > 4.1) {
+      warnings.push({ type: daily > 7 ? "danger" : "warning",
+        text:`<strong>Kẽm — Trẻ 1-3:</strong> Khoảng an toàn hẹp (RDA=4.1mg, UL=7mg). Liều ${fmt(daily)}mg/ngày ${daily > 7 ? "VƯỢT UL!" : "gần UL"}.`
+      });
+    }
+    if (item.nutrientId === "iron" && (groups.includes("female_16_18")) && daily !== null) {
+      const stats = getGroupStats("iron");
+      if (stats && stats.rdaMax >= 32) {
+        warnings.push({ type:"info",
+          text:`<strong>Sắt — Nữ 16-18:</strong> RDA rất cao do kinh nguyệt + tăng trưởng. Khó đạt 100% RNI mà không vượt UL (45mg).`
+        });
+      }
+    }
+    if (item.nutrientId === "vitamin_b9" && groups.includes("pregnant")) {
+      warnings.push({ type:"info",
+        text:`<strong>Folate — PN mang thai:</strong> RDA=600 mcg DFE. WHO/TT43 khuyến nghị bổ sung ≥400 mcg acid folic/ngày trước và trong thai kỳ.`
+      });
+    }
+    if (item.nutrientId === "magnesium" && daily !== null) {
+      const stats = getGroupStats("magnesium");
+      if (stats && stats.ulMin !== null && daily > stats.ulMin * 0.9) {
+        warnings.push({ type:"warning",
+          text:`<strong>Magie:</strong> UL (${stats.ulMin}mg) chỉ áp dụng cho Mg từ TPCN/bổ sung. Liều ${fmt(daily)}mg gần hoặc vượt UL.`
+        });
+      }
+    }
+  });
+
+  const detailEl = document.getElementById("detailPanel");
+  if (warnings.length > 0) {
+    detailEl.innerHTML = warnings.map(w => {
+      const bc = w.type === "danger" ? "var(--danger)" : w.type === "warning" ? "var(--warning)" : "var(--info)";
+      const bg = w.type === "danger" ? "var(--danger-light)" : w.type === "warning" ? "var(--warning-light)" : "var(--info-light)";
+      return `<div style="background:${bg};border-left:3px solid ${bc};border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 12px;margin:6px 0;font-size:0.78rem;line-height:1.5">${w.text}</div>`;
+    }).join("");
+  } else { detailEl.innerHTML = ""; }
+
+  body.innerHTML = html;
+  document.getElementById("totalItems").textContent = formula.length;
+  document.getElementById("totalOk").textContent = okCount;
+  document.getElementById("totalWarning").textContent = warnCount;
+  document.getElementById("totalDanger").textContent = dangerCount;
+}
+
+// ===== OPTIMIZE =====
+function runOptimize() {
+  const groups = getSelectedGroups();
+  if (groups.length === 0) { showOpt("Vui lòng chọn ít nhất 1 đối tượng."); return; }
+  if (formula.length === 0) { showOpt("Vui lòng thêm ít nhất 1 chất dinh dưỡng."); return; }
+
+  let bestPlan = null, bestScore = -1;
+
+  [1, 2, 3].forEach(sv => {
+    let plan = { servings: sv, items: [], feasible: true, score: 0 };
+
+    formula.forEach(item => {
+      const stats = getGroupStats(item.nutrientId);
+      const nut = NUTRIENTS[item.nutrientId];
+      if (!stats || !nut) return;
+
+      const targetRDA = stats.rdaMax;
+      const limitUL = stats.ulMin;
+
+      if (targetRDA === null) {
+        plan.items.push({
+          nutrientId: item.nutrientId, name: nut.name, unit: nut.unit,
+          perServing: item.amountPerServing,
+          daily: item.amountPerServing ? item.amountPerServing * sv : null,
+          note: "Không có RDA để tối ưu", feasible: true
+        });
+        return;
+      }
+
+      let idealDaily = targetRDA;
+      if (limitUL !== null && idealDaily > limitUL) {
+        idealDaily = limitUL;
+        plan.feasible = false;
+      }
+
+      const perServing = Math.round((idealDaily / sv) * 10) / 10;
+      const actualDaily = perServing * sv;
+      const pctRDA = (actualDaily / targetRDA * 100).toFixed(0);
+      const withinUL = limitUL === null || actualDaily <= limitUL;
+
+      plan.items.push({
+        nutrientId: item.nutrientId, name: nut.name, unit: nut.unit,
+        perServing, daily: actualDaily, pctRDA, withinUL,
+        rdaTarget: targetRDA, ulLimit: limitUL,
+        rdaTargetGroup: stats.rdaMaxGroup,
+        note: withinUL ? `${pctRDA}% RNI` : `Vượt UL!`,
+        feasible: withinUL,
+      });
+
+      plan.score += withinUL ? parseInt(pctRDA) : -100;
+    });
+
+    if (bestPlan === null || plan.score > bestScore) {
+      bestPlan = plan; bestScore = plan.score;
+    }
+  });
+
+  if (!bestPlan) { showOpt("Không thể tối ưu."); return; }
+
+  bestPlan.items.forEach(opt => {
+    if (opt.perServing !== null) {
+      const f = formula.find(x => x.nutrientId === opt.nutrientId);
+      if (f) f.amountPerServing = opt.perServing;
+    }
+  });
+  document.getElementById("servingsPerDay").value = bestPlan.servings;
+
+  const L = I18N_RDA[currentLang] || I18N_RDA.vi;
+  const optTitle = (L.opt_title || "Kết quả tối ưu — {srv} lần/ngày").replace("{srv}", bestPlan.servings);
+  let html = `<div class="opt-result"><h3>${optTitle}</h3>`;
+  bestPlan.items.forEach(opt => {
+    const icon = opt.feasible 
+      ? `<span style="color:var(--ok);font-weight:700">[${L.pass || "Đạt"}]</span>` 
+      : `<span style="color:var(--warning);font-weight:700">[${currentLang === "en" ? "Warning" : "Lưu ý"}]</span>`;
+    const nut = NUTRIENTS[opt.nutrientId];
+    const nName = currentLang === "en" ? (nut?.name_en || opt.name) : opt.name;
+    const srvStr = opt.perServing !== null ? fmt(opt.perServing) + " " + opt.unit + (L.opt_srv_label || "/lần") : "—";
+    html += `<div class="opt-row">
+      <span class="opt-label">${icon} ${nName}</span>
+      <span class="opt-value">${srvStr}</span>
+    </div>`;
+    if (opt.rdaTarget) {
+      const gObj = AGE_GROUPS.find(g => g.label === opt.rdaTargetGroup);
+      const grpName = currentLang === "en" ? (gObj?.label_en || opt.rdaTargetGroup) : opt.rdaTargetGroup;
+      const ulStr = opt.ulLimit ? `UL: ${fmt(opt.ulLimit)}` : (L.opt_no_ul || "UL: KC");
+      html += `<div class="opt-row" style="font-size:0.72rem;padding-left:20px">
+        <span class="opt-label">→ ${fmt(opt.daily)} ${opt.unit}${L.opt_day_label || "/ngày"} = ${opt.pctRDA}% RNI (${grpName})</span>
+        <span class="opt-value">${ulStr}</span>
+      </div>`;
+    }
+  });
+  if (!bestPlan.feasible) {
+    html += `<div style="margin-top:8px;color:var(--warning);font-size:0.78rem">[${currentLang === "en" ? "Warning" : "Lưu ý"}] ${L.opt_warn || "Một số chất không thể đạt 100% RNI mà không vượt UL."}</div>`;
+  }
+  let hasNQ66Issue = bestPlan.items.some(opt => {
+    if (!opt.daily || !opt.rdaTarget) return false;
+    const stats = getGroupStats(opt.nutrientId);
+    return stats && stats.rdaMin !== null && (opt.daily / stats.rdaMin * 100) < 15;
+  });
+  if (hasNQ66Issue) {
+    html += `<div style="margin-top:6px;color:var(--danger);font-size:0.78rem">[${currentLang === "en" ? "Alert" : "Cảnh báo"}] ${L.opt_danger || "NQ 66/13/2026: Có chất < 15% RNI → không đủ ĐK đăng ký."}</div>`;
+  }
+  html += `</div>`;
+  document.getElementById("optResult").innerHTML = html;
+  renderFormula();
+}
+
+function showOpt(msg) {
+  document.getElementById("optResult").innerHTML = `<div class="opt-result" style="border-color:var(--warning)">${msg}</div>`;
+}
+
+function fmt(n) {
+  if (n === null || n === undefined) return "—";
+  if (Number.isInteger(n)) return n.toLocaleString("vi-VN");
+  return n.toLocaleString("vi-VN", { maximumFractionDigits: 1 });
+}
+
+init();
+
+
+// Language toggle and localization
+function applyRdaLang() {
+  const L = I18N_RDA[currentLang] || I18N_RDA.vi;
+  document.documentElement.lang = currentLang;
+  
+  const setEl = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+
+  setEl("lblPopTitle", L.pop_title);
+  setEl("btnAdults", L.adults);
+  setEl("btnChildren", L.children);
+  setEl("btnAll", L.all);
+  setEl("btnNone", L.none);
+  setEl("lblAddTitle", L.add_title);
+  
+  const lblNut = document.getElementById("lblNutrient");
+  if (lblNut && lblNut.childNodes[0]) lblNut.childNodes[0].textContent = L.nutrient + " ";
+  setEl("lblNutHint", L.nut_hint);
+  
+  const nutSearch = document.getElementById("nutrientSearch");
+  if (nutSearch) nutSearch.placeholder = L.search_ph;
+  
+  setEl("lblServings", L.servings);
+  setEl("lblAmount", L.amount);
+  
+  const amtInput = document.getElementById("amountInput");
+  if (amtInput) amtInput.placeholder = L.amount_ph;
+  
+  setEl("lblUnit", L.unit);
+  setEl("btnAdd", L.btn_add);
+  setEl("lblOptText", L.btn_opt);
+  setEl("lblFormulaTitle", L.formula_title);
+  setEl("lblTotalItems", L.total_items);
+  setEl("lblTotalOk", L.total_ok);
+  setEl("lblTotalWarning", L.total_warn);
+  setEl("lblTotalDanger", L.total_danger);
+  setEl("thNutrient", L.th_nut);
+  setEl("thAmount", L.th_amt);
+  setEl("thServings", L.th_srv);
+  setEl("thDaily", L.th_daily);
+  setEl("thRni", L.th_rni);
+  setEl("thHardest", L.th_hardest);
+  setEl("thUl", L.th_ul);
+  setEl("thEval", L.th_eval);
+  setEl("emptyText", L.empty_text);
+  
+  // Update age group checkboxes text
+  const grid = document.getElementById("ageGroupGrid");
+  if (grid) {
+    const currentChecked = new Set(getSelectedGroups());
+    grid.innerHTML = "";
+    AGE_GROUPS.forEach(g => {
+      const lbl = document.createElement("label");
+      const name = currentLang === 'en' ? (g.label_en || g.label) : g.label;
+      const chk = currentChecked.has(g.id) ? "checked" : "";
+      lbl.innerHTML = `<input type="checkbox" id="ag_${g.id}" value="${g.id}" ${chk} onchange="updateTags();renderFormula()"> ${name}`;
+      grid.appendChild(lbl);
+    });
+  }
+  updateTags();
+  renderFormula();
+}
+
+// Synchronize Theme & Language with parent
+try {
+  if (window.parent && window.parent.L) currentLang = window.parent.L;
+  else currentLang = localStorage.getItem('lang') || 'vi';
+} catch(e){}
+
+let currentTheme = 'light';
+try {
+  if (window.parent && window.parent.currentTheme) currentTheme = window.parent.currentTheme;
+  else currentTheme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+} catch(e){}
+document.documentElement.setAttribute('data-theme', currentTheme);
+document.documentElement.lang = currentLang;
+
+window.addEventListener('message', e => {
+  if (e.data) {
+    if (e.data.theme) {
+      currentTheme = e.data.theme;
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    }
+    if (e.data.lang) {
+      currentLang = e.data.lang;
+      applyRdaLang();
+    }
+  }
+});
+
+applyRdaLang();
+</script>
+</body>
+</html>

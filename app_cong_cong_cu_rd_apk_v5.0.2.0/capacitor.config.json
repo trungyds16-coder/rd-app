@@ -1,0 +1,11 @@
+{
+  "appId": "com.rdtools.portal",
+  "appName": "Cổng công cụ RD",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "adjustMarginsForEdgeToEdge": "force"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "rd-tools-portal",
+  "version": "5.0.2",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^7.1.0",
+    "@capacitor/cli": "^7.1.0",
+    "@capacitor/core": "^7.1.0"
+  }
+}

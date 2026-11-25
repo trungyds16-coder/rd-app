@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Hệ thống Tạo Dữ liệu Biểu đồ Quá trình Dập viên</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f9;
+  --card: #ffffff;
+  --fg: #1f1f1f;
+  --mut: #5f6368;
+  --sub: #444746;
+  --bd: #e3e3e3;
+  --ac: #0b57d0;
+  --ac-hover: #0842a0;
+  --ac-subtle: rgba(11, 87, 208, 0.08);
+  --th: #f8fafc;
+  --th-fg: #475569;
+  --row-hover: #f1f5f9;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --font: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --success: #15803d;
+  --success-bg: #dcfce7;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+}
+[data-theme="dark"] {
+  --bg: #131314;
+  --card: #1e1f20;
+  --fg: #e3e3e3;
+  --mut: #8e918f;
+  --sub: #c4c7c5;
+  --bd: #444746;
+  --ac: #a8c7fa;
+  --ac-hover: #c2e7ff;
+  --ac-subtle: rgba(168, 199, 250, 0.12);
+  --th: #282a2c;
+  --th-fg: #cbd5e1;
+  --row-hover: #2a2b2e;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --success-bg: rgba(74, 222, 128, 0.15);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.15);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sleek Modern Header Bar */
+.top-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--bd);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--fg);
+}
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--ac-subtle);
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-dec {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.btn-dec:hover {
+  background: var(--row-hover);
+  border-color: var(--ac);
+}
+
+/* Layout */
+main {
+  flex: 1;
+  max-width: 1520px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 14px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 420px 1fr;
+  height: calc(100vh - 54px);
+  overflow: hidden;
+}
+@media (max-width: 1020px) {
+  body { height: auto; overflow: auto; }
+  main { height: auto; grid-template-columns: 1fr; overflow: visible; }
+  .scroll-pane { max-height: none !important; overflow: visible !important; }
+}
+
+.scroll-pane {
+  overflow-y: auto;
+  max-height: calc(100vh - 78px);
+  padding-right: 6px;
+}
+.scroll-pane::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-pane::-webkit-scrollbar-thumb {
+  background: var(--bd);
+  border-radius: 4px;
+}
+
+/* Card Container */
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--bd);
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Section Blocks */
+.section-block {
+  border: 1px solid var(--bd);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  background: var(--card);
+  transition: border-color 0.15s ease;
+}
+.section-block:hover {
+  border-color: rgba(11, 87, 208, 0.3);
+}
+.section-block h2 {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Labels and Inputs */
+label {
+  display: block;
+  margin: 6px 0 3px;
+  font-weight: 600;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+label.sub {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--mut);
+  margin-top: 2px;
+}
+input[type=text], input[type=number], select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.15s ease;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px var(--ac-subtle);
+}
+.row {
+  display: flex;
+  gap: 8px;
+}
+.row > div {
+  flex: 1;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  width: 100%;
+  padding: 8px 14px;
+  margin-top: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--ac);
+  color: #fff;
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+button:hover {
+  opacity: 0.92;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+button.secondary {
+  background: var(--th);
+  color: var(--fg);
+  border: 1px solid var(--bd);
+}
+button.secondary:hover {
+  background: var(--row-hover);
+  border-color: var(--mut);
+}
+button.success {
+  background: #0b57d0;
+}
+[data-theme="dark"] button.success {
+  background: #0b57d0;
+  color: #ffffff;
+}
+button.mini {
+  width: auto;
+  margin: 0;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  border-radius: 20px;
+}
+#all {
+  margin-top: 0;
+  padding: 8px 14px;
+  background: #0b57d0;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* Results and Tables */
+.result-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.result-card {
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--card);
+}
+.hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.hd h2 {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+}
+.tw {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bd);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--card);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+th, td {
+  border: 1px solid var(--bd);
+  padding: 7px 10px;
+  text-align: center;
+}
+th {
+  background: var(--th);
+  color: var(--th-fg);
+  font-weight: 600;
+  font-size: 11.5px;
+}
+td:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+tbody tr:hover {
+  background: var(--row-hover);
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge-pass {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.badge-review {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* Info Icon and Tooltip */
+.info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  margin-left: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--ac);
+  color: var(--ac);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: serif;
+  cursor: help;
+  vertical-align: middle;
+  flex: none;
+  transition: all 0.15s ease;
+}
+.info:hover {
+  background: var(--ac);
+  color: #fff;
+}
+#tip {
+  position: fixed;
+  display: none;
+  max-width: 320px;
+  background: var(--card);
+  color: var(--fg);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  z-index: 999;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--bd);
+  pointer-events: none;
+  white-space: pre-line;
+  font-weight: normal;
+}
+
+/* Spin Number Input */
+.spin {
+  position: relative;
+}
+.spin input {
+  padding-right: 24px;
+}
+.spin .sp {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.spin .sp button {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  font-size: 8px;
+  line-height: 1;
+  background: var(--th);
+  color: var(--fg);
+  border-radius: 0;
+  border: none;
+  border-left: 1px solid var(--bd);
+  cursor: pointer;
+}
+.spin .sp button:first-child {
+  border-radius: 0 4px 0 0;
+}
+.spin .sp button:last-child {
+  border-radius: 0 0 4px 0;
+  border-top: 1px solid var(--bd);
+}
+.spin .sp button:hover {
+  background: var(--row-hover);
+}
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="brand-title">
+    <div class="brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+    </div>
+    <span id="txt_app_title">Hệ thống Tạo Dữ liệu Biểu đồ Quá trình Dập viên</span>
+  </div>
+  <div class="top-actions">
+    <button id="btn_dec" class="btn-dec" type="button" title="Chuyển đổi dấu thập phân">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="19" r="1.5"/></svg>
+      <span id="dec_label">Dấu thập phân: Chấm (.)</span>
+    </button>
+    <button id="all" class="success" type="button" style="width:auto;margin:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+      <span id="txt_all">Tạo lại tất cả dữ liệu</span>
+    </button>
+  </div>
+</header>
+
+<main>
+<!-- CỘT TRÁI: NHẬP GIỚI HẠN -->
+<section class="card scroll-pane">
+  <div class="card-header">
+    <h1 class="card-title">
+      <span id="txt_sec1_title">1. Nhập giới hạn & Sinh dữ liệu</span>
+      <span class="info" id="info_sec1">i</span>
+    </h1>
+  </div>
+
+  <div style="margin-bottom:12px">
+    <label id="lbl_lot">Mã lô sản xuất</label>
+    <input type="text" id="lot" value="0222NC">
+  </div>
+  
+  <p id="msg" style="color:var(--danger);font-size:12px;margin:4px 0 8px;min-height:16px"></p>
+
+  <!-- Mục 1 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec1">Mục 1: Lô sàng lọc – KLV, độ dày, độ cứng</span>
+      <span class="info" id="info_s1">i</span>
+    </h2>
+    <div class="row">
+      <div class="m1" data-i="a_n" data-l="Số viên" data-en="Tablet count (n)" data-v="20"></div>
+      <div class="m1" data-i="a_p" data-l="± % so với TB" data-en="± % from mean" data-v="7.5"></div>
+    </div>
+    <div class="m3" data-i="a_k" data-l="Khối lượng viên – KLV (mg)" data-en="Tablet mass – KLV (mg)" data-v="117 125 120.5"></div>
+    <div class="m3" data-i="a_t" data-l="Độ dày (mm)" data-en="Thickness (mm)" data-v="3.36 3.48 3.43"></div>
+    <div class="m3" data-i="a_h" data-l="Độ cứng (N)" data-en="Hardness (N)" data-v="34 62 44.5"></div>
+    <button id="b1" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 1</span></button>
+  </div>
+
+  <!-- Mục 2 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec2">Mục 2: Phân bố cỡ rây (khối lượng g)</span>
+      <span class="info" id="info_s2">i</span>
+    </h2>
+    <div class="row">
+      <div><label class="sub" id="lbl_sieve_sz">Cỡ rây</label></div>
+      <div><label class="sub" id="lbl_sieve_min">Min (g)</label></div>
+      <div><label class="sub" id="lbl_sieve_max">Max (g)</label></div>
+    </div>
+    <div id="sv"></div>
+    <button id="b2" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 2</span></button>
+  </div>
+
+  <!-- Mục 3 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec3">Mục 3: Chỉ số nén CI, HR & góc nghỉ</span>
+      <span class="info" id="info_s3">i</span>
+    </h2>
+    <div class="row">
+      <div class="m1" data-i="c_vb" data-l="Vbulk (mL)" data-en="Vbulk (mL)" data-v="50"></div>
+      <div class="m1" data-i="c_r" data-l="r (mm)" data-en="r (mm)" data-v="53.27"></div>
+    </div>
+    <div class="m2" data-i="c_ci" data-l="Chỉ số nén CI (%)" data-en="Compressibility Index CI (%)" data-v="28 32"></div>
+    <div class="m2" data-i="c_ang" data-l="Góc nghỉ (độ)" data-en="Angle of repose (deg)" data-v="30 36"></div>
+    <button id="b3" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 3</span></button>
+  </div>
+
+  <!-- Mục 4 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec4">Mục 4: Độ mài mòn</span>
+      <span class="info" id="info_s4">i</span>
+    </h2>
+    <div class="row">
+      <div class="m1" data-i="d_m" data-l="m viên (mg)" data-en="Tablet mass (mg)" data-v="120.48"></div>
+      <div class="m1" data-i="d_n" data-l="Số viên (n)" data-en="Tablet count (n)" data-v="55"></div>
+    </div>
+    <div class="m2" data-i="d_pc" data-l="% mất khối lượng" data-en="% Mass loss" data-v="0.15 0.30"></div>
+    <button id="b4" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 4</span></button>
+  </div>
+
+  <!-- Mục 5 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec5">Mục 5: Lô Scale up (đầu / giữa / cuối)</span>
+      <span class="info" id="info_s5">i</span>
+    </h2>
+    <div class="m1" data-i="e_n" data-l="Số viên mỗi giai đoạn" data-en="Tablets per stage" data-v="10"></div>
+    <div class="m3" data-i="e_t" data-l="Độ dày (mm)" data-en="Thickness (mm)" data-v="3.29 3.45 3.37"></div>
+    <div class="m3" data-i="e_h" data-l="Độ cứng (N)" data-en="Hardness (N)" data-v="40 63 50"></div>
+    <button id="b5" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 5</span></button>
+  </div>
+
+  <!-- Mục 6 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec6">Mục 6: Khối lượng trung bình 10 viên</span>
+      <span class="info" id="info_s6">i</span>
+    </h2>
+    <div class="row">
+      <div><label id="lbl_t0">Giờ bắt đầu</label><input type="text" id="f_t0" value="10h00"></div>
+      <div class="m1" data-i="f_step" data-l="Bước (phút)" data-en="Interval (min)" data-v="5"></div>
+      <div class="m1" data-i="f_n" data-l="Số mốc" data-en="Time points" data-v="7"></div>
+    </div>
+    <div class="m3" data-i="f_k" data-l="KLTB 10 viên (g)" data-en="Avg mass 10 tab (g)" data-v="1.17 1.23 1.20"></div>
+    <label id="lbl_cq">Cảm quan</label><input type="text" id="f_cq" value="Đạt">
+    <button id="b6" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 6</span></button>
+  </div>
+
+  <!-- Mục 7 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec7">Mục 7: Độ rã viên (phút : giây)</span>
+      <span class="info" id="info_s7">i</span>
+    </h2>
+    <div class="m1" data-i="g_n" data-l="Số viên thử" data-en="Tablets tested" data-v="6"></div>
+    <div class="m3" data-x="1" data-i="g0" data-l="Đầu lô (phút:giây)" data-en="Beginning (min:sec)" data-v="4:00 9:00 6:00"></div>
+    <div class="m3" data-x="1" data-i="g1" data-l="Giữa lô (phút:giây)" data-en="Middle (min:sec)" data-v="4:00 9:00 6:00"></div>
+    <div class="m3" data-x="1" data-i="g2" data-l="Cuối lô (phút:giây)" data-en="End (min:sec)" data-v="4:00 9:00 6:00"></div>
+    <button id="b7" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 7</span></button>
+  </div>
+
+  <!-- Mục 8 -->
+  <div class="section-block">
+    <h2>
+      <span id="t_sec8">Mục 8: Khối lượng viên bao phim (mg)</span>
+      <span class="info" id="info_s8">i</span>
+    </h2>
+    <div class="row">
+      <div class="m1" data-i="h_r" data-l="Số hàng" data-en="Rows" data-v="2"></div>
+      <div class="m1" data-i="h_c" data-l="Số cột" data-en="Columns" data-v="10"></div>
+    </div>
+    <div class="m3" data-i="h_k" data-l="Khối lượng viên bao (mg)" data-en="Coated tablet mass (mg)" data-v="170 183 175.7"></div>
+    <button id="b8" class="success" type="button"><span class="btn-txt">Tạo dữ liệu Mục 8</span></button>
+  </div>
+</section>
+
+<!-- CỘT PHẢI: KẾT QUẢ -->
+<section class="card scroll-pane">
+  <div class="card-header">
+    <h1 class="card-title">
+      <span id="txt_sec2_title">2. Bảng kết quả – Lô </span><span id="lotv"></span>
+    </h1>
+  </div>
+  <div class="result-box" id="out"></div>
+</section>
+</main>
+
+<div id="tip"></div>
+
+<script>
+const $ = i => document.getElementById(i);
+let DEC = '.', S = {}, curLang = 'vi';
+
+const DICT = {
+  vi: {
+    app_title: 'Hệ thống Tạo Dữ liệu Biểu đồ Quá trình Dập viên',
+    dec_dot: 'Dấu thập phân: Chấm (.)',
+    dec_comma: 'Dấu thập phân: Phẩy (,)',
+    all: 'Tạo lại tất cả dữ liệu',
+    sec1_title: '1. Nhập giới hạn & Sinh dữ liệu độc lập',
+    sec2_title: '2. Bảng kết quả – Lô ',
+    lot_lbl: 'Mã lô sản xuất',
+    copy_btn: 'Sao chép bảng',
+    copied_btn: 'Đã chép',
+    no_data: 'Chưa tạo dữ liệu.',
+    gen_btn_prefix: 'Tạo dữ liệu ',
+    min: 'Min',
+    max: 'Max',
+    mean: 'TB mong muốn',
+    sieve_sz: 'Cỡ rây',
+    sieve_min: 'Min (g)',
+    sieve_max: 'Max (g)',
+    t0: 'Giờ bắt đầu',
+    cq: 'Cảm quan',
+    pass: 'Đạt',
+    review: 'Xem lại',
+    total: 'Tổng',
+    param: 'Chỉ tiêu',
+    val: 'Giá trị',
+    flow_rating: 'Nhận xét độ chảy',
+    flow_overall: 'Nhận xét chung',
+    granule_flow: 'Cốm chảy ',
+    suitable: '(đủ điều kiện dập viên)',
+    need_improve: '(cần cải thiện, ví dụ bổ sung chất trơn chảy)',
+    flow_lv: ['rất tốt', 'tốt', 'khá', 'chấp nhận được', 'kém', 'rất kém', 'cực kỳ kém'],
+    stages: ['ĐẦU LÔ', 'GIỮA LÔ', 'CUỐI LÔ'],
+    stage_names: ['Đầu lô', 'Giữa lô', 'Cuối lô'],
+    stt: 'STT',
+    thickness: 'Độ dày (mm)',
+    hardness: 'Độ cứng (N)',
+    mass: 'KLV (mg)',
+    mean_abbr: 'TB',
+    time_col: 'Thời điểm',
+    min_word: 'phút',
+    sec_word: 'giây',
+    row_word: 'Hàng',
+    col_word: 'Cột',
+    sec1_h: 'Mục 1: Lô sàng lọc – KLV, độ dày, độ cứng',
+    sec2_h: 'Mục 2: Phân bố cỡ rây (khối lượng g)',
+    sec3_h: 'Mục 3: Chỉ số nén CI, HR & góc nghỉ',
+    sec4_h: 'Mục 4: Độ mài mòn',
+    sec5_h: 'Mục 5: Lô Scale up (đầu / giữa / cuối)',
+    sec6_h: 'Mục 6: Khối lượng trung bình 10 viên',
+    sec7_h: 'Mục 7: Độ rã viên (phút : giây)',
+    sec8_h: 'Mục 8: Khối lượng viên bao phim (mg)',
+    tbl_titles: [
+      ['Bảng 1: Khối lượng viên, độ dày, độ cứng – lô sàng lọc', 'TB − % và TB + % là giới hạn chấp nhận của KLV theo ± % ở Mục 1.'],
+      ['Bảng 2: Phân bố cỡ rây', '% = khối lượng từng rây / tổng khối lượng × 100.'],
+      ['Bảng 3: Chỉ số nén (CI), Hausner (HR) & góc nghỉ', 'Thang độ chảy (USP 1174):\nCI: ≤10 rất tốt; 11–15 tốt; 16–20 khá; 21–25 chấp nhận được; 26–31 kém; 32–37 rất kém; trên 37 cực kỳ kém.\nHR: 1,00–1,11 rất tốt; 1,12–1,18 tốt; 1,19–1,25 khá; 1,26–1,34 chấp nhận được; 1,35–1,45 kém; 1,46–1,59 rất kém; trên 1,59 cực kỳ kém.\nGóc nghỉ: 25–30° rất tốt; 31–35° tốt; 36–40° khá; 41–45° chấp nhận được; 46–55° kém; 56–65° rất kém; trên 65° cực kỳ kém.\nNhận xét chung = mức trung bình của 3 chỉ số.'],
+      ['Bảng 4: Độ mài mòn', '% mất khối lượng được sinh trong khoảng đã nhập ở Mục 4.'],
+      ['Bảng 5: Độ dày & độ cứng lô Scale up (đầu / giữa / cuối lô)', 'Ba giai đoạn dùng chung giới hạn nhưng sinh dữ liệu riêng.'],
+      ['Bảng 6: Khối lượng trung bình 10 viên', 'Cột Cảm quan lấy theo nội dung nhập ở Mục 6.'],
+      ['Bảng 7: Độ rã viên', 'Hiển thị theo phút và giây. TB được làm tròn đến giây.'],
+      ['Bảng 8: Khối lượng viên bao phim', 'Average, Max, Min tính trên toàn bộ các ô.']
+    ],
+    tips: {
+      sec1: 'Mỗi mục nhập khoảng Min–Max và trung bình (TB) mong muốn; công cụ sinh ngẫu nhiên các giá trị nằm trong khoảng và có TB sát giá trị mong muốn.\nDùng nút ▲▼ bên phải ô nhập hoặc phím mũi tên lên/xuống để tăng/giảm. Bước nhảy tự theo số chữ số thập phân đang nhập.',
+      s1: 'Sinh dữ liệu từng viên cho lô sàng lọc. ± % dùng để kiểm tra KLV có nằm trong TB ± % hay không (Đạt / Xem lại).',
+      s2: 'Mỗi cỡ rây: tên rây và khoảng khối lượng (g). % = khối lượng rây / tổng × 100.',
+      s3: 'CI = (Vbulk − Vtab)/Vbulk × 100\nHR = Vbulk/Vtab\nGóc nghỉ = arctan(h/r)\nVtab và h được sinh sao cho CI và góc nghỉ nằm trong khoảng đã nhập. Bảng kết quả có nhận xét độ chảy của cốm.',
+      s4: 'Tổng KL trước = m viên × n.\nTổng KL sau = KL trước × (1 − % mất / 100).',
+      s5: 'Chỉ cần nhập một bộ giới hạn độ dày và độ cứng; áp dụng chung cho đầu, giữa và cuối lô (mỗi giai đoạn sinh dữ liệu riêng).',
+      s6: 'Giờ bắt đầu dạng 10h00 hoặc 10:00. Các mốc sau cách nhau số phút ở ô Bước.',
+      s7: 'Nhập thời gian dạng phút:giây, ví dụ 4:30 = 4 phút 30 giây. Nếu chỉ nhập số (vd 6) thì hiểu là 6 phút. Kết quả hiển thị phút và giây.',
+      s8: 'Số hàng × số cột viên. Average, Max, Min tính trên toàn bảng.'
+    }
+  },
+  en: {
+    app_title: 'Tablet Compression & Scale-Up Data System',
+    dec_dot: 'Decimal separator: Period (.)',
+    dec_comma: 'Decimal separator: Comma (,)',
+    all: 'Regenerate All Data',
+    sec1_title: '1. Parameters & Independent Generation',
+    sec2_title: '2. Result Tables – Batch ',
+    lot_lbl: 'Batch Number',
+    copy_btn: 'Copy Table',
+    copied_btn: 'Copied',
+    no_data: 'No data generated yet.',
+    gen_btn_prefix: 'Generate ',
+    min: 'Min',
+    max: 'Max',
+    mean: 'Target Mean',
+    sieve_sz: 'Sieve Mesh',
+    sieve_min: 'Min (g)',
+    sieve_max: 'Max (g)',
+    t0: 'Start Time',
+    cq: 'Appearance',
+    pass: 'Pass',
+    review: 'Review',
+    total: 'Total',
+    param: 'Parameter',
+    val: 'Value',
+    flow_rating: 'Flow Rating',
+    flow_overall: 'Overall Assessment',
+    granule_flow: 'Granule flow is ',
+    suitable: '(suitable for compression)',
+    need_improve: '(needs improvement, e.g. add glidants)',
+    flow_lv: ['excellent', 'good', 'fair', 'passable', 'poor', 'very poor', 'very very poor'],
+    stages: ['BEGINNING', 'MIDDLE', 'END'],
+    stage_names: ['Beginning', 'Middle', 'End'],
+    stt: 'No.',
+    thickness: 'Thickness (mm)',
+    hardness: 'Hardness (N)',
+    mass: 'Tablet Mass (mg)',
+    mean_abbr: 'Mean',
+    time_col: 'Time',
+    min_word: 'min',
+    sec_word: 'sec',
+    row_word: 'Row',
+    col_word: 'Col',
+    sec1_h: 'Section 1: Screening Batch – Mass, Thickness, Hardness',
+    sec2_h: 'Section 2: Sieve Analysis (Mass in g)',
+    sec3_h: 'Section 3: Compressibility Index CI, HR & Angle of Repose',
+    sec4_h: 'Section 4: Tablet Friability',
+    sec5_h: 'Section 5: Scale-up Batch (Beginning / Middle / End)',
+    sec6_h: 'Section 6: Average Mass of 10 Tablets Over Time',
+    sec7_h: 'Section 7: Tablet Disintegration (min : sec)',
+    sec8_h: 'Section 8: Film-Coated Tablet Mass (mg)',
+    tbl_titles: [
+      ['Table 1: Tablet Mass, Thickness, Hardness – Screening Batch', 'Mean − % and Mean + % are mass acceptance limits based on ± % in Section 1.'],
+      ['Table 2: Sieve Analysis (Particle Size Distribution)', '% = mass per sieve / total mass × 100.'],
+      ['Table 3: Compressibility Index (CI), Hausner Ratio (HR) & Angle of Repose', 'USP 1174 Flowability scale:\nCI: ≤10 excellent; 11–15 good; 16–20 fair; 21–25 passable; 26–31 poor; 32–37 very poor; >37 very very poor.\nHR: 1.00–1.11 excellent; 1.12–1.18 good; 1.19–1.25 fair; 1.26–1.34 passable; 1.35–1.45 poor; 1.46–1.59 very poor; >1.59 very very poor.\nAngle of repose: 25–30° excellent; 31–35° good; 36–40° fair; 41–45° passable; 46–55° poor; 56–65° very poor; >65° very very poor.\nOverall rating = average index level.'],
+      ['Table 4: Tablet Friability', '% Mass loss generated within limits specified in Section 4.'],
+      ['Table 5: Thickness & Hardness for Scale-up Batch (Beginning / Middle / End)', 'Shared specification limits with independently generated stage datasets.'],
+      ['Table 6: Average Mass of 10 Tablets Over Time', 'Appearance column taken from Section 6 input.'],
+      ['Table 7: Tablet Disintegration Time', 'Displayed in minutes and seconds. Mean rounded to nearest second.'],
+      ['Table 8: Film-Coated Tablet Mass', 'Average, Max, and Min calculated across all grid cells.']
+    ],
+    tips: {
+      sec1: 'Enter Min–Max ranges and target Mean for each parameter; random values are generated within the range and centered around the target.\nUse the ▲▼ spin buttons or Up/Down arrow keys to adjust values.',
+      s1: 'Generates per-tablet data for screening batch. ± % checks whether tablet mass falls within Mean ± % (Pass / Review).',
+      s2: 'Each sieve mesh: mesh name and mass range (g). % = sieve mass / total × 100.',
+      s3: 'CI = (Vbulk − Vtab)/Vbulk × 100\nHR = Vbulk/Vtab\nAngle of repose = arctan(h/r)\nVtab and h generated to match target CI and angle ranges.',
+      s4: 'Initial mass = tablet mass × n.\nFinal mass = initial mass × (1 − % loss / 100).',
+      s5: 'Enter thickness and hardness limits; applied to beginning, middle, and end of batch (independent data generated per stage).',
+      s6: 'Start time formatted like 10h00 or 10:00. Successive intervals spaced by minutes in Interval.',
+      s7: 'Enter time as min:sec (e.g. 4:30 = 4 min 30 sec). Plain number (e.g. 6) defaults to 6 minutes.',
+      s8: 'Rows × Columns grid. Average, Max, Min calculated across the full table.'
+    }
+  }
+};
+
+const pf = v => parseFloat(String(v).replace(',', '.'));
+const G = id => pf($(id).value);
+const N = id => Math.max(1, Math.round(G(id)) || 1);
+const F = (v, d = 2) => isFinite(v) ? v.toFixed(d).replace('.', DEC) : '*';
+const D = v => String(v).replace('.', DEC);
+const sum = a => a.reduce((x, y) => x + y, 0), avg = a => sum(a) / a.length, mn = a => Math.min(...a), mx = a => Math.max(...a);
+const rnd = (a, b) => a + Math.random() * (b - a);
+const row = (a, h) => '<tr>' + a.map(c => h ? `<th>${c}</th>` : `<td>${c}</td>`).join('') + '</tr>';
+const rows = (n, f) => Array.from({ length: n }, (_, i) => f(i)).join('');
+const B = v => `<b>${v}</b>`;
+
+function randn() {
+  let u = 0, v = 0;
+  while (!u) u = Math.random();
+  while (!v) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+// Sinh n giá trị trong [lo,hi], trung bình sát "m", làm tròn d chữ số thập phân
+function gen(n, lo, hi, m, d) {
+  if (!isFinite(lo) || !isFinite(hi) || lo > hi) throw Error(curLang === 'vi' ? 'Giới hạn Min/Max không hợp lệ.' : 'Invalid Min/Max limits.');
+  if (!isFinite(m)) m = (lo + hi) / 2;
+  m = Math.min(hi, Math.max(lo, m));
+  const st = 10 ** -d, sdv = (hi - lo) / 6 || st, R = v => +(Math.round(v / st) * st).toFixed(d);
+  const a = Array.from({ length: n }, () => {
+    let v, c = 0;
+    do { v = m + randn() * sdv; } while ((v < lo || v > hi) && ++c < 50);
+    return R(Math.min(hi, Math.max(lo, v)));
+  });
+  for (let it = 0; it < 5000; it++) {
+    const df = m * n - sum(a);
+    if (Math.abs(df) < st / 2) break;
+    const dir = df > 0 ? 1 : -1, c = a.map((_, i) => i).filter(i => dir > 0 ? a[i] + st <= hi + 1e-9 : a[i] - st >= lo - 1e-9);
+    if (!c.length) break;
+    const i = c[Math.random() * c.length | 0];
+    a[i] = R(a[i] + dir * st);
+  }
+  return a;
+}
+const GM = (p, n, d) => gen(n, G(p + '_min'), G(p + '_max'), G(p + '_mean'), d);
+
+// ---- Mục 1
+function g1() {
+  const n = N('a_n');
+  S.a = { k: GM('a_k', n, 1), t: GM('a_t', n, 2), h: GM('a_h', n, 1) };
+  r1();
+}
+function r1() {
+  const a = S.a;
+  if (!a) return;
+  const L = DICT[curLang];
+  const p = G('a_p') || 0, n = a.k.length, c = [[a.k, 1], [a.t, 2], [a.h, 1]];
+  const lo = avg(a.k) * (1 - p / 100), hi = avg(a.k) * (1 + p / 100);
+  const isPass = mn(a.k) >= lo && mx(a.k) <= hi;
+  const badge = isPass ? `<span class="badge badge-pass">${L.pass}</span>` : `<span class="badge badge-review">${L.review}</span>`;
+
+  $('t1').innerHTML = row([L.stt, L.mass, L.thickness, L.hardness], 1)
+    + rows(n, i => row([i + 1, F(a.k[i], 1), F(a.t[i], 2), F(a.h[i], 1)]))
+    + row([L.mean_abbr, ...c.map(([x, d]) => B(F(avg(x), d)))])
+    + row(['Max', ...c.map(([x, d]) => F(mx(x), d))])
+    + row(['Min', ...c.map(([x, d]) => F(mn(x), d))])
+    + row([`${L.mean_abbr} − ${D(p)}%`, F(lo, 1), '–', '–'])
+    + row([`${L.mean_abbr} + ${D(p)}%`, F(hi, 1), '–', '–'])
+    + row([curLang === 'vi' ? 'Kết quả (KLV)' : 'Result (Mass)', badge, '–', '–']);
+}
+
+// ---- Mục 2
+function g2() {
+  S.b = [1, 2, 3, 4].map(i => {
+    const lo = G('s' + i + '_min'), hi = G('s' + i + '_max');
+    if (!(lo <= hi)) throw Error((curLang === 'vi' ? 'Cỡ rây ' : 'Sieve mesh ') + i + ': Min/Max ' + (curLang === 'vi' ? 'không hợp lệ.' : 'invalid.'));
+    return { n: $('s' + i + '_n').value, m: +rnd(lo, hi).toFixed(2) };
+  });
+  r2();
+}
+function r2() {
+  const b = S.b;
+  if (!b) return;
+  const L = DICT[curLang];
+  const s = sum(b.map(x => x.m));
+  $('t2').innerHTML = row([L.sieve_sz, curLang === 'vi' ? 'Khối lượng (g)' : 'Mass (g)', '%'], 1)
+    + b.map(x => row([x.n, F(x.m, 2), F(x.m / s * 100, 2) + '%'])).join('')
+    + row([L.total, B(F(s, 2)), B('100' + DEC + '00%')]);
+}
+
+// ---- Mục 3
+function g3() {
+  const vb = G('c_vb'), c0 = G('c_ci_min'), c1 = G('c_ci_max'), r = G('c_r'), a0 = G('c_ang_min'), a1 = G('c_ang_max');
+  if (![vb, c0, c1, r, a0, a1].every(isFinite) || c0 > c1 || a0 > a1) throw Error(curLang === 'vi' ? 'Mục 3: giới hạn không hợp lệ.' : 'Section 3: invalid limits.');
+  const lo = Math.ceil(vb * (1 - c1 / 100)), hi = Math.floor(vb * (1 - c0 / 100));
+  const vt = lo <= hi ? lo + Math.floor(Math.random() * (hi - lo + 1)) : Math.round(vb * (1 - (c0 + c1) / 200));
+  S.c = { vb, vt, r, h: +(r * Math.tan(rnd(a0, a1) * Math.PI / 180)).toFixed(2) };
+  r3();
+}
+const lv = (v, th) => { const i = th.findIndex(t => v <= t); return i < 0 ? 6 : i; };
+function r3() {
+  const c = S.c;
+  if (!c) return;
+  const L = DICT[curLang];
+  const ci = (c.vb - c.vt) / c.vb * 100, hr = c.vb / c.vt, ag = Math.atan(c.h / c.r) * 180 / Math.PI,
+    a = lv(ci, [10, 15, 20, 25, 31, 37]), b = lv(hr, [1.11, 1.18, 1.25, 1.34, 1.45, 1.59]), d = lv(ag, [30, 35, 40, 45, 55, 65]), o = Math.round((a + b + d) / 3),
+    cm = i => curLang === 'vi' ? 'Chảy ' + L.flow_lv[i] : L.flow_lv[i], x = '–';
+  $('t3').innerHTML = row([L.param, L.val, L.flow_rating], 1)
+    + row(['Vbulk (mL)', F(c.vb, 0), x])
+    + row(['Vtab (mL)', F(c.vt, 0), x])
+    + row(['CI = (Vbulk − Vtab)/Vbulk × 100 (%)', B(F(ci, 2)), cm(a)])
+    + row(['HR = Vbulk/Vtab', B(F(hr, 2)), cm(b)])
+    + row(['h (mm)', F(c.h, 2), x])
+    + row(['r (mm)', F(c.r, 2), x])
+    + row([curLang === 'vi' ? 'Tỉ lệ h/r' : 'Ratio h/r', F(c.h / c.r, 4), x])
+    + row([curLang === 'vi' ? 'Góc nghỉ = arctan(h/r) (độ)' : 'Angle of repose = arctan(h/r) (deg)', B(F(ag, 2)), cm(d)])
+    + `<tr><td>${L.flow_overall}</td><td colspan="2"><b>${L.granule_flow}${L.flow_lv[o]}</b> ${o <= 3 ? L.suitable : L.need_improve}</td></tr>`;
+}
+
+// ---- Mục 4
+function g4() {
+  const lo = G('d_pc_min'), hi = G('d_pc_max'), m = G('d_m');
+  if (!(lo <= hi) || !isFinite(m)) throw Error(curLang === 'vi' ? 'Mục 4: giới hạn không hợp lệ.' : 'Section 4: invalid limits.');
+  S.d = { m, n: N('d_n'), pc: +rnd(lo, hi).toFixed(2) };
+  r4();
+}
+function r4() {
+  const d = S.d;
+  if (!d) return;
+  const L = DICT[curLang];
+  const s = d.m * d.n, a = s - s * d.pc / 100;
+  $('t4').innerHTML = row([L.param, L.val], 1)
+    + row([curLang === 'vi' ? 'm viên (mg)' : 'Tablet mass (mg)', F(d.m, 2)])
+    + row([curLang === 'vi' ? 'Số viên (n)' : 'Tablet count (n)', d.n])
+    + row([curLang === 'vi' ? 'Tổng KL trước (mg)' : 'Total initial mass (mg)', F(s, 2)])
+    + row([curLang === 'vi' ? 'Tổng KL trước (g)' : 'Total initial mass (g)', F(s / 1000, 3)])
+    + row([curLang === 'vi' ? '% mất khối lượng (độ mài mòn)' : '% Mass loss (Friability)', B(F(d.pc, 2) + '%')])
+    + row([curLang === 'vi' ? 'Tổng KL sau (mg)' : 'Total final mass (mg)', F(a, 2)])
+    + row([curLang === 'vi' ? 'Tổng KL sau (g)' : 'Total final mass (g)', F(a / 1000, 3)]);
+}
+
+// ---- Mục 5
+function g5() {
+  const n = N('e_n');
+  S.e = [0, 1, 2].map(() => ({ t: GM('e_t', n, 2), h: GM('e_h', n, 1) }));
+  r5();
+}
+function r5() {
+  const e = S.e;
+  if (!e) return;
+  const L = DICT[curLang];
+  const stageLabels = L.stages;
+  const n = e[0].t.length;
+  let h = '<tr><th rowspan="2">' + L.stt + '</th>' + stageLabels.map(x => `<th colspan="2">${x}</th>`).join('') + '</tr><tr>' + stageLabels.map(() => `<th>${L.thickness}</th><th>${L.hardness}</th>`).join('') + '</tr>';
+  h += rows(n, i => row([i + 1, ...e.flatMap(s => [F(s.t[i], 2), F(s.h[i], 1)])]));
+  [[L.mean_abbr, avg, 1], ['Min', mn], ['Max', mx]].forEach(([lbl, f, b]) => h += row([lbl, ...e.flatMap(s => [F(f(s.t), 2), F(f(s.h), 1)].map(v => b ? B(v) : v))]));
+  $('t5').innerHTML = h;
+}
+
+// ---- Mục 6
+function g6() {
+  const n = N('f_n'), st = G('f_step') || 5, m = ($('f_t0').value.match(/(\d+)\D*(\d*)/) || [0, 10, 0]), t0 = (+m[1]) * 60 + (+m[2] || 0), v = GM('f_k', n, 3), cq = $('f_cq').value;
+  const p = x => String(x).padStart(2, '0');
+  S.f = v.map((x, i) => { const t = t0 + i * st; return { t: p(Math.floor(t / 60) % 24) + 'h' + p(t % 60), v: x, cq }; });
+  r6();
+}
+function r6() {
+  const f = S.f;
+  if (!f) return;
+  const L = DICT[curLang];
+  $('t6').innerHTML = row([L.time_col, curLang === 'vi' ? 'KLTB 10 viên (g)' : 'Avg mass 10 tab (g)', L.cq], 1)
+    + f.map(x => row([x.t, F(x.v, 3), x.cq])).join('');
+}
+
+// ---- Mục 7 (phút:giây)
+const ps = v => { const m = String(v).match(/(\d+)\s*[:']\s*(\d+)/); return m ? +m[1] * 60 + +m[2] : Math.round(parseFloat(String(v).replace(',', '.')) * 60); };
+const fT = t => Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+const fP = t => {
+  t = Math.round(t);
+  const L = DICT[curLang];
+  return Math.floor(t / 60) + ' ' + L.min_word + ' ' + String(t % 60).padStart(2, '0') + ' ' + L.sec_word;
+};
+const GT = (p, n) => gen(n, ps($(p + '_min').value), ps($(p + '_max').value), ps($(p + '_mean').value), 0);
+function g7() {
+  const n = N('g_n');
+  S.g = [0, 1, 2].map(s => GT('g' + s, n).sort((a, b) => a - b));
+  r7();
+}
+function r7() {
+  const g = S.g;
+  if (!g) return;
+  const L = DICT[curLang];
+  $('t7').innerHTML = row([L.stt, ...L.stage_names], 1)
+    + rows(g[0].length, i => row([i + 1, ...g.map(c => fP(c[i]))]))
+    + row([L.mean_abbr, ...g.map(c => B(fP(avg(c))))])
+    + row(['Min', ...g.map(c => fP(mn(c)))])
+    + row(['Max', ...g.map(c => fP(mx(c)))]);
+}
+
+// ---- Mục 8
+function g8() {
+  const r = N('h_r'), c = N('h_c'), v = GM('h_k', r * c, 1);
+  S.h = Array.from({ length: r }, (_, i) => v.slice(i * c, i * c + c));
+  r8();
+}
+function r8() {
+  const h = S.h;
+  if (!h) return;
+  const L = DICT[curLang];
+  const c = h[0].length, all = h.flat(), sp = v => `<td colspan="${c}">${v}</td>`;
+  $('t8').innerHTML = row([L.row_word, ...Array.from({ length: c }, (_, i) => L.col_word + ' ' + (i + 1))], 1)
+    + h.map((r, i) => row([L.row_word + ' ' + (i + 1), ...r.map(x => F(x, 1))])).join('')
+    + `<tr><td>Average</td>${sp(B(F(avg(all), 2)))}</tr><tr><td>Max</td>${sp(F(mx(all), 1))}</tr><tr><td>Min</td>${sp(F(mn(all), 1))}</tr>`;
+}
+
+const GEN = [g1, g2, g3, g4, g5, g6, g7, g8], REN = [r1, r2, r3, r4, r5, r6, r7, r8];
+const run = f => { try { $('msg').textContent = ''; f(); } catch (e) { $('msg').textContent = e.message; } };
+
+// ---- Dựng giao diện nhập liệu
+const IN = (id, v, c = 'nin') => `<input class="${c}" type="text" inputmode="decimal" id="${id}" value="${v}">`;
+document.querySelectorAll('.m1').forEach(e => {
+  const lbl = curLang === 'vi' ? e.dataset.l : (e.dataset.en || e.dataset.l);
+  e.innerHTML = `<label data-vi="${e.dataset.l}" data-en="${e.dataset.en || e.dataset.l}">${lbl}</label>` + IN(e.dataset.i, e.dataset.v);
+});
+document.querySelectorAll('.m2,.m3').forEach(e => {
+  const k = ['min', 'max', 'mean'], L = [DICT[curLang].min, DICT[curLang].max, DICT[curLang].mean];
+  const lbl = curLang === 'vi' ? e.dataset.l : (e.dataset.en || e.dataset.l);
+  e.innerHTML = `<label data-vi="${e.dataset.l}" data-en="${e.dataset.en || e.dataset.l}">${lbl}</label><div class="row">` + e.dataset.v.split(' ').map((x, i) => `<div><label class="sub" data-k="${k[i]}">${L[i]}</label>${IN(e.dataset.i + '_' + k[i], x, e.dataset.x ? 'tin' : 'nin')}</div>`).join('') + '</div>';
+});
+const SV = [['1000-710', 0.8, 1.5], ['710-500', 8, 9.5], ['500-250', 20, 23], ['<250', 42, 45]];
+$('sv').innerHTML = SV.map(([n, a, b], i) => `<div class="row" style="margin-bottom:6px"><div><input type="text" id="s${i + 1}_n" value="${n}"></div><div>${IN('s' + (i + 1) + '_min', a)}</div><div>${IN('s' + (i + 1) + '_max', b)}</div></div>`).join('');
+
+// ---- Dựng khu vực kết quả
+function renderOutputContainers() {
+  const L = DICT[curLang];
+  $('out').innerHTML = L.tbl_titles.map(([t, k], i) => `
+    <div class="result-card">
+      <div class="hd">
+        <h2><span class="tbl-t">${t}</span><span class="info" data-tip="${k}">i</span></h2>
+        <button class="mini secondary copy-btn" type="button" data-t="t${i + 1}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="cp-txt">${L.copy_btn}</span>
+        </button>
+      </div>
+      <div class="tw"><table id="t${i + 1}"><tr><td>${L.no_data}</td></tr></table></div>
+    </div>
+  `).join('');
+
+  // Bind copy events
+  document.querySelectorAll('.copy-btn').forEach(b => b.onclick = () => {
+    const txt = [...$(b.dataset.t).rows].map(r => [...r.cells].flatMap(c => [c.textContent, ...Array((c.colSpan || 1) - 1).fill('')]).join('\t')).join('\n');
+    const span = b.querySelector('.cp-txt');
+    const ok = () => { if (span) span.textContent = DICT[curLang].copied_btn; setTimeout(() => { if (span) span.textContent = DICT[curLang].copy_btn; }, 1200); };
+    const fb = () => { const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); };
+    navigator.clipboard ? navigator.clipboard.writeText(txt).then(ok, fb) : fb();
+  });
+}
+renderOutputContainers();
+
+// ---- Nút tăng / giảm
+function bump(inp, s) {
+  if (inp.classList.contains('tin')) {
+    const t = ps(inp.value);
+    if (!isFinite(t)) return;
+    inp.value = fT(Math.max(0, t + s * 5));
+  } else {
+    const raw = inp.value.trim().replace(',', '.'), v = parseFloat(raw);
+    if (!isFinite(v)) return;
+    const dp = (raw.split('.')[1] || '').length;
+    inp.value = Math.max(0, +(v + s * 10 ** -dp).toFixed(dp)).toFixed(dp).replace('.', DEC);
+  }
+  inp.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function initSpinners() {
+  document.querySelectorAll('.nin,.tin').forEach(inp => {
+    if (inp.parentNode.classList.contains('spin')) return;
+    const w = document.createElement('div');
+    w.className = 'spin';
+    inp.replaceWith(w);
+    w.appendChild(inp);
+    w.insertAdjacentHTML('beforeend', '<div class="sp"><button type="button" tabindex="-1" title="Tăng">▲</button><button type="button" tabindex="-1" title="Giảm">▼</button></div>');
+    const [u, d] = w.querySelectorAll('button');
+    u.onclick = () => bump(inp, 1);
+    d.onclick = () => bump(inp, -1);
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        bump(inp, e.key === 'ArrowUp' ? 1 : -1);
+      }
+    });
+  });
+}
+initSpinners();
+
+// ---- Chú thích Tooltip
+const tip = $('tip');
+const showTip = e => {
+  const t = e.target.closest && e.target.closest('.info');
+  if (!t) { tip.style.display = 'none'; return; }
+  const text = t.dataset.tip || '';
+  if (!text) { tip.style.display = 'none'; return; }
+  tip.textContent = text;
+  tip.style.display = 'block';
+  const r = t.getBoundingClientRect(), w = tip.offsetWidth;
+  tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px';
+  tip.style.top = (r.bottom + 6) + 'px';
+};
+document.addEventListener('mouseover', showTip);
+document.addEventListener('click', showTip);
+
+// ---- Bind Generate Buttons
+GEN.forEach((g, i) => $('b' + (i + 1)).onclick = () => run(g));
+$('all').onclick = () => run(() => GEN.forEach(g => g()));
+$('a_p').addEventListener('input', r1);
+$('lot').addEventListener('input', () => $('lotv').textContent = $('lot').value);
+
+// ---- Dấu thập phân
+function setDec(d) {
+  const old = DEC;
+  if (old !== d) document.querySelectorAll('.nin').forEach(e => e.value = e.value.split(old).join(d));
+  DEC = d;
+  $('dec_label').textContent = d === '.' ? DICT[curLang].dec_dot : DICT[curLang].dec_comma;
+  try { localStorage.setItem('decSep', d); } catch (e) { }
+  REN.forEach(r => r());
+}
+$('btn_dec').onclick = () => setDec(DEC === '.' ? ',' : '.');
+
+// ---- Apply Language
+function applyLang(lang) {
+  curLang = lang === 'en' ? 'en' : 'vi';
+  document.documentElement.lang = curLang;
+  const L = DICT[curLang];
+
+  $('txt_app_title').textContent = L.app_title;
+  $('txt_all').textContent = L.all;
+  $('txt_sec1_title').textContent = L.sec1_title;
+  $('txt_sec2_title').textContent = L.sec2_title;
+  $('lbl_lot').textContent = L.lot_lbl;
+  $('dec_label').textContent = DEC === '.' ? L.dec_dot : L.dec_comma;
+
+  $('lbl_sieve_sz').textContent = L.sieve_sz;
+  $('lbl_sieve_min').textContent = L.sieve_min;
+  $('lbl_sieve_max').textContent = L.sieve_max;
+  $('lbl_t0').textContent = L.t0;
+  $('lbl_cq').textContent = L.cq;
+
+  $('t_sec1').textContent = L.sec1_h;
+  $('t_sec2').textContent = L.sec2_h;
+  $('t_sec3').textContent = L.sec3_h;
+  $('t_sec4').textContent = L.sec4_h;
+  $('t_sec5').textContent = L.sec5_h;
+  $('t_sec6').textContent = L.sec6_h;
+  $('t_sec7').textContent = L.sec7_h;
+  $('t_sec8').textContent = L.sec8_h;
+
+  for (let i = 1; i <= 8; i++) {
+    const btn = $('b' + i);
+    if (btn) {
+      const span = btn.querySelector('.btn-txt');
+      if (span) span.textContent = curLang === 'vi' ? `Tạo dữ liệu Mục ${i}` : `Generate Section ${i}`;
+    }
+  }
+
+  // Update dynamic input labels
+  document.querySelectorAll('.m1 label, .m2 > label, .m3 > label').forEach(lbl => {
+    if (curLang === 'vi' && lbl.dataset.vi) lbl.textContent = lbl.dataset.vi;
+    else if (curLang === 'en' && lbl.dataset.en) lbl.textContent = lbl.dataset.en;
+  });
+  document.querySelectorAll('.sub[data-k]').forEach(lbl => {
+    lbl.textContent = L[lbl.dataset.k] || lbl.textContent;
+  });
+
+  // Tooltips
+  $('info_sec1').dataset.tip = L.tips.sec1;
+  $('info_s1').dataset.tip = L.tips.s1;
+  $('info_s2').dataset.tip = L.tips.s2;
+  $('info_s3').dataset.tip = L.tips.s3;
+  $('info_s4').dataset.tip = L.tips.s4;
+  $('info_s5').dataset.tip = L.tips.s5;
+  $('info_s6').dataset.tip = L.tips.s6;
+  $('info_s7').dataset.tip = L.tips.s7;
+  $('info_s8').dataset.tip = L.tips.s8;
+
+  // Re-render table headers & contents
+  renderOutputContainers();
+  REN.forEach(r => r());
+}
+
+// ---- Parent Communication & Theme Sync
+function setTheme(th) {
+  document.documentElement.setAttribute('data-theme', th === 'dark' ? 'dark' : 'light');
+}
+
+window.addEventListener('message', e => {
+  if (!e.data) return;
+  if (e.data.theme) setTheme(e.data.theme);
+  if (e.data.lang) applyLang(e.data.lang);
+});
+
+// Init
+window.onload = () => {
+  $('lotv').textContent = $('lot').value;
+  let sv = '.';
+  try { sv = localStorage.getItem('decSep') === ',' ? ',' : '.'; } catch (e) { }
+
+  // Check parent theme and lang
+  try {
+    if (window.parent && window.parent.currentTheme) setTheme(window.parent.currentTheme);
+    if (window.parent && window.parent.L) curLang = window.parent.L;
+  } catch (e) { }
+
+  setDec(sv);
+  applyLang(curLang);
+  run(() => GEN.forEach(g => g()));
+};
+</script>
+</body>
+</html>

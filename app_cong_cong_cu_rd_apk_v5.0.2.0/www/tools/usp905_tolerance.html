@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Độ đồng đều Phân liều USP <905> & Tolerance Interval — Cổng RD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f9;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --fg: #1f1f1f;
+  --muted: #5f6368;
+  --line: #dce5ef;
+  --grid-line: #cfd9e6;
+  --accent: #1558B0;
+  --accent-soft: #eaf1fa;
+  --ok: #137333;
+  --ok-soft: #e6f4ea;
+  --warn: #b06000;
+  --warn-soft: #fef7e0;
+  --danger: #b3261e;
+  --danger-soft: #fce8e6;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  /* Minitab chart tokens */
+  --mt-panel-bg: #ffffff;
+  --mt-plot-bg: #ffffff;
+  --mt-frame: #6b7280;
+  --mt-grid: #e5e9f0;
+  --mt-bar-fill: #5b9bff;
+  --mt-bar-stroke: #2c67cc;
+  --mt-bar-hover: #3b82f6;
+  --mt-curve: #b80000;
+  --mt-spec: #b30000;
+  --mt-target: #15803d;
+  --mt-ti: #1d4ed8;
+  --mt-box-bg: #f9fbfd;
+  --mt-box-border: #d4dce6;
+}
+:root[data-theme="dark"] {
+  --bg: #121316;
+  --surface: #1e1f22;
+  --surface-2: #282a2e;
+  --fg: #e3e3e3;
+  --muted: #9aa0a6;
+  --line: #2d3540;
+  --grid-line: #363f4d;
+  --accent: #3b8cf5;
+  --accent-soft: #162436;
+  --ok: #81c995;
+  --ok-soft: rgba(129, 201, 149, 0.14);
+  --warn: #fdd663;
+  --warn-soft: rgba(253, 214, 99, 0.14);
+  --danger: #f28b82;
+  --danger-soft: rgba(242, 139, 130, 0.14);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  /* Minitab chart tokens (dark) */
+  --mt-panel-bg: #1e1f22;
+  --mt-plot-bg: #181a1e;
+  --mt-frame: #7c8796;
+  --mt-grid: #2b313c;
+  --mt-bar-fill: #4f8ff0;
+  --mt-bar-stroke: #85b4ff;
+  --mt-bar-hover: #6aa2f7;
+  --mt-curve: #ff5c5c;
+  --mt-spec: #ff6b6b;
+  --mt-target: #4ade80;
+  --mt-ti: #60a5fa;
+  --mt-box-bg: #23262b;
+  --mt-box-border: #363f4d;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.48;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 10px 12px 36px;
+}
+
+/* Navigation Tabs (No language/theme toggles — controlled by parent portal) */
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 5px 6px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tab-btn:hover { background: var(--surface-2); color: var(--fg); }
+.tab-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Cards & Layout */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.card-title { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--fg); }
+.card-sub { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 820px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .app { padding: 8px 8px 28px; }
+  .card { padding: 11px; }
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+/* Controls */
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 11px;
+  min-height: 32px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+.btn-primary:hover { background: var(--accent); color: #ffffff; opacity: 0.9; }
+.btn-sm { padding: 4px 9px; min-height: 28px; font-size: 12px; }
+.btn-xs { padding: 2px 6px; min-height: 22px; font-size: 11px; border-radius: 4px; }
+.btn-danger { color: var(--danger); }
+.btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
+
+.field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+.field label { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-family: inherit;
+  font-size: 12.5px;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+
+.inline-fields {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.inline-fields .field { margin-bottom: 0; flex: 1; min-width: 120px; }
+
+.check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--fg);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.seg {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 2px;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+.seg-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.seg-btn:hover { color: var(--fg); }
+.seg-btn.active { background: var(--accent); color: #ffffff; }
+
+/* Standard Result Tables */
+.tw {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  background: var(--surface);
+}
+th, td {
+  padding: 6px 9px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 11.5px;
+}
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.wrap { white-space: normal; min-width: 140px; }
+
+/* =========================================================================
+   COMPACT EXCEL-LIKE SPREADSHEET INPUT GRID
+   ========================================================================= */
+.xl-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 5px;
+}
+.xl-bar-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.xl-hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+.xl-wrap {
+  width: 100%;
+  max-height: 210px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+.xl-wrap.xl-tall { max-height: 240px; }
+.xl-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  font-size: 12px;
+  background: var(--surface);
+}
+.xl-tbl th, .xl-tbl td {
+  border: 1px solid var(--grid-line);
+  padding: 0;
+  height: 26px;
+  vertical-align: middle;
+}
+.xl-tbl thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 0 6px;
+  height: 28px;
+  text-align: center;
+  user-select: none;
+}
+.xl-tbl th.xl-rn, .xl-tbl td.xl-rn {
+  width: 30px;
+  min-width: 30px;
+  max-width: 34px;
+  background: var(--surface-2);
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  user-select: none;
+  padding: 0 4px;
+}
+.xl-th-inner {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.xl-th-in {
+  width: 100%;
+  min-width: 64px;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 11.5px;
+  text-align: center;
+  padding: 3px 4px !important;
+  height: 26px;
+}
+.xl-th-in:focus {
+  background: var(--accent-soft) !important;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.xl-col-del {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.xl-col-del:hover { color: var(--danger); background: var(--danger-soft); }
+
+.xl-cell {
+  width: 100%;
+  min-width: 68px;
+  height: 25px;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Be Vietnam Pro', monospace;
+  font-size: 12px;
+  padding: 2px 6px !important;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.xl-cell.xl-text {
+  font-family: inherit;
+  text-align: left;
+  min-width: 96px;
+}
+.xl-cell.xl-num-sm {
+  min-width: 48px;
+  max-width: 64px;
+  text-align: center;
+}
+.xl-cell:focus {
+  background: var(--accent-soft) !important;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.xl-tbl tbody tr:hover td:not(.xl-rn) {
+  background: color-mix(in srgb, var(--accent-soft) 35%, transparent);
+}
+.xl-td-pad { padding: 2px 6px !important; }
+
+/* KPI & Badges */
+.kpi {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 11px;
+}
+.kpi-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+.kpi-val { font-size: 18px; font-weight: 700; color: var(--fg); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.kpi-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge-ok { background: var(--ok-soft); color: var(--ok); }
+.badge-warn { background: var(--warn-soft); color: var(--warn); }
+.badge-danger { background: var(--danger-soft); color: var(--danger); }
+.badge-info { background: var(--accent-soft); color: var(--accent); }
+
+.alert {
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg);
+}
+.alert-ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.alert-warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.alert-danger { border-left-color: var(--danger); background: var(--danger-soft); }
+
+/* =========================================================================
+   MINITAB-STYLE PROCESS CAPABILITY & TOLERANCE REPORT
+   ========================================================================= */
+.mt-report {
+  background: var(--mt-panel-bg);
+  border: 1px solid var(--mt-box-border);
+  border-radius: 8px;
+  padding: 14px 16px 12px;
+  position: relative;
+}
+.mt-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--mt-box-border);
+}
+.mt-report-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+.mt-report-sub {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.mt-grid {
+  display: grid;
+  grid-template-columns: 185px minmax(0, 1fr) 195px;
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .mt-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .mt-center-col {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+}
+@media (max-width: 560px) {
+  .mt-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.mt-side-box {
+  background: var(--mt-box-bg);
+  border: 1px solid var(--mt-box-border);
+  border-radius: 6px;
+  padding: 9px 11px;
+  margin-bottom: 10px;
+}
+.mt-side-box:last-child { margin-bottom: 0; }
+.mt-box-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--fg);
+  padding-bottom: 5px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--mt-box-border);
+}
+.mt-kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+.mt-kv-k { color: var(--muted); font-weight: 500; }
+.mt-kv-v {
+  color: var(--fg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.mt-kv-v.ok { color: var(--ok); }
+.mt-kv-v.warn { color: var(--warn); }
+.mt-kv-v.danger { color: var(--danger); }
+
+.mt-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--fg);
+  margin-top: 4px;
+}
+.mt-legend-line {
+  width: 18px;
+  height: 0;
+  border-top: 2px solid var(--mt-curve);
+  flex-shrink: 0;
+}
+.mt-legend-line.dashed {
+  border-top-style: dashed;
+  border-top-color: var(--mt-spec);
+}
+.mt-legend-line.target {
+  border-top-style: dashed;
+  border-top-color: var(--mt-target);
+}
+.mt-legend-swatch {
+  width: 14px;
+  height: 10px;
+  background: var(--mt-bar-fill);
+  border: 1px solid var(--mt-bar-stroke);
+  flex-shrink: 0;
+}
+.mt-legend-ti {
+  width: 14px;
+  height: 10px;
+  background: color-mix(in srgb, var(--mt-ti) 14%, transparent);
+  border-left: 1.5px solid var(--mt-ti);
+  border-right: 1.5px solid var(--mt-ti);
+  flex-shrink: 0;
+}
+
+.mt-chart-wrap {
+  position: relative;
+  width: 100%;
+  background: var(--mt-panel-bg);
+}
+.mt-chart-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+.mt-bar {
+  transition: fill 0.12s ease, opacity 0.12s ease;
+  cursor: crosshair;
+}
+.mt-bar:hover {
+  fill: var(--mt-bar-hover);
+  fill-opacity: 0.96;
+}
+.mt-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  transition: opacity 0.12s ease;
+  z-index: 20;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+}
+.mt-tooltip.show { opacity: 1; }
+
+.mt-perf-wrap {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--mt-box-border);
+}
+.mt-perf-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  background: transparent;
+}
+.mt-perf-tbl th {
+  background: transparent;
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 4px 8px;
+  border-bottom: 1.5px solid var(--mt-box-border);
+  text-align: right;
+}
+.mt-perf-tbl th:first-child { text-align: left; }
+.mt-perf-tbl td {
+  padding: 4px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--mt-box-border) 55%, transparent);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+.mt-perf-tbl td:first-child {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 600;
+}
+.mt-perf-tbl tr:last-child td { border-bottom: none; }
+
+/* Legacy Chart Box kept for compatibility */
+.chart-box {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  overflow: hidden;
+}
+.chart-box svg { width: 100%; height: auto; display: block; }
+
+/* Paste Box Collapsible */
+.paste-panel {
+  background: var(--surface-2);
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  padding: 9px;
+  margin-bottom: 10px;
+  display: none;
+}
+.paste-panel.open { display: block; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 8px 13px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Subtle Scientific Reference Strip */
+.ref-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-top: 6px;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.ref-lbl {
+  font-weight: 600;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 2px;
+}
+.ref-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--muted);
+  text-decoration: none;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.ref-link:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--accent-soft);
+}
+.ref-ext { font-size: 10px; opacity: 0.7; }
+
+.print-header { display: none; }
+
+@media print {
+  :root, :root[data-theme="dark"] {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --fg: #111111;
+    --muted: #555555;
+    --line: #d0d7de;
+    --grid-line: #c8d1dc;
+    --accent: #1558B0;
+    --accent-soft: #eaf1fa;
+    --ok: #137333;
+    --ok-soft: #e6f4ea;
+    --warn: #b06000;
+    --warn-soft: #fef7e0;
+    --danger: #b3261e;
+    --danger-soft: #fce8e6;
+    --mt-panel-bg: #ffffff;
+    --mt-plot-bg: #ffffff;
+    --mt-frame: #555555;
+    --mt-grid: #e5e7eb;
+    --mt-bar-fill: #5b9bff;
+    --mt-bar-stroke: #2c67cc;
+    --mt-curve: #b80000;
+    --mt-spec: #b30000;
+    --mt-target: #15803d;
+    --mt-ti: #1d4ed8;
+    --mt-box-bg: #f9fafb;
+    --mt-box-border: #d1d5db;
+  }
+  body { background: #ffffff; color: #111111; font-size: 11px; }
+  .app { max-width: 100%; padding: 0; }
+  .nav-wrap, .no-print, .btn, .paste-panel, .toast, .mt-tooltip { display: none !important; }
+  .xl-wrap { max-height: none !important; overflow: visible !important; }
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #1558B0;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .card { box-shadow: none; border: 1px solid #d0d7de; break-inside: avoid; page-break-inside: avoid; }
+  .chart-box, .mt-report, .tw { break-inside: avoid; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="print-header">
+    <div><strong id="printTitle">Độ đồng đều Phân liều USP &lt;905&gt; &amp; Tolerance Interval — Báo cáo R&amp;D</strong></div>
+    <div id="printMeta" style="font-size:11px;color:#555;"></div>
+  </div>
+
+
+  <div class="nav-wrap no-print" style="justify-content:space-between;align-items:center;padding:8px 12px;">
+    <span style="font-size:12.5px;font-weight:700;color:var(--accent);" data-i18n="tab2"></span>
+    <button class="btn btn-sm no-print" id="btnPrint" type="button"></button>
+  </div>
+  <section id="panel-t2" class="panel active">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title" data-i18n="t2_title"></h2>
+          <p class="card-sub" data-i18n="t2_sub"></p>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn btn-sm" id="t2SampleBtn" type="button" data-i18n="btn_sample"></button>
+          <button class="btn btn-primary btn-sm" id="t2RunBtn" type="button" data-i18n="btn_analyze"></button>
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div class="field">
+          <label for="t2Target" data-i18n="t2_target"></label>
+          <input type="number" id="t2Target" step="0.1" value="100.0">
+        </div>
+        <div class="field">
+          <label for="t2LSL" data-i18n="t2_lsl"></label>
+          <input type="number" id="t2LSL" step="0.1" value="85.0">
+        </div>
+        <div class="field">
+          <label for="t2USL" data-i18n="t2_usl"></label>
+          <input type="number" id="t2USL" step="0.1" value="115.0">
+        </div>
+        <div class="field">
+          <label for="t2Conf" data-i18n="t2_conf"></label>
+          <select id="t2Conf">
+            <option value="0.95">95%</option>
+            <option value="0.99">99%</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="t2Cov" data-i18n="t2_cov"></label>
+          <select id="t2Cov">
+            <option value="0.95">95%</option>
+            <option value="0.99">99%</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="xl-bar no-print">
+        <span class="xl-hint" data-i18n="t2_grid_tip"></span>
+        <div class="btn-row">
+          <button class="btn btn-xs" id="t2AddRowBtn" type="button" data-i18n="btn_add_row"></button>
+          <button class="btn btn-xs btn-danger" id="t2ClearBtn" type="button" data-i18n="btn_clear"></button>
+        </div>
+      </div>
+      <div id="t2SheetWrap" class="xl-wrap"></div>
+    </div>
+
+    <div id="t2Output"></div>
+    <footer class="ref-strip" aria-label="References">
+      <span class="ref-lbl"><span aria-hidden="true">&#128214;</span><span data-i18n="ref_title"></span></span>
+      <a class="ref-link" href="https://database.ich.org/sites/default/files/Q4B%20Annex%206%20Guideline.pdf" target="_blank" rel="noopener noreferrer">ICH Q4B Annex 6 — USP &lt;905&gt; / Ph. Eur. 2.9.40<span class="ref-ext">↗</span></a>
+      <a class="ref-link" href="https://www.fda.gov/files/drugs/published/Q4B-Annex-6--Uniformity-of-Dosage-Units-General-Chapter.pdf" target="_blank" rel="noopener noreferrer">FDA — Uniformity of Dosage Units (Q4B Annex 6)<span class="ref-ext">↗</span></a>
+      <a class="ref-link" href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc263.htm" target="_blank" rel="noopener noreferrer">NIST/SEMATECH — Tolerance Intervals &amp; Howe k₂ (7.2.6.3)<span class="ref-ext">↗</span></a>
+    </footer>
+  </section>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* =========================================================================
+     1. I18N DICTIONARY (VI / EN)
+     ========================================================================= */
+  const I18N = {
+    vi: {
+      tab1: '1. So sánh Công thức (ANOVA)',
+      tab2: '2. Độ đồng đều USP <905>',
+      tab3: '3. Thẩm định ICH Q2 & MSA',
+      tab4: '4. Rủi ro FMEA & Pareto',
+      print: 'In / Xuất PDF',
+      btn_sample: 'Nạp dữ liệu mẫu Dược phẩm',
+      btn_analyze: 'Phân tích',
+      btn_paste_excel: 'Dán nhanh từ Excel',
+      btn_apply_paste: 'Áp dụng dữ liệu dán',
+      btn_close: 'Đóng',
+      btn_add_row: '+ Dòng',
+      btn_clear: 'Xóa bảng',
+      xl_paste_tip: 'Mẹo: Bấm vào bất kỳ ô nào và nhấn Ctrl+V để dán trực tiếp bảng từ Excel (Enter/Mũi tên để di chuyển).',
+      alpha_label: 'Mức ý nghĩa (α)',
+      pass: 'ĐẠT',
+      fail: 'KHÔNG ĐẠT',
+      cond: 'CHẤP NHẬN CÓ ĐIỀU KIỆN',
+      sig_yes: 'Khác biệt có ý nghĩa',
+      sig_no: 'Không khác biệt có ý nghĩa',
+      yes: 'Có',
+      no: 'Không',
+      sample_loaded: 'Đã nạp dữ liệu mẫu dược phẩm',
+      paste_applied: 'Đã dán dữ liệu từ Excel/CSV',
+      err_min_data: 'Không đủ dữ liệu hợp lệ (cần ít nhất 2 nhóm, mỗi nhóm ≥ 2 giá trị số).',
+
+      // Tab 2
+      t2_title: 'Độ đồng đều Phân liều USP <905> / DĐVN & Two-Sided Tolerance Interval',
+      t2_sub: 'Tính tự động Giá trị chấp nhận AV (Bước 1: n=10, Bước 2: n=30) theo USP <905> và khoảng dung sai hai phía (Howe).',
+      t2_target: 'Giá trị mục tiêu T (%)',
+      t2_lsl: 'Giới hạn dưới LSL (%)',
+      t2_usl: 'Giới hạn trên USL (%)',
+      t2_conf: 'Độ tin cậy (1−α)',
+      t2_cov: 'Bao phủ quần thể (P)',
+      t2_grid_tip: 'Nhập trực tiếp hoặc dán cột từ Excel: Cột 1 = 10 viên Giai đoạn 1, Cột 2 = 20 viên Giai đoạn 2 (để trống nếu chỉ xét Bước 1).',
+      t2_col_s1: 'Giai đoạn 1 — 10 viên (%)',
+      t2_col_s2: 'Giai đoạn 2 — thêm 20 viên (%)',
+      t2_s1_res: 'Kết quả Giai đoạn 1 (n = 10, k = 2.4)',
+      t2_s2_res: 'Kết quả Giai đoạn 2 (n = 30, k = 2.0)',
+      t2_ti_res: 'Khoảng Dung sai Hai phía (Two-Sided Tolerance Interval — Xấp xỉ Howe)',
+      t2_err_n: 'Vui lòng nhập ít nhất 3 giá trị số hợp lệ ở cột Giai đoạn 1 (chuẩn USP <905> Bước 1 cần đúng 10 viên).',
+      t2_warn_n10: 'Lưu ý: USP <905> Giai đoạn 1 quy định n = 10 viên (hiện tại n = {n}). Kết quả vẫn được tính với k = 2.4 để tham khảo.',
+      t2_warn_n30: 'Lưu ý: USP <905> Giai đoạn 2 quy định tổng n = 30 viên (hiện tại tổng n = {n}). Kết quả vẫn được tính với k = 2.0 để tham khảo.',
+      t2_unit_bounds: 'Giới hạn biên từng đơn vị [0.75M ; 1.25M]',
+      t2_out_units: 'Số đơn vị ngoài biên L2',
+      t2_ti_in_spec: 'Khoảng dung sai nằm gọn trong [LSL, USL] → Quy trình đạt năng lực bao phủ.',
+      t2_ti_out_spec: 'Khoảng dung sai vượt ra ngoài [LSL, USL] → Nguy cơ xuất hiện đơn vị ngoài tiêu chuẩn.',
+
+      // Minitab Chart Report
+      mt_title: 'Báo cáo Năng lực Quy trình & Phân phối (Chuẩn Minitab)',
+      mt_sub: 'Biểu đồ tần suất (Histogram) ghép đường cong chuẩn mượt (Overall Normal Fit), giới hạn quy cách & khoảng dung sai Howe.',
+      mt_view_spec: 'Toàn dải (LSL–USL)',
+      mt_view_zoom: 'Phóng to (±4σ & TI)',
+      mt_proc_data: 'Dữ liệu Quy trình (Process Data)',
+      mt_cap_overall: 'Năng lực Tổng thể (Overall)',
+      mt_ti_box: 'Khoảng Dung sai (Howe TI)',
+      mt_legend: 'Chú giải biểu đồ',
+      mt_leg_hist: 'Tần suất mẫu (Histogram)',
+      mt_leg_norm: 'Đường cong chuẩn (Overall)',
+      mt_leg_spec: 'Giới hạn LSL / USL',
+      mt_leg_target: 'Mục tiêu (Target T)',
+      mt_leg_ti: 'Khoảng dung sai (LTL–UTL)',
+      mt_xaxis: 'Hàm lượng / Khối lượng (% so với nhãn)',
+      mt_yaxis: 'Tần suất (n)',
+      mt_perf_title: 'Hiệu năng Ngoài tiêu chuẩn (Performance)',
+      mt_obs: 'Thực tế (Observed)',
+      mt_exp: 'Kỳ vọng Tổng thể (Expected Overall)',
+      mt_ppm_lt: 'PPM < LSL',
+      mt_ppm_gt: 'PPM > USL',
+      mt_ppm_tot: 'PPM Tổng (Total)',
+      mt_pct_lt: '% < LSL',
+      mt_pct_gt: '% > USL',
+      mt_pct_tot: '% Tổng ngoài quy cách',
+      mt_bin_lbl: 'Khoảng',
+      mt_cnt_lbl: 'Số viên',
+      ref_title: 'Tài liệu tham khảo & Kiểm chứng:'
+    },
+    en: {
+      tab1: '1. Formulation Comparison (ANOVA)',
+      tab2: '2. USP <905> Uniformity',
+      tab3: '3. ICH Q2 & Gage R&R',
+      tab4: '4. ICH Q9 FMEA & Pareto',
+      print: 'Print / PDF',
+      btn_sample: 'Load Pharma Sample Data',
+      btn_analyze: 'Analyze',
+      btn_paste_excel: 'Quick Paste Excel',
+      btn_apply_paste: 'Apply Pasted Data',
+      btn_close: 'Close',
+      btn_add_row: '+ Row',
+      btn_clear: 'Clear Grid',
+      xl_paste_tip: 'Tip: Click any cell and press Ctrl+V to paste directly from Excel (Enter / Arrow keys to navigate).',
+      alpha_label: 'Significance (α)',
+      pass: 'PASS',
+      fail: 'FAIL',
+      cond: 'MARGINAL / CONDITIONAL',
+      sig_yes: 'Statistically Significant',
+      sig_no: 'Not Significant',
+      yes: 'Yes',
+      no: 'No',
+      sample_loaded: 'Pharmaceutical sample data loaded',
+      paste_applied: 'Imported data from Excel/CSV',
+      err_min_data: 'Insufficient valid numeric data (need at least 2 groups with ≥ 2 values each).',
+
+      // Tab 2
+      t2_title: 'USP <905> Uniformity of Dosage Units & Two-Sided Tolerance Interval',
+      t2_sub: 'Automated Acceptance Value (Stage 1: n=10, Stage 2: n=30) per USP <905> and Minitab-style Howe Tolerance Interval.',
+      t2_target: 'Target Value T (%)',
+      t2_lsl: 'Lower Spec Limit LSL (%)',
+      t2_usl: 'Upper Spec Limit USL (%)',
+      t2_conf: 'Confidence (1−α)',
+      t2_cov: 'Population Coverage (P)',
+      t2_grid_tip: 'Type or Ctrl+V paste from Excel: Col 1 = 10 Stage 1 units, Col 2 = 20 Stage 2 units (leave blank for Stage 1 only).',
+      t2_col_s1: 'Stage 1 — 10 Units (%)',
+      t2_col_s2: 'Stage 2 — +20 Units (%)',
+      t2_s1_res: 'Stage 1 Evaluation (n = 10, k = 2.4)',
+      t2_s2_res: 'Stage 2 Evaluation (n = 30, k = 2.0)',
+      t2_ti_res: 'Two-Sided Tolerance Interval (Howe Approximation)',
+      t2_err_n: 'Enter at least 3 valid numbers in Stage 1 column (USP <905> Stage 1 specifies n = 10 units).',
+      t2_warn_n10: 'Note: USP <905> Stage 1 specifies n = 10 units (current n = {n}). Computed using k = 2.4 for reference.',
+      t2_warn_n30: 'Note: USP <905> Stage 2 specifies total n = 30 units (current total n = {n}). Computed using k = 2.0 for reference.',
+      t2_unit_bounds: 'Individual Unit Bounds [0.75M ; 1.25M]',
+      t2_out_units: 'Units Outside L2 Bounds',
+      t2_ti_in_spec: 'Tolerance interval falls entirely within [LSL, USL] → Process meets coverage capability.',
+      t2_ti_out_spec: 'Tolerance interval extends beyond [LSL, USL] → Risk of out-of-specification units.',
+
+      // Minitab Chart Report
+      mt_title: 'Process Capability & Distribution Report (Minitab Standard)',
+      mt_sub: 'Histogram with smooth Overall Normal density curve, LSL/Target/USL specification lines, and Howe Tolerance Interval.',
+      mt_view_spec: 'Full Spec (LSL–USL)',
+      mt_view_zoom: 'Zoom (±4σ & TI)',
+      mt_proc_data: 'Process Data',
+      mt_cap_overall: 'Overall Capability',
+      mt_ti_box: 'Tolerance Interval (Howe)',
+      mt_legend: 'Legend',
+      mt_leg_hist: 'Observed Histogram',
+      mt_leg_norm: 'Overall Normal Curve',
+      mt_leg_spec: 'LSL / USL Limits',
+      mt_leg_target: 'Target (T)',
+      mt_leg_ti: 'Tolerance Interval (LTL–UTL)',
+      mt_xaxis: 'Dosage Unit Value (% Label Claim)',
+      mt_yaxis: 'Frequency (n)',
+      mt_perf_title: 'Performance (Out-of-Spec)',
+      mt_obs: 'Observed',
+      mt_exp: 'Expected Overall',
+      mt_ppm_lt: 'PPM < LSL',
+      mt_ppm_gt: 'PPM > USL',
+      mt_ppm_tot: 'PPM Total',
+      mt_pct_lt: '% < LSL',
+      mt_pct_gt: '% > USL',
+      mt_pct_tot: '% Total OOS',
+      mt_bin_lbl: 'Bin',
+      mt_cnt_lbl: 'Count',
+      ref_title: 'References & Verification:'
+    }
+  };
+
+  /* =========================================================================
+     2. STATE & PARENT PORTAL SYNCHRONIZATION
+     ========================================================================= */
+  const state = {
+    lang: 'vi',
+    theme: 'light',
+    activeTab: 't2',
+    t2ChartMode: 'spec', // 'spec' (Minitab full LSL-USL) | 'zoom' (±4σ & TI)
+    t2Rows: []           // array of [s1, s2]
+  };
+
+  function tr(key) {
+    return (I18N[state.lang] && I18N[state.lang][key]) || I18N.vi[key] || key;
+  }
+
+  function initParentSync() {
+    let pLang = null, pTheme = null;
+    try {
+      if (window.parent && window.parent !== window) {
+        if (window.parent.L === 'vi' || window.parent.L === 'en') pLang = window.parent.L;
+        if (window.parent.currentTheme === 'dark' || window.parent.currentTheme === 'light') pTheme = window.parent.currentTheme;
+      }
+    } catch (e) {}
+
+    if (!pLang) {
+      try {
+        const ls = localStorage.getItem('lang');
+        if (ls === 'vi' || ls === 'en') pLang = ls;
+      } catch (e) {}
+    }
+    if (!pTheme) {
+      try {
+        const ts = localStorage.getItem('theme');
+        if (ts === 'dark' || ts === 'light') pTheme = ts;
+      } catch (e) {}
+    }
+    state.lang = pLang || 'vi';
+    state.theme = pTheme || 'light';
+    applyTheme(state.theme);
+  }
+
+  function applyTheme(theme) {
+    if (theme !== 'dark' && theme !== 'light') return;
+    state.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  window.addEventListener('message', function(e) {
+    if (!e || !e.data || typeof e.data !== 'object') return;
+    let changed = false;
+    if (e.data.theme === 'dark' || e.data.theme === 'light') {
+      applyTheme(e.data.theme);
+      changed = true;
+    }
+    if (e.data.lang === 'vi' || e.data.lang === 'en') {
+      state.lang = e.data.lang;
+      changed = true;
+    }
+    if (changed) {
+      renderAllI18n();
+      renderAllGrids();
+      rerenderActiveOutputs();
+    }
+  });
+
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => el.classList.remove('show'), 2100);
+  }
+
+  /* =========================================================================
+     3. PARSING, FORMATTING & REUSABLE EXCEL-GRID ENGINE
+     ========================================================================= */
+  function escHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function fmt(x, d = 4) {
+    if (x == null || !Number.isFinite(x)) return '—';
+    return x.toFixed(d);
+  }
+
+  function fmtTrim(x, d = 2) {
+    if (x == null || !Number.isFinite(x)) return '—';
+    return Number(x.toFixed(d)).toString();
+  }
+
+  function parseTokenNum(tok) {
+    if (tok == null) return NaN;
+    let s = String(tok).trim().replace(/\s+/g, '');
+    if (!s) return NaN;
+    if (s.includes(',') && s.includes('.')) {
+      if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+      else s = s.replace(/,/g, '');
+    } else if (s.includes(',')) {
+      if (/^[+-]?\d+,\d+$/.test(s)) s = s.replace(',', '.');
+      else s = s.replace(/,/g, '');
+    }
+    const v = Number(s);
+    return Number.isFinite(v) ? v : NaN;
+  }
+
+  function splitRowCells(line) {
+    const t = line.trim();
+    if (!t) return [];
+    if (t.includes('\t')) return t.split('\t').map(s => s.trim());
+    if (t.includes(';')) return t.split(';').map(s => s.trim());
+    if (t.includes('|')) return t.split('|').map(s => s.trim());
+    if (t.includes(',')) {
+      const parts = t.split(',').map(s => s.trim());
+      if (parts.length === 2 && /^[+-]?\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])) return [t];
+      return parts;
+    }
+    return t.split(/\s+/);
+  }
+
+  function renderExcelGrid(containerEl, cfg) {
+    const nCols = cfg.headers.length;
+    const rows = cfg.rows;
+
+    let thead = '<thead><tr><th class="xl-rn">#</th>';
+    for (let c = 0; c < nCols; c++) {
+      thead += `<th>${escHtml(cfg.headers[c])}</th>`;
+    }
+    thead += '</tr></thead>';
+
+    let tbody = '<tbody>';
+    for (let r = 0; r < rows.length; r++) {
+      tbody += `<tr><td class="xl-rn">${r + 1}</td>`;
+      for (let c = 0; c < nCols; c++) {
+        const val = rows[r][c] == null ? '' : rows[r][c];
+        const isText = cfg.colTypes && cfg.colTypes[c] === 'text';
+        tbody += `<td><input type="text" class="xl-cell${isText ? ' xl-text' : ''}" data-r="${r}" data-c="${c}" value="${escHtml(val)}" autocomplete="off" spellcheck="false"></td>`;
+      }
+      tbody += '</tr>';
+    }
+    tbody += '</tbody>';
+
+    containerEl.innerHTML = `<table class="xl-tbl">${thead}${tbody}</table>`;
+
+    const cells = containerEl.querySelectorAll('.xl-cell');
+    cells.forEach(inp => {
+      inp.addEventListener('input', e => {
+        const r = Number(e.target.dataset.r), c = Number(e.target.dataset.c);
+        rows[r][c] = e.target.value;
+        if (cfg.onChange) cfg.onChange();
+      });
+
+      inp.addEventListener('keydown', e => {
+        const r = Number(e.target.dataset.r), c = Number(e.target.dataset.c);
+        let nr = r, nc = c, move = false;
+        if (e.key === 'Enter' || e.key === 'ArrowDown') {
+          nr = r + 1; move = true;
+          if (nr >= rows.length) {
+            rows.push(new Array(nCols).fill(''));
+            renderExcelGrid(containerEl, cfg);
+            const next = containerEl.querySelector(`.xl-cell[data-r="${nr}"][data-c="${nc}"]`);
+            if (next) next.focus();
+            e.preventDefault();
+            return;
+          }
+        } else if (e.key === 'ArrowUp' && r > 0) {
+          nr = r - 1; move = true;
+        }
+        if (move) {
+          e.preventDefault();
+          const target = containerEl.querySelector(`.xl-cell[data-r="${nr}"][data-c="${nc}"]`);
+          if (target) { target.focus(); target.select(); }
+        }
+      });
+
+      inp.addEventListener('paste', e => {
+        const clip = (e.clipboardData || window.clipboardData)?.getData('text');
+        if (!clip) return;
+        if (clip.includes('\n') || clip.includes('\t')) {
+          e.preventDefault();
+          const startR = Number(e.target.dataset.r);
+          const startC = Number(e.target.dataset.c);
+          const pastedLines = clip.replace(/\r/g, '').split('\n').filter((l, i, arr) => l !== '' || i < arr.length - 1);
+          const matrix = pastedLines.map(l => l.includes('\t') ? l.split('\t').map(s => s.trim()) : splitRowCells(l));
+
+          while (rows.length < startR + matrix.length) {
+            rows.push(new Array(cfg.headers.length).fill(''));
+          }
+          for (let dr = 0; dr < matrix.length; dr++) {
+            for (let dc = 0; dc < matrix[dr].length; dc++) {
+              const cc = startC + dc;
+              if (cc < cfg.headers.length) rows[startR + dr][cc] = matrix[dr][dc];
+            }
+          }
+          renderExcelGrid(containerEl, cfg);
+          if (cfg.onChange) cfg.onChange();
+          showToast(tr('paste_applied'));
+        }
+      });
+    });
+  }
+
+  /* =========================================================================
+     4. STATISTICAL ENGINE (PURE JS, ZERO EXTERNAL DEPS)
+     ========================================================================= */
+  const Stat = (function() {
+    function sum(a) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i]; return s; }
+    function mean(a) { return a.length ? sum(a) / a.length : NaN; }
+    function variance(a) {
+      if (a.length < 2) return NaN;
+      const m = mean(a);
+      let s = 0;
+      for (let i = 0; i < a.length; i++) { const d = a[i] - m; s += d * d; }
+      return s / (a.length - 1);
+    }
+    function sd(a) { const v = variance(a); return Number.isFinite(v) ? Math.sqrt(Math.max(0, v)) : NaN; }
+    function quantile(sorted, p) {
+      const n = sorted.length;
+      if (!n) return NaN;
+      if (n === 1) return sorted[0];
+      const pos = (n - 1) * p;
+      const lo = Math.floor(pos), hi = Math.ceil(pos);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (pos - lo) * (sorted[hi] - sorted[lo]);
+    }
+    function median(a) {
+      const s = a.slice().sort((x, y) => x - y);
+      return quantile(s, 0.5);
+    }
+
+    function logGamma(z) {
+      const g = 7;
+      const C = [
+        0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+        771.32342877765313, -176.61502916214059, 12.507343278686905,
+        -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+      ];
+      if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - logGamma(1 - z);
+      z -= 1;
+      let x = C[0];
+      for (let i = 1; i < g + 2; i++) x += C[i] / (z + i);
+      const t = z + g + 0.5;
+      return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+    }
+
+    function gammap(a, x) {
+      if (x <= 0) return 0;
+      if (a <= 0) return 1;
+      const gln = logGamma(a);
+      if (x < a + 1) {
+        let ap = a, del = 1 / a, sumVal = del;
+        for (let n = 1; n <= 200; n++) {
+          ap += 1;
+          del *= x / ap;
+          sumVal += del;
+          if (Math.abs(del) < Math.abs(sumVal) * 3e-12) break;
+        }
+        return Math.min(1, Math.max(0, sumVal * Math.exp(-x + a * Math.log(x) - gln)));
+      } else {
+        let b = x + 1 - a, c = 1 / 1e-30, d = 1 / b, h = d;
+        for (let i = 1; i <= 200; i++) {
+          const an = -i * (i - a);
+          b += 2;
+          d = an * d + b; if (Math.abs(d) < 1e-30) d = 1e-30;
+          c = b + an / c; if (Math.abs(c) < 1e-30) c = 1e-30;
+          d = 1 / d;
+          const del = d * c;
+          h *= del;
+          if (Math.abs(del - 1) < 3e-12) break;
+        }
+        return Math.min(1, Math.max(0, 1 - Math.exp(-x + a * Math.log(x) - gln) * h));
+      }
+    }
+
+    function normCDF(z) {
+      const sign = z < 0 ? -1 : 1;
+      const x = Math.abs(z) / Math.SQRT2;
+      const t = 1 / (1 + 0.3275911 * x);
+      const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+      return 0.5 * (1 + sign * y);
+    }
+
+    function normInv(p) {
+      if (p <= 0) return -Infinity;
+      if (p >= 1) return Infinity;
+      if (p === 0.5) return 0;
+      const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+      const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+      const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+      const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+      const plow = 0.02425, phigh = 1 - plow;
+      let q, r;
+      if (p < plow) {
+        q = Math.sqrt(-2 * Math.log(p));
+        return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+      }
+      if (p <= phigh) {
+        q = p - 0.5; r = q * q;
+        return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+      }
+      q = Math.sqrt(-2 * Math.log(1 - p));
+      return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+    }
+
+    function chi2Inv(p, df) {
+      if (p <= 0 || p >= 1 || df <= 0) return NaN;
+      let lo = 0, hi = Math.max(df + 10 * Math.sqrt(2 * df), 50);
+      while (gammap(df / 2, hi / 2) < p && hi < 1e7) hi *= 2;
+      for (let i = 0; i < 80; i++) {
+        const mid = 0.5 * (lo + hi);
+        if (gammap(df / 2, mid / 2) < p) lo = mid; else hi = mid;
+      }
+      return 0.5 * (lo + hi);
+    }
+
+    function howeK2(n, conf, cov) {
+      if (n < 2) return NaN;
+      const df = n - 1;
+      const zp = normInv((1 + cov) / 2);
+      const chi2 = chi2Inv(1 - conf, df);
+      const r = zp * Math.sqrt(1 + 1 / n);
+      const u = Math.sqrt(df / chi2);
+      const k2 = r * u * Math.sqrt(1 + (df - 3 - chi2) / (2 * (n + 1) * (n + 1)));
+      return Number.isFinite(k2) ? k2 : r * u;
+    }
+
+    return { sum, mean, variance, sd, quantile, median, normCDF, normInv, chi2Inv, howeK2 };
+  })();
+
+  /* =========================================================================
+     5. MINITAB-STANDARD SVG CHART HELPERS (THEME-AWARE)
+     ========================================================================= */
+  function themeColors() {
+    const cs = getComputedStyle(document.documentElement);
+    return {
+      panelBg: cs.getPropertyValue('--mt-panel-bg').trim() || '#ffffff',
+      plotBg: cs.getPropertyValue('--mt-plot-bg').trim() || '#ffffff',
+      frame: cs.getPropertyValue('--mt-frame').trim() || '#6b7280',
+      grid: cs.getPropertyValue('--mt-grid').trim() || '#e5e9f0',
+      fg: cs.getPropertyValue('--fg').trim() || '#1f1f1f',
+      muted: cs.getPropertyValue('--muted').trim() || '#5f6368',
+      barFill: cs.getPropertyValue('--mt-bar-fill').trim() || '#5b9bff',
+      barStroke: cs.getPropertyValue('--mt-bar-stroke').trim() || '#2c67cc',
+      curve: cs.getPropertyValue('--mt-curve').trim() || '#b80000',
+      spec: cs.getPropertyValue('--mt-spec').trim() || '#b30000',
+      target: cs.getPropertyValue('--mt-target').trim() || '#15803d',
+      ti: cs.getPropertyValue('--mt-ti').trim() || '#1d4ed8',
+      ok: cs.getPropertyValue('--ok').trim() || '#137333',
+      warn: cs.getPropertyValue('--warn').trim() || '#b06000',
+      danger: cs.getPropertyValue('--danger').trim() || '#b3261e'
+    };
+  }
+
+  function niceStep(rawStep) {
+    if (!Number.isFinite(rawStep) || rawStep <= 0) return 1;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / mag;
+    if (norm <= 1.2) return 1 * mag;
+    if (norm <= 2.2) return 2 * mag;
+    if (norm <= 3.0) return 2.5 * mag;
+    if (norm <= 6.0) return 5 * mag;
+    return 10 * mag;
+  }
+
+  function niceTicks(minV, maxV, count = 6) {
+    if (!Number.isFinite(minV) || !Number.isFinite(maxV)) return [0, 1];
+    if (minV === maxV) { minV -= 1; maxV += 1; }
+    const step = niceStep((maxV - minV) / Math.max(1, count));
+    const start = Math.floor(minV / step) * step;
+    const end = Math.ceil(maxV / step) * step;
+    const ticks = [];
+    for (let v = start; v <= end + step * 0.001; v += step) {
+      ticks.push(Number(v.toFixed(10)));
+      if (ticks.length > 24) break;
+    }
+    return ticks;
+  }
+
+  /**
+   * Computes Minitab-like uniform histogram bins with human-friendly edges.
+   */
+  function buildMinitabBins(vals) {
+    const n = vals.length;
+    const minV = Math.min(...vals);
+    const maxV = Math.max(...vals);
+    const span = maxV - minV;
+    if (span === 0) {
+      return { bw: 1, binStart: minV - 0.5, bins: [{ lo: minV - 0.5, hi: minV + 0.5, count: n }] };
+    }
+    const targetBins = Math.max(6, Math.min(12, Math.round((1 + 3.322 * Math.log10(n)) * 1.45)));
+    const bw = niceStep(span / targetBins);
+    const binStart = Math.floor(minV / bw) * bw;
+    let nBins = Math.ceil((maxV - binStart) / bw);
+    if (binStart + nBins * bw <= maxV + 1e-12) nBins += 1;
+    if (nBins < 4) nBins = 4;
+
+    const bins = [];
+    for (let i = 0; i < nBins; i++) {
+      bins.push({
+        lo: Number((binStart + i * bw).toFixed(10)),
+        hi: Number((binStart + (i + 1) * bw).toFixed(10)),
+        count: 0
+      });
+    }
+    vals.forEach(v => {
+      let idx = Math.floor((v - binStart + 1e-12) / bw);
+      if (idx < 0) idx = 0;
+      if (idx >= nBins) idx = nBins - 1;
+      bins[idx].count++;
+    });
+
+    // Trim empty leading/trailing bins while preserving bin alignment
+    let first = 0, last = bins.length - 1;
+    while (first < last && bins[first].count === 0) first++;
+    while (last > first && bins[last].count === 0) last--;
+    return { bw, binStart: bins[first].lo, binEnd: bins[last].hi, bins: bins.slice(first, last + 1) };
+  }
+
+  /**
+   * Converts a sequence of [x, y] points into a silky-smooth SVG Cubic Bezier path
+   * using Catmull-Rom spline interpolation (tension = 1/6), zero kinks or jagged vertices.
+   */
+  function buildSmoothBezierPath(pts) {
+    if (!pts || pts.length < 2) return '';
+    let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
+    if (pts.length === 2) {
+      return `${d} L ${pts[1][0].toFixed(2)} ${pts[1][1].toFixed(2)}`;
+    }
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i === 0 ? 0 : i - 1];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2 < pts.length ? i + 2 : pts.length - 1];
+      const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+      const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+      const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+    }
+    return d;
+  }
+
+  /* =========================================================================
+     7. TAB 2 — USP <905> UNIFORMITY & MINITAB CAPABILITY REPORT
+     ========================================================================= */
+  function loadT2Sample() {
+    document.getElementById('t2Target').value = '100.0';
+    document.getElementById('t2LSL').value = '85.0';
+    document.getElementById('t2USL').value = '115.0';
+    document.getElementById('t2Conf').value = '0.95';
+    document.getElementById('t2Cov').value = '0.95';
+    const s1 = ['98.4','101.2','99.5','97.8','102.1','100.4','96.9','101.8','99.1','100.7'];
+    const s2 = ['99.2','100.5','98.7','101.0','97.9','102.3','99.8','100.1','98.5','101.4',
+                '99.6','100.8','98.1','101.6','99.4','100.2','97.5','102.0','99.0','100.9'];
+    state.t2Rows = Array.from({ length: 20 }, (_, i) => [s1[i] || '', s2[i] || '']);
+    renderT2Grid();
+    runT2();
+    showToast(tr('sample_loaded'));
+  }
+
+  function renderT2Grid() {
+    renderExcelGrid(document.getElementById('t2SheetWrap'), {
+      headers: [tr('t2_col_s1'), tr('t2_col_s2')],
+      rows: state.t2Rows,
+      editableHeaders: false
+    });
+  }
+
+  function calcUsp905(vals, T, k) {
+    const n = vals.length, xbar = Stat.mean(vals), s = Stat.sd(vals);
+    let M;
+    if (T <= 101.5) M = xbar < 98.5 ? 98.5 : (xbar > 101.5 ? 101.5 : xbar);
+    else M = xbar < 98.5 ? 98.5 : (xbar > T ? T : xbar);
+    const AV = Math.abs(M - xbar) + k * s;
+    const lowL2 = 0.75 * M, highL2 = 1.25 * M;
+    const outUnits = vals.filter(v => v < lowL2 || v > highL2);
+    return { n, xbar, s, rsd: xbar !== 0 ? (s / xbar) * 100 : NaN, M, k, AV, passL1: AV <= 15.0, lowL2, highL2, outUnits, passL2: outUnits.length === 0 };
+  }
+
+  function calcCapability(vals, meanVal, sdVal, lsl, usl) {
+    const n = vals.length;
+    const hasLSL = Number.isFinite(lsl);
+    const hasUSL = Number.isFinite(usl);
+    const validSd = Number.isFinite(sdVal) && sdVal > 0;
+
+    const Pp = (hasLSL && hasUSL && usl > lsl && validSd) ? (usl - lsl) / (6 * sdVal) : NaN;
+    const PPL = (hasLSL && validSd) ? (meanVal - lsl) / (3 * sdVal) : NaN;
+    const PPU = (hasUSL && validSd) ? (usl - meanVal) / (3 * sdVal) : NaN;
+    let Ppk = NaN;
+    if (Number.isFinite(PPL) && Number.isFinite(PPU)) Ppk = Math.min(PPL, PPU);
+    else if (Number.isFinite(PPL)) Ppk = PPL;
+    else if (Number.isFinite(PPU)) Ppk = PPU;
+
+    const obsLt = hasLSL ? (vals.filter(v => v < lsl).length / n) * 100 : NaN;
+    const obsGt = hasUSL ? (vals.filter(v => v > usl).length / n) * 100 : NaN;
+    const obsTot = (Number.isFinite(obsLt) ? obsLt : 0) + (Number.isFinite(obsGt) ? obsGt : 0);
+
+    const expLt = (hasLSL && validSd) ? Stat.normCDF((lsl - meanVal) / sdVal) * 100 : NaN;
+    const expGt = (hasUSL && validSd) ? (1 - Stat.normCDF((usl - meanVal) / sdVal)) * 100 : NaN;
+    const expTot = (Number.isFinite(expLt) ? expLt : 0) + (Number.isFinite(expGt) ? expGt : 0);
+
+    return {
+      Pp, PPL, PPU, Ppk,
+      obsLt, obsGt, obsTot,
+      expLt, expGt, expTot,
+      obsPpmLt: Number.isFinite(obsLt) ? obsLt * 10000 : NaN,
+      obsPpmGt: Number.isFinite(obsGt) ? obsGt * 10000 : NaN,
+      obsPpmTot: obsTot * 10000,
+      expPpmLt: Number.isFinite(expLt) ? expLt * 10000 : NaN,
+      expPpmGt: Number.isFinite(expGt) ? expGt * 10000 : NaN,
+      expPpmTot: expTot * 10000
+    };
+  }
+
+  function renderMinitabSvg(vals, meanVal, sdVal, tiLo, tiHi, lsl, usl, target, mode) {
+    const C = themeColors();
+    const W = 620, H = 374;
+    const pad = { l: 48, r: 30, t: 44, b: 88 };
+    const pw = W - pad.l - pad.r;
+    const ph = H - pad.t - pad.b;
+
+    const hist = buildMinitabBins(vals);
+    const { bw, binStart, binEnd, bins } = hist;
+
+    // Determine X domain based on mode ('spec' vs 'zoom')
+    const dataExtremes = [binStart, binEnd];
+    if (Number.isFinite(sdVal) && sdVal > 0) {
+      dataExtremes.push(meanVal - 3.5 * sdVal, meanVal + 3.5 * sdVal);
+    }
+    if (Number.isFinite(tiLo)) dataExtremes.push(tiLo);
+    if (Number.isFinite(tiHi)) dataExtremes.push(tiHi);
+
+    let xLo, xHi;
+    if (mode === 'zoom') {
+      const dMin = Math.min(...dataExtremes);
+      const dMax = Math.max(...dataExtremes);
+      const span = (dMax - dMin) || 4;
+      xLo = dMin - span * 0.08;
+      xHi = dMax + span * 0.08;
+    } else {
+      const fullExt = dataExtremes.slice();
+      if (Number.isFinite(lsl)) fullExt.push(lsl);
+      if (Number.isFinite(usl)) fullExt.push(usl);
+      if (Number.isFinite(target)) fullExt.push(target);
+      xLo = Math.min(...fullExt);
+      xHi = Math.max(...fullExt);
+      if (xHi === xLo) { xLo -= 5; xHi += 5; }
+    }
+
+    const xTicks = niceTicks(xLo, xHi, 6).filter(t => t >= xLo - 1e-9 && t <= xHi + 1e-9);
+    const xScale = v => pad.l + ((v - xLo) / (xHi - xLo)) * pw;
+
+    // Y domain: account for both tallest histogram bar AND normal curve peak
+    const maxBinCount = Math.max(...bins.map(b => b.count), 1);
+    const peakCurve = (sdVal > 0) ? (vals.length * bw) / (sdVal * Math.sqrt(2 * Math.PI)) : 0;
+    const rawMaxY = Math.max(maxBinCount, peakCurve) * 1.14;
+    const yTicks = niceTicks(0, rawMaxY, 5).filter(t => t >= 0);
+    const yHi = yTicks[yTicks.length - 1] || rawMaxY;
+    const yScale = c => pad.t + ph - (c / yHi) * ph;
+
+    const clipId = 'mtPlotClip';
+    let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Minitab Style Capability Histogram and Normal Curve">`;
+    svg += `<defs><clipPath id="${clipId}"><rect x="${pad.l}" y="${pad.t}" width="${pw}" height="${ph}"/></clipPath></defs>`;
+
+    // Outer clean canvas & inner Minitab plot box background
+    svg += `<rect width="${W}" height="${H}" fill="${C.panelBg}"/>`;
+    svg += `<rect x="${pad.l}" y="${pad.t}" width="${pw}" height="${ph}" fill="${C.plotBg}"/>`;
+
+    // Subtle horizontal gridlines
+    yTicks.forEach(t => {
+      if (t <= 0) return;
+      const y = yScale(t);
+      if (y > pad.t + 2 && y < pad.t + ph - 1) {
+        svg += `<line x1="${pad.l}" y1="${y.toFixed(1)}" x2="${pad.l + pw}" y2="${y.toFixed(1)}" stroke="${C.grid}" stroke-width="0.9"/>`;
+      }
+    });
+
+    // Clipped plot interior: TI band, touching histogram bars, smooth normal curve, spec lines
+    svg += `<g clip-path="url(#${clipId})">`;
+
+    // Subtle Tolerance Interval shading inside plot
+    if (Number.isFinite(tiLo) && Number.isFinite(tiHi)) {
+      const tx1 = xScale(tiLo), tx2 = xScale(tiHi);
+      svg += `<rect x="${tx1.toFixed(2)}" y="${pad.t}" width="${Math.max(1, tx2 - tx1).toFixed(2)}" height="${ph}" fill="${C.ti}" fill-opacity="0.06"/>`;
+      svg += `<line x1="${tx1.toFixed(2)}" y1="${pad.t}" x2="${tx1.toFixed(2)}" y2="${pad.t + ph}" stroke="${C.ti}" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.65"/>`;
+      svg += `<line x1="${tx2.toFixed(2)}" y1="${pad.t}" x2="${tx2.toFixed(2)}" y2="${pad.t + ph}" stroke="${C.ti}" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.65"/>`;
+    }
+
+    // Minitab-style touching histogram bars (sharp corners, crisp border, zero gap)
+    bins.forEach(b => {
+      if (b.count <= 0) return;
+      const x1 = xScale(b.lo);
+      const x2 = xScale(b.hi);
+      const y = yScale(b.count);
+      const barH = Math.max(0.5, pad.t + ph - y);
+      const pct = ((b.count / vals.length) * 100).toFixed(1);
+      svg += `<rect class="mt-bar" x="${x1.toFixed(2)}" y="${y.toFixed(2)}" width="${Math.max(1.5, x2 - x1).toFixed(2)}" height="${barH.toFixed(2)}" fill="${C.barFill}" fill-opacity="0.82" stroke="${C.barStroke}" stroke-width="1" shape-rendering="crispEdges" data-lo="${fmtTrim(b.lo, 2)}" data-hi="${fmtTrim(b.hi, 2)}" data-cnt="${b.count}" data-pct="${pct}"/>`;
+    });
+
+    // Target reference line (if within plot)
+    if (Number.isFinite(target) && target >= xLo && target <= xHi) {
+      const tx = xScale(target);
+      svg += `<line x1="${tx.toFixed(2)}" y1="${pad.t}" x2="${tx.toFixed(2)}" y2="${pad.t + ph}" stroke="${C.target}" stroke-width="1.35" stroke-dasharray="4,3" stroke-opacity="0.85"/>`;
+    }
+
+    // LSL & USL vertical dashed crimson lines inside plot
+    if (Number.isFinite(lsl) && lsl >= xLo && lsl <= xHi) {
+      const lx = xScale(lsl);
+      svg += `<line x1="${lx.toFixed(2)}" y1="${pad.t}" x2="${lx.toFixed(2)}" y2="${pad.t + ph}" stroke="${C.spec}" stroke-width="1.65" stroke-dasharray="5,3"/>`;
+    }
+    if (Number.isFinite(usl) && usl >= xLo && usl <= xHi) {
+      const ux = xScale(usl);
+      svg += `<line x1="${ux.toFixed(2)}" y1="${pad.t}" x2="${ux.toFixed(2)}" y2="${pad.t + ph}" stroke="${C.spec}" stroke-width="1.65" stroke-dasharray="5,3"/>`;
+    }
+
+    // Silky-smooth Fitted Overall Normal Curve (240 points -> Catmull-Rom Cubic Bezier path)
+    if (Number.isFinite(sdVal) && sdVal > 0) {
+      const pts = [];
+      const steps = 220;
+      const coeff = (vals.length * bw) / (sdVal * Math.sqrt(2 * Math.PI));
+      for (let i = 0; i <= steps; i++) {
+        const xv = xLo + (xHi - xLo) * (i / steps);
+        const z = (xv - meanVal) / sdVal;
+        const yv = coeff * Math.exp(-0.5 * z * z);
+        pts.push([xScale(xv), yScale(yv)]);
+      }
+      const smoothD = buildSmoothBezierPath(pts);
+      svg += `<path d="${smoothD}" fill="none" stroke="${C.curve}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>`;
+    }
+
+    svg += `</g>`;
+
+    // Crisp 4-sided Minitab plot frame on top
+    svg += `<rect x="${pad.l}" y="${pad.t}" width="${pw}" height="${ph}" fill="none" stroke="${C.frame}" stroke-width="1.2" shape-rendering="crispEdges"/>`;
+
+    // Top reference labels above the frame (LSL, Target, USL — Minitab signature placement)
+    const topLabels = [];
+    if (Number.isFinite(lsl) && lsl >= xLo && lsl <= xHi) {
+      topLabels.push({ x: xScale(lsl), name: 'LSL', val: `${fmtTrim(lsl, 1)}%`, color: C.spec });
+    }
+    if (Number.isFinite(target) && target >= xLo && target <= xHi) {
+      topLabels.push({ x: xScale(target), name: 'Target', val: `${fmtTrim(target, 1)}%`, color: C.target });
+    }
+    if (Number.isFinite(usl) && usl >= xLo && usl <= xHi) {
+      topLabels.push({ x: xScale(usl), name: 'USL', val: `${fmtTrim(usl, 1)}%`, color: C.spec });
+    }
+    topLabels.forEach(lbl => {
+      const clampedX = Math.max(pad.l + 14, Math.min(pad.l + pw - 14, lbl.x));
+      svg += `<text x="${clampedX.toFixed(1)}" y="${pad.t - 20}" text-anchor="middle" fill="${lbl.color}" font-size="11.5" font-weight="700">${lbl.name}</text>`;
+      svg += `<text x="${clampedX.toFixed(1)}" y="${pad.t - 7}" text-anchor="middle" fill="${lbl.color}" font-size="10" font-weight="600">${lbl.val}</text>`;
+    });
+
+    // Off-screen spec badges in Zoom mode
+    if (mode === 'zoom') {
+      if (Number.isFinite(lsl) && lsl < xLo) {
+        svg += `<text x="${pad.l + 4}" y="${pad.t - 10}" text-anchor="start" fill="${C.spec}" font-size="10.5" font-weight="700">← LSL ${fmtTrim(lsl, 1)}%</text>`;
+      }
+      if (Number.isFinite(usl) && usl > xHi) {
+        svg += `<text x="${pad.l + pw - 4}" y="${pad.t - 10}" text-anchor="end" fill="${C.spec}" font-size="10.5" font-weight="700">USL ${fmtTrim(usl, 1)}% →</text>`;
+      }
+    }
+
+    // Y-axis ticks & label (Frequency)
+    yTicks.forEach(t => {
+      if (Math.abs(t - Math.round(t)) > 0.01 && yHi >= 4) return;
+      const y = yScale(t);
+      svg += `<line x1="${pad.l - 4}" y1="${y.toFixed(1)}" x2="${pad.l}" y2="${y.toFixed(1)}" stroke="${C.frame}" stroke-width="1"/>`;
+      svg += `<text x="${pad.l - 8}" y="${(y + 3.5).toFixed(1)}" text-anchor="end" fill="${C.muted}" font-size="10.5">${fmtTrim(t, 1)}</text>`;
+    });
+    svg += `<text x="13" y="${(pad.t + ph / 2).toFixed(1)}" text-anchor="middle" fill="${C.muted}" font-size="11" font-weight="600" transform="rotate(-90 13 ${(pad.t + ph / 2).toFixed(1)})">${escHtml(tr('mt_yaxis'))}</text>`;
+
+    // X-axis ticks & numeric labels (clean Minitab outward ticks)
+    xTicks.forEach(t => {
+      if (t < xLo - 1e-9 || t > xHi + 1e-9) return;
+      const x = xScale(t);
+      svg += `<line x1="${x.toFixed(1)}" y1="${pad.t + ph}" x2="${x.toFixed(1)}" y2="${pad.t + ph + 5}" stroke="${C.frame}" stroke-width="1.1"/>`;
+      svg += `<text x="${x.toFixed(1)}" y="${pad.t + ph + 19}" text-anchor="middle" fill="${C.fg}" font-size="11" font-weight="500">${fmtTrim(t, 1)}</text>`;
+    });
+
+    // Dedicated Tolerance Interval bracket track below X-axis ticks (zero overlap!)
+    if (Number.isFinite(tiLo) && Number.isFinite(tiHi)) {
+      const yTrack = pad.t + ph + 42;
+      const tx1 = Math.max(pad.l, Math.min(pad.l + pw, xScale(tiLo)));
+      const tx2 = Math.max(pad.l, Math.min(pad.l + pw, xScale(tiHi)));
+      const tm = Math.max(pad.l, Math.min(pad.l + pw, xScale(meanVal)));
+      svg += `<line x1="${tx1.toFixed(1)}" y1="${yTrack}" x2="${tx2.toFixed(1)}" y2="${yTrack}" stroke="${C.ti}" stroke-width="2"/>`;
+      svg += `<line x1="${tx1.toFixed(1)}" y1="${yTrack - 5}" x2="${tx1.toFixed(1)}" y2="${yTrack + 5}" stroke="${C.ti}" stroke-width="2"/>`;
+      svg += `<line x1="${tx2.toFixed(1)}" y1="${yTrack - 5}" x2="${tx2.toFixed(1)}" y2="${yTrack + 5}" stroke="${C.ti}" stroke-width="2"/>`;
+      svg += `<circle cx="${tm.toFixed(1)}" cy="${yTrack}" r="3.4" fill="${C.curve}" stroke="${C.panelBg}" stroke-width="1"/>`;
+      const ltlRoom = tx1 - pad.l >= 74;
+      const utlRoom = (pad.l + pw) - tx2 >= 74;
+      if (ltlRoom) {
+        svg += `<text x="${(tx1 - 6).toFixed(1)}" y="${yTrack + 3.5}" text-anchor="end" fill="${C.ti}" font-size="10" font-weight="600">LTL ${fmt(tiLo, 2)}%</text>`;
+      } else {
+        svg += `<text x="${Math.max(pad.l, tx1).toFixed(1)}" y="${yTrack + 15}" text-anchor="start" fill="${C.ti}" font-size="10" font-weight="600">LTL ${fmt(tiLo, 2)}%</text>`;
+      }
+      if (utlRoom) {
+        svg += `<text x="${(tx2 + 6).toFixed(1)}" y="${yTrack + 3.5}" text-anchor="start" fill="${C.ti}" font-size="10" font-weight="600">UTL ${fmt(tiHi, 2)}%</text>`;
+      } else {
+        svg += `<text x="${Math.min(pad.l + pw, tx2).toFixed(1)}" y="${yTrack + 15}" text-anchor="end" fill="${C.ti}" font-size="10" font-weight="600">UTL ${fmt(tiHi, 2)}%</text>`;
+      }
+    }
+
+    // X-axis title
+    svg += `<text x="${(pad.l + pw / 2).toFixed(1)}" y="${H - 12}" text-anchor="middle" fill="${C.muted}" font-size="11.5" font-weight="600">${escHtml(tr('mt_xaxis'))}</text>`;
+
+    svg += `</svg>`;
+    return svg;
+  }
+
+  function renderMinitabReport(vals, meanVal, sdVal, tiLo, tiHi, k2, conf, cov, lsl, usl, target, activeAV) {
+    const cap = calcCapability(vals, meanVal, sdVal, lsl, usl);
+    const rsd = meanVal !== 0 ? (sdVal / meanVal) * 100 : NaN;
+    const ppkClass = !Number.isFinite(cap.Ppk) ? '' : (cap.Ppk >= 1.33 ? 'ok' : (cap.Ppk >= 1.0 ? 'warn' : 'danger'));
+
+    const svgMarkup = renderMinitabSvg(vals, meanVal, sdVal, tiLo, tiHi, lsl, usl, target, state.t2ChartMode);
+
+    return `
+    <div class="mt-report">
+      <div class="mt-report-head">
+        <div>
+          <h4 class="mt-report-title">${tr('mt_title')}</h4>
+          <p class="mt-report-sub">${tr('mt_sub')}</p>
+        </div>
+        <div class="seg no-print" role="group" aria-label="Chart Zoom Mode">
+          <button type="button" class="seg-btn ${state.t2ChartMode === 'spec' ? 'active' : ''}" data-mt-mode="spec">${tr('mt_view_spec')}</button>
+          <button type="button" class="seg-btn ${state.t2ChartMode === 'zoom' ? 'active' : ''}" data-mt-mode="zoom">${tr('mt_view_zoom')}</button>
+        </div>
+      </div>
+
+      <div class="mt-grid">
+        <!-- Left Panel: Process Data (Minitab Standard) -->
+        <div>
+          <div class="mt-side-box">
+            <div class="mt-box-title">${tr('mt_proc_data')}</div>
+            <div class="mt-kv"><span class="mt-kv-k">LSL</span><span class="mt-kv-v">${Number.isFinite(lsl) ? fmt(lsl, 2) + '%' : '*'}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Target</span><span class="mt-kv-v">${Number.isFinite(target) ? fmt(target, 2) + '%' : '*'}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">USL</span><span class="mt-kv-v">${Number.isFinite(usl) ? fmt(usl, 2) + '%' : '*'}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Sample Mean</span><span class="mt-kv-v">${fmt(meanVal, 3)}%</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Sample N</span><span class="mt-kv-v">${vals.length}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">StDev (Overall)</span><span class="mt-kv-v">${fmt(sdVal, 4)}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">%RSD</span><span class="mt-kv-v">${fmt(rsd, 2)}%</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">USP &lt;905&gt; AV</span><span class="mt-kv-v ${activeAV <= 15 ? 'ok' : 'danger'}">${fmt(activeAV, 2)}</span></div>
+          </div>
+
+          <div class="mt-side-box">
+            <div class="mt-box-title">${tr('mt_legend')}</div>
+            <div class="mt-legend-row"><span class="mt-legend-swatch"></span><span>${tr('mt_leg_hist')}</span></div>
+            <div class="mt-legend-row"><span class="mt-legend-line"></span><span>${tr('mt_leg_norm')}</span></div>
+            <div class="mt-legend-row"><span class="mt-legend-line dashed"></span><span>${tr('mt_leg_spec')}</span></div>
+            <div class="mt-legend-row"><span class="mt-legend-line target"></span><span>${tr('mt_leg_target')}</span></div>
+            <div class="mt-legend-row"><span class="mt-legend-ti"></span><span>${tr('mt_leg_ti')}</span></div>
+          </div>
+        </div>
+
+        <!-- Center Panel: Minitab Histogram + Smooth Normal Curve -->
+        <div class="mt-center-col">
+          <div class="mt-chart-wrap" id="mtChartWrap">
+            ${svgMarkup}
+            <div class="mt-tooltip" id="mtTooltip" role="tooltip"></div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Overall Capability & Howe Tolerance Interval -->
+        <div>
+          <div class="mt-side-box">
+            <div class="mt-box-title">${tr('mt_cap_overall')}</div>
+            <div class="mt-kv"><span class="mt-kv-k">Pp</span><span class="mt-kv-v">${fmt(cap.Pp, 2)}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">PPL</span><span class="mt-kv-v">${fmt(cap.PPL, 2)}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">PPU</span><span class="mt-kv-v">${fmt(cap.PPU, 2)}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Ppk</span><span class="mt-kv-v ${ppkClass}">${fmt(cap.Ppk, 2)}</span></div>
+          </div>
+
+          <div class="mt-side-box">
+            <div class="mt-box-title">${tr('mt_ti_box')}</div>
+            <div class="mt-kv"><span class="mt-kv-k">1−α / P</span><span class="mt-kv-v">${Math.round(conf * 100)}% / ${Math.round(cov * 100)}%</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Howe k₂</span><span class="mt-kv-v">${fmt(k2, 4)}</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Lower TL</span><span class="mt-kv-v">${fmt(tiLo, 2)}%</span></div>
+            <div class="mt-kv"><span class="mt-kv-k">Upper TL</span><span class="mt-kv-v">${fmt(tiHi, 2)}%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Strip: Observed vs Expected Overall Performance (Minitab Standard) -->
+      <div class="mt-perf-wrap">
+        <table class="mt-perf-tbl">
+          <thead>
+            <tr>
+              <th>${tr('mt_perf_title')}</th>
+              <th>${tr('mt_obs')}</th>
+              <th>${tr('mt_exp')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${tr('mt_pct_lt')}</td>
+              <td>${Number.isFinite(cap.obsLt) ? fmt(cap.obsLt, 2) + '%' : '*'}</td>
+              <td>${Number.isFinite(cap.expLt) ? fmt(cap.expLt, 4) + '%' : '*'}</td>
+            </tr>
+            <tr>
+              <td>${tr('mt_pct_gt')}</td>
+              <td>${Number.isFinite(cap.obsGt) ? fmt(cap.obsGt, 2) + '%' : '*'}</td>
+              <td>${Number.isFinite(cap.expGt) ? fmt(cap.expGt, 4) + '%' : '*'}</td>
+            </tr>
+            <tr>
+              <td>${tr('mt_pct_tot')}</td>
+              <td>${fmt(cap.obsTot, 2)}%</td>
+              <td>${fmt(cap.expTot, 4)}%</td>
+            </tr>
+            <tr>
+              <td>${tr('mt_ppm_tot')}</td>
+              <td>${fmt(cap.obsPpmTot, 2)}</td>
+              <td>${fmt(cap.expPpmTot, 2)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  function bindMinitabChartInteractions() {
+    document.querySelectorAll('[data-mt-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-mt-mode');
+        if (mode && mode !== state.t2ChartMode) {
+          state.t2ChartMode = mode;
+          runT2();
+        }
+      });
+    });
+
+    const wrap = document.getElementById('mtChartWrap');
+    const tip = document.getElementById('mtTooltip');
+    if (!wrap || !tip) return;
+
+    wrap.querySelectorAll('.mt-bar').forEach(bar => {
+      bar.addEventListener('mousemove', e => {
+        const rect = wrap.getBoundingClientRect();
+        const lo = bar.getAttribute('data-lo');
+        const hi = bar.getAttribute('data-hi');
+        const cnt = bar.getAttribute('data-cnt');
+        const pct = bar.getAttribute('data-pct');
+        tip.textContent = `${tr('mt_bin_lbl')} [${lo}%, ${hi}%) • ${tr('mt_cnt_lbl')}: ${cnt} (${pct}%)`;
+        tip.style.left = `${e.clientX - rect.left}px`;
+        tip.style.top = `${e.clientY - rect.top - 10}px`;
+        tip.classList.add('show');
+      });
+      bar.addEventListener('mouseleave', () => {
+        tip.classList.remove('show');
+      });
+    });
+  }
+
+  function runT2() {
+    const out = document.getElementById('t2Output');
+    const T = parseFloat(document.getElementById('t2Target').value);
+    const lsl = parseFloat(document.getElementById('t2LSL').value);
+    const usl = parseFloat(document.getElementById('t2USL').value);
+    const conf = parseFloat(document.getElementById('t2Conf').value) || 0.95;
+    const cov = parseFloat(document.getElementById('t2Cov').value) || 0.95;
+
+    const s1Vals = [], s2Extra = [];
+    state.t2Rows.forEach(r => {
+      const v1 = parseTokenNum(r[0]), v2 = parseTokenNum(r[1]);
+      if (Number.isFinite(v1)) s1Vals.push(v1);
+      if (Number.isFinite(v2)) s2Extra.push(v2);
+    });
+
+    if (s1Vals.length < 3) {
+      out.innerHTML = `<div class="alert alert-danger">${tr('t2_err_n')}</div>`;
+      return;
+    }
+
+    const target = Number.isFinite(T) ? T : 100.0;
+    const r1 = calcUsp905(s1Vals, target, 2.4);
+    let activeAV = r1.AV;
+    let html = '';
+    if (s1Vals.length !== 10) html += `<div class="alert alert-warn">${tr('t2_warn_n10').replace('{n}', s1Vals.length)}</div>`;
+
+    html += `<div class="card"><div class="card-head">
+      <h3 class="card-title">${tr('t2_s1_res')}</h3>
+      <span class="badge ${r1.passL1 ? 'badge-ok' : 'badge-danger'}">${r1.passL1 ? tr('pass') + ' (AV ≤ 15.0)' : tr('fail') + ' (AV > 15.0)'}</span>
+    </div>
+    <div class="grid-4">
+      <div class="kpi"><div class="kpi-label">Mean (X̄) / RSD</div><div class="kpi-val">${fmt(r1.xbar, 2)}%</div><div class="kpi-sub">SD = ${fmt(r1.s, 3)} | %RSD = ${fmt(r1.rsd, 2)}%</div></div>
+      <div class="kpi"><div class="kpi-label">Reference (M)</div><div class="kpi-val">${fmt(r1.M, 2)}%</div><div class="kpi-sub">|M − X̄| = ${fmt(Math.abs(r1.M - r1.xbar), 3)}</div></div>
+      <div class="kpi"><div class="kpi-label">Acceptance Value (AV)</div><div class="kpi-val" style="color:${r1.passL1 ? 'var(--ok)' : 'var(--danger)'}">${fmt(r1.AV, 2)}</div><div class="kpi-sub">k = 2.4 | L₁ = 15.0</div></div>
+      <div class="kpi"><div class="kpi-label">Min / Max (n=${r1.n})</div><div class="kpi-val" style="font-size:15px">${fmt(Math.min(...s1Vals), 2)} – ${fmt(Math.max(...s1Vals), 2)}%</div><div class="kpi-sub">T = ${fmt(target, 1)}%</div></div>
+    </div></div>`;
+
+    let activeVals = s1Vals;
+    if (s2Extra.length > 0) {
+      const all30 = s1Vals.concat(s2Extra);
+      activeVals = all30;
+      const r2 = calcUsp905(all30, target, 2.0);
+      activeAV = r2.AV;
+      const passAll = r2.passL1 && r2.passL2;
+      if (all30.length !== 30) html += `<div class="alert alert-warn">${tr('t2_warn_n30').replace('{n}', all30.length)}</div>`;
+      html += `<div class="card"><div class="card-head">
+        <h3 class="card-title">${tr('t2_s2_res')}</h3>
+        <span class="badge ${passAll ? 'badge-ok' : 'badge-danger'}">${passAll ? tr('pass') : tr('fail')}</span>
+      </div>
+      <div class="grid-4">
+        <div class="kpi"><div class="kpi-label">Mean (X̄) / SD (n=${r2.n})</div><div class="kpi-val">${fmt(r2.xbar, 2)}%</div><div class="kpi-sub">SD = ${fmt(r2.s, 3)} | %RSD = ${fmt(r2.rsd, 2)}%</div></div>
+        <div class="kpi"><div class="kpi-label">Acceptance Value (AV)</div><div class="kpi-val" style="color:${r2.passL1 ? 'var(--ok)' : 'var(--danger)'}">${fmt(r2.AV, 2)}</div><div class="kpi-sub">k = 2.0 | M = ${fmt(r2.M, 2)}% | L₁ = 15.0</div></div>
+        <div class="kpi"><div class="kpi-label">${tr('t2_unit_bounds')}</div><div class="kpi-val" style="font-size:15px">[${fmt(r2.lowL2, 2)}, ${fmt(r2.highL2, 2)}]</div><div class="kpi-sub">L₂ = 25.0%</div></div>
+        <div class="kpi"><div class="kpi-label">${tr('t2_out_units')}</div><div class="kpi-val" style="color:${r2.passL2 ? 'var(--ok)' : 'var(--danger)'}">${r2.outUnits.length}</div><div class="kpi-sub">${r2.outUnits.length ? r2.outUnits.map(v => fmt(v, 2)).join(', ') : 'All within bounds'}</div></div>
+      </div></div>`;
+    }
+
+    const nTI = activeVals.length, mTI = Stat.mean(activeVals), sTI = Stat.sd(activeVals);
+    const k2 = Stat.howeK2(nTI, conf, cov);
+    const tiLo = mTI - k2 * sTI, tiHi = mTI + k2 * sTI;
+    const tiPass = (!Number.isFinite(lsl) || tiLo >= lsl) && (!Number.isFinite(usl) || tiHi <= usl);
+
+    html += `<div class="card"><div class="card-head">
+      <h3 class="card-title">${tr('t2_ti_res')} (n = ${nTI})</h3>
+      <span class="badge ${tiPass ? 'badge-ok' : 'badge-warn'}">${tiPass ? tr('pass') : tr('fail')}</span>
+    </div>
+    <div class="grid-4" style="margin-bottom:10px">
+      <div class="kpi"><div class="kpi-label">Confidence / Coverage</div><div class="kpi-val">${Math.round(conf * 100)}% / ${Math.round(cov * 100)}%</div><div class="kpi-sub">df = ${nTI - 1}</div></div>
+      <div class="kpi"><div class="kpi-label">Howe Factor (k₂)</div><div class="kpi-val">${fmt(k2, 4)}</div><div class="kpi-sub">k₂ × s = ${fmt(k2 * sTI, 3)}%</div></div>
+      <div class="kpi"><div class="kpi-label">Lower Tolerance Limit</div><div class="kpi-val">${fmt(tiLo, 2)}%</div><div class="kpi-sub">LSL = ${fmt(lsl, 1)}%</div></div>
+      <div class="kpi"><div class="kpi-label">Upper Tolerance Limit</div><div class="kpi-val">${fmt(tiHi, 2)}%</div><div class="kpi-sub">USL = ${fmt(usl, 1)}%</div></div>
+    </div>
+    <div class="alert ${tiPass ? 'alert-ok' : 'alert-warn'}">${tiPass ? tr('t2_ti_in_spec') : tr('t2_ti_out_spec')}</div>
+    ${renderMinitabReport(activeVals, mTI, sTI, tiLo, tiHi, k2, conf, cov, lsl, usl, target, activeAV)}
+    </div>`;
+
+    out.innerHTML = html;
+    bindMinitabChartInteractions();
+  }
+
+
+  function renderAllI18n() {
+    document.documentElement.lang = state.lang;
+    const bp = document.getElementById('btnPrint');
+    if (bp) bp.textContent = tr('print');
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = tr(el.dataset.i18n); });
+  }
+
+  function renderAllGrids() {
+    renderT2Grid();
+  }
+
+  function rerenderActiveOutputs() {
+    if (state.t2Rows.length > 0) runT2();
+  }
+
+  function bindEvents() {
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      document.getElementById('printMeta').textContent = new Date().toLocaleString(state.lang === 'vi' ? 'vi-VN' : 'en-US');
+      window.print();
+    });
+    document.getElementById('t2SampleBtn').addEventListener('click', loadT2Sample);
+    document.getElementById('t2RunBtn').addEventListener('click', runT2);
+    document.getElementById('t2AddRowBtn').addEventListener('click', () => { state.t2Rows.push(['', '']); renderT2Grid(); });
+    document.getElementById('t2ClearBtn').addEventListener('click', () => {
+      state.t2Rows = Array.from({ length: 10 }, () => ['', '']);
+      renderT2Grid();
+    });
+  }
+
+  window.__MINITAB_RD_STAT__ = Stat;
+
+  initParentSync();
+  renderAllI18n();
+  bindEvents();
+  loadT2Sample();
+})();
+</script>
+</body>
+</html>

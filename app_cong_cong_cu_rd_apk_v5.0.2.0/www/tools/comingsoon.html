@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team RD - Sắp Ra Mắt & Góp Ý Sản Phẩm</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com">
+window.addEventListener("DOMContentLoaded", applySoonLang);
+</script>
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'bounce-gentle': 'bounceGentle 2s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-12px) rotate(3deg)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(1.05)' },
+                        },
+                        bounceGentle: {
+                            '0%, 100%': { transform: 'translateY(-5%)' },
+                            '50%': { transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-input {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .glass-input:focus {
+            background: rgba(31, 41, 55, 0.8);
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        /* Glow effects */
+        .glow-bg-1 {
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+        .glow-bg-2 {
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center relative p-4 md:p-8">
+
+    <!-- Background Dynamic Ambient Glows -->
+    <div class="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] glow-bg-1 pointer-events-none animation-pulse-glow"></div>
+    <div class="fixed bottom-10 right-10 w-[400px] h-[400px] glow-bg-2 pointer-events-none"></div>
+
+    <!-- Header / Brand Logo -->
+    <header class="w-full max-w-5xl flex justify-between items-center py-4 z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 font-black text-white text-lg tracking-wider">
+                RD
+            </div>
+            <span class="font-bold text-xl tracking-tight text-white">Team <span class="text-indigo-400">RD</span></span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="sn_badge">Đang nghiên cứu & phát triển</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-4xl my-auto py-8 z-10 flex flex-col items-center">
+        
+        <!-- Animated Icons Banner Section -->
+        <div class="flex items-center justify-center space-x-6 mb-8 relative">
+            <!-- Hourglass Icon Box -->
+            <div class="relative group">
+                <div class="w-20 h-20 md:w-24 md:h-24 rounded-3xl glass-card flex items-center justify-center shadow-2xl border border-indigo-500/20 text-amber-400 text-3xl md:text-4xl transition-all duration-300 group-hover:scale-105 group-hover:border-amber-500/40">
+                    <i class="fa-solid fa-hourglass-half text-amber-400 animate-spin-slow inline-block"></i>
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    <span id="sn_status1">Đang thử nghiệm</span>
+                </div>
+            </div>
+
+            <!-- Connecting Indicator Line -->
+            <div class="hidden sm:flex items-center space-x-2 text-indigo-400/50">
+                <div class="w-2 h-2 rounded-full bg-indigo-500/40 animate-ping"></div>
+                <div class="w-12 h-[2px] bg-gradient-to-r from-indigo-500/40 to-indigo-500/10"></div>
+            </div>
+
+            <!-- Rocket Icon Box -->
+            <div class="relative group">
+                <div class="w-20 h-20 md:w-24 md:h-24 rounded-3xl glass-card flex items-center justify-center shadow-2xl border border-indigo-500/20 text-indigo-400 text-3xl md:text-4xl transition-all duration-300 group-hover:scale-105 group-hover:border-indigo-500/40 animate-float">
+                    <i class="fa-solid fa-rocket text-indigo-400"></i>
+                </div>
+                <div class="absolute -top-2 -right-2 bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    <span id="sn_status2">Sắp ra mắt</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Heading & Description -->
+        <div class="text-center max-w-2xl mb-10 px-4">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+                <span id="sn_h1_1">Team RD đang phát triển</span> <br class="hidden sm:inline" />
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">
+                    <span id="sn_h1_2">những công cụ đột phá tiếp theo</span>
+                </span>
+            </h1>
+            <p id="sn_desc" class="text-gray-400 text-base md:text-lg leading-relaxed mb-6">
+                Đội ngũ <strong>Team RD</strong> đang nỗ lực tối ưu và hoàn thiện từng tính năng. Hãy cùng chờ đón sản phẩm chính thức nhé!
+            </p>
+
+        </div>
+
+        <!-- Feedback Form Section -->
+        <div class="w-full max-w-xl glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <!-- Decorative Accent Bar -->
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-flask text-indigo-400"></i>
+                    <span id="sn_form_title">Gửi đóng góp cho Team RD</span>
+                </h2>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1">
+                    <span id="sn_form_sub">Ý kiến phản hồi của bạn sẽ giúp Team RD nâng cao chất lượng sản phẩm tốt hơn mỗi ngày.</span>
+                </p>
+            </div>
+
+            <!-- Form -->
+            <form id="feedbackForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="name" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Tên của bạn</label>
+                        <input type="text" id="name" required placeholder="Nguyễn Văn A" class="w-full glass-input rounded-xl px-4 py-2.5 text-sm transition duration-200">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Email liên hệ</label>
+                        <input type="email" id="email" required placeholder="you@example.com" class="w-full glass-input rounded-xl px-4 py-2.5 text-sm transition duration-200">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="feedback" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Góp ý & Ý tưởng</label>
+                    <textarea id="feedback" rows="4" required placeholder="Chia sẻ ý tưởng, tính năng bạn mong muốn hoặc giải pháp cùng Team RD..." class="w-full glass-input rounded-xl px-4 py-3 text-sm transition duration-200 resize-none"></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all duration-300 flex items-center justify-center space-x-2 group">
+                    <span id="sn_btn_txt">Gửi cho Team RD</span>
+                    <i class="fa-solid fa-paper-plane text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
+                </button>
+            </form>
+
+            <!-- Success Alert Message Box (Hidden by default) -->
+            <div id="successMessage" class="hidden transition-all duration-300 text-center py-6">
+                <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Cảm ơn góp ý của bạn!</h3>
+                <p class="text-sm text-gray-300 mt-1 max-w-sm mx-auto">
+                    Team RD đã ghi nhận phản hồi. Cảm ơn bạn đã dành thời gian đóng góp ý kiến! 
+                </p>
+                <button onclick="resetForm()" class="mt-4 text-xs font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-4">
+                    Gửi thêm đóng góp khác
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-5xl text-center py-4 text-xs text-gray-400 z-10 border-t border-gray-800/50 flex flex-col sm:flex-row items-center justify-center gap-2 px-4">
+        <p>© 2026 Team RD. All rights reserved. · Email: <a href="mailto:tlabtool@gmail.com" class="text-indigo-400 hover:text-indigo-300">tlabtool@gmail.com</a></p>
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        
+let currentLang = 'vi';
+try {
+    if (window.parent && window.parent.L) currentLang = window.parent.L;
+    else currentLang = localStorage.getItem('lang') || 'vi';
+} catch(e) {}
+
+const I18N_SOON = {
+    vi: {
+        badge: "Đang nghiên cứu & phát triển",
+        status1: "Đang thử nghiệm",
+        status2: "Sắp ra mắt",
+        h1_1: "Team RD đang phát triển",
+        h1_2: "những công cụ đột phá tiếp theo",
+        desc: "Đội ngũ <strong>Team RD</strong> đang nỗ lực tối ưu và hoàn thiện từng tính năng. Hãy cùng chờ đón sản phẩm chính thức nhé!",
+        form_title: "Gửi đóng góp cho Team RD",
+        form_sub: "Ý kiến phản hồi của bạn sẽ giúp Team RD nâng cao chất lượng sản phẩm tốt hơn mỗi ngày.",
+        lbl_name: "Họ và tên *",
+        lbl_email: "Email liên hệ *",
+        lbl_msg: "Nội dung góp ý & Đề xuất tính năng *",
+        ph_name: "Dược sĩ Nguyễn Văn A",
+        ph_email: "nguyenvana@gmail.com",
+        ph_msg: "Hãy chia sẻ mong muốn về tính năng mới, giao diện hoặc cải tiến công cụ...",
+        btn_txt: "Gửi cho Team RD",
+        ok_h: "Cảm ơn bạn đã đóng góp!",
+        ok_p: "Phản hồi của bạn đã được ghi nhận trực tiếp vào hệ thống."
+    },
+    en: {
+        badge: "In Research & Development",
+        status1: "Under Testing",
+        status2: "Coming Soon",
+        h1_1: "Team RD is engineering",
+        h1_2: "the next breakthrough pharmaceutical tools",
+        desc: "The <strong>Team RD</strong> engineering team is actively building and refining new features. Stay tuned for the upcoming releases!",
+        form_title: "Send Feedback to Team RD",
+        form_sub: "Your valuable insights empower Team RD to continuously enhance tool precision and user experience.",
+        lbl_name: "Full Name *",
+        lbl_email: "Contact Email *",
+        lbl_msg: "Feedback & Feature Proposals *",
+        ph_name: "Dr. / Pharmacist Name",
+        ph_email: "name@company.com",
+        ph_msg: "Share ideas, requested formulas, calculations, or usability suggestions...",
+        btn_txt: "Submit to Team RD",
+        ok_h: "Thank you for your feedback!",
+        ok_p: "Your submission has been recorded into the central tracker."
+    }
+};
+
+function applySoonLang() {
+    const L = I18N_SOON[currentLang] || I18N_SOON.vi;
+    document.documentElement.lang = currentLang;
+
+    const setT = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    const setH = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+    setT('sn_badge', L.badge);
+    setT('sn_status1', L.status1);
+    setT('sn_status2', L.status2);
+    setT('sn_h1_1', L.h1_1);
+    setT('sn_h1_2', L.h1_2);
+    setH('sn_desc', L.desc);
+    setT('sn_form_title', L.form_title);
+    setT('sn_form_sub', L.form_sub);
+    setT('sn_btn_txt', L.btn_txt);
+    setT('sn_ok_h', L.ok_h);
+
+    const nInp = document.getElementById('name');
+    if (nInp) nInp.placeholder = L.ph_name;
+    const eInp = document.getElementById('email');
+    if (eInp) eInp.placeholder = L.ph_email;
+    const mInp = document.getElementById('feedback');
+    if (mInp) mInp.placeholder = L.ph_msg;
+}
+
+function setLanguage(lang) {
+    if (lang !== 'vi' && lang !== 'en') return;
+    currentLang = lang;
+    applySoonLang();
+}
+
+window.addEventListener('message', function(e) {
+    if (!e.data) return;
+    if (e.data.lang) {
+        setLanguage(e.data.lang);
+    }
+});
+
+// Google Apps Script Web App URL
+        // Giữ URL deployment hiện tại nếu bạn cập nhật đúng deployment đó.
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyZJCPPciWnEDogxoEFo9TGbXsBDf5gkrX8h6xnepEnzxg62qrwkYERWCl-TgC9QO0uNw/exec';
+
+        let feedbackRequestTimer = null;
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('feedbackForm');
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const feedback = document.getElementById('feedback').value.trim();
+
+            if (!name || !email || !feedback) {
+                alert('Vui lòng điền đầy đủ họ tên, email và nội dung góp ý.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Đang lưu phản hồi...</span>
+            `;
+
+            // JSONP cho phép nhận phản hồi từ Apps Script mà không cần no-cors.
+            // Apps Script chỉ gọi callback success sau khi appendRow hoàn tất.
+            const callbackName = 'teamRdFeedbackCallback_' +
+                Date.now() + '_' + Math.random().toString(36).slice(2);
+            const query = new URLSearchParams({
+                action: 'submitFeedback',
+                name: name,
+                email: email,
+                feedback: feedback,
+                callback: callbackName
+            });
+
+            const script = document.createElement('script');
+            script.src = scriptURL + '?' + query.toString();
+            script.async = true;
+
+            let settled = false;
+
+            function finishRequest(success, message) {
+                if (settled) return;
+                settled = true;
+
+                if (feedbackRequestTimer) {
+                    clearTimeout(feedbackRequestTimer);
+                    feedbackRequestTimer = null;
+                }
+
+                try { delete window[callbackName]; } catch (_) {
+                    window[callbackName] = undefined;
+                }
+                script.remove();
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Gửi cho Team RD</span><i class="fa-solid fa-paper-plane text-xs"></i>`;
+
+                if (success) {
+                    form.classList.add('hidden');
+                    document.getElementById('successMessage').classList.remove('hidden');
+                } else {
+                    alert(message || 'Chưa xác nhận được việc lưu phản hồi. Vui lòng thử lại.');
+                }
+            }
+
+            window[callbackName] = function(result) {
+                if (result && result.result === 'success') {
+                    finishRequest(true);
+                } else {
+                    finishRequest(false, result && result.message
+                        ? result.message
+                        : 'Google Apps Script chưa xác nhận lưu dữ liệu.');
+                }
+            };
+
+            script.onerror = function() {
+                finishRequest(false, 'Không kết nối được với máy chủ lưu phản hồi. Vui lòng thử lại.');
+            };
+
+            feedbackRequestTimer = setTimeout(function() {
+                finishRequest(false, 'Đã hết thời gian chờ và chưa nhận được xác nhận lưu. Vui lòng kiểm tra kết nối rồi thử lại.');
+            }, 20000);
+
+            document.head.appendChild(script);
+        }
+
+        function resetForm() {
+            document.getElementById('feedbackForm').reset();
+            document.getElementById('feedbackForm').classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

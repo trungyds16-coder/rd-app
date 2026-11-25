@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>Hệ thống Kiểm soát & Phân tích Chất lượng Lô sản xuất</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f9;
+  --card: #ffffff;
+  --fg: #1f1f1f;
+  --mut: #5f6368;
+  --sub: #444746;
+  --bd: #e3e3e3;
+  --ac: #0b57d0;
+  --ac-hover: #0842a0;
+  --ac-subtle: rgba(11, 87, 208, 0.08);
+  --th: #f8fafc;
+  --th-fg: #475569;
+  --row-hover: #f1f5f9;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --font: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --success: #15803d;
+  --success-bg: #dcfce7;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+}
+[data-theme="dark"] {
+  --bg: #131314;
+  --card: #1e1f20;
+  --fg: #e3e3e3;
+  --mut: #8e918f;
+  --sub: #c4c7c5;
+  --bd: #444746;
+  --ac: #a8c7fa;
+  --ac-hover: #c2e7ff;
+  --ac-subtle: rgba(168, 199, 250, 0.12);
+  --th: #282a2c;
+  --th-fg: #cbd5e1;
+  --row-hover: #2a2b2e;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --success-bg: rgba(74, 222, 128, 0.15);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.15);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modern Top Header Bar */
+.top-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--bd);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+}
+.brand-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--fg);
+}
+.brand-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--ac-subtle);
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-dec {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.btn-dec:hover {
+  background: var(--row-hover);
+  border-color: var(--ac);
+}
+
+/* Layout */
+main {
+  flex: 1;
+  max-width: 1520px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 12px 14px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 420px 1fr;
+  height: calc(100vh - 54px);
+  overflow: hidden;
+}
+@media (max-width: 1020px) {
+  body { height: auto; overflow-x: hidden; overflow-y: auto; }
+  main { height: auto; grid-template-columns: 1fr; overflow: visible; padding: 10px; }
+  .scroll-pane { max-height: none !important; overflow: visible !important; padding-right: 0; }
+  .top-bar { padding: 8px 12px; flex-wrap: wrap; }
+  .top-actions { width: 100%; justify-content: space-between; margin-top: 4px; }
+}
+
+.scroll-pane {
+  overflow-y: auto;
+  max-height: calc(100vh - 78px);
+  padding-right: 6px;
+}
+.scroll-pane::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-pane::-webkit-scrollbar-thumb {
+  background: var(--bd);
+  border-radius: 4px;
+}
+
+/* Card Container */
+.card {
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px solid var(--bd);
+}
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ac);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Section Blocks */
+.section-block {
+  border: 1px solid var(--bd);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  background: var(--card);
+  transition: border-color 0.15s ease;
+}
+.section-block:hover {
+  border-color: rgba(11, 87, 208, 0.3);
+}
+.section-block h2 {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.generator-box {
+  background: var(--card);
+  border-color: var(--ac);
+}
+
+/* Labels and Inputs */
+label {
+  display: block;
+  margin: 6px 0 3px;
+  font-weight: 600;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+label.sub {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--mut);
+  margin-top: 2px;
+}
+input[type=text], input[type=number], textarea, select {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  transition: all 0.15s ease;
+}
+textarea {
+  height: 90px;
+  font-family: monospace;
+  font-size: 11.5px;
+  line-height: 1.4;
+  white-space: pre;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px var(--ac-subtle);
+}
+.row {
+  display: flex;
+  gap: 8px;
+}
+.row > div {
+  flex: 1;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  width: 100%;
+  padding: 8px 14px;
+  margin-top: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--ac);
+  color: #fff;
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+button:hover {
+  opacity: 0.92;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+button.secondary {
+  background: var(--th);
+  color: var(--fg);
+  border: 1px solid var(--bd);
+}
+button.secondary:hover {
+  background: var(--row-hover);
+  border-color: var(--mut);
+}
+button.success {
+  background: #0b57d0;
+}
+button.mini {
+  width: auto;
+  margin: 0;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  border-radius: 20px;
+}
+
+/* Mode Switch Pills */
+.mode-switch-wrap {
+  display: inline-flex;
+  background: var(--th);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.mode-pill {
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mut);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mode-pill.active {
+  background: var(--card);
+  color: var(--ac);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.mode-pill input {
+  display: none;
+}
+
+/* Canvas Styling */
+.canvas-card {
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: var(--card);
+  margin-bottom: 12px;
+}
+.canvas-card h3 {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ac);
+  text-align: center;
+  margin: 0 0 10px;
+}
+canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  display: block;
+  border: 1px solid var(--bd);
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+/* Results and Tables */
+.result-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.result-card {
+  border: 1px solid var(--bd);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--card);
+}
+.hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.hd h2 {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--fg);
+}
+.tw {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bd);
+  width: 100%;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--card);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+th, td {
+  border: 1px solid var(--bd);
+  padding: 7px 10px;
+  text-align: center;
+}
+th {
+  background: var(--th);
+  color: var(--th-fg);
+  font-weight: 600;
+  font-size: 11.5px;
+}
+td:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+tbody tr:hover {
+  background: var(--row-hover);
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge-pass {
+  background: var(--success-bg);
+  color: var(--success);
+}
+.badge-review {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* Mobile Overflow Fix */
+html, body { max-width: 100%; overflow-x: hidden; }
+main { grid-template-columns: 420px minmax(0, 1fr); }
+.scroll-pane, .card, .section-block, .result-box, .result-card, .canvas-card, .tw, .row > div { min-width: 0; max-width: 100%; }
+.tw { -webkit-overflow-scrolling: touch; }
+.card-header, .hd, .top-actions, .mode-switch-wrap, .section-block h2 { flex-wrap: wrap; gap: 6px; }
+.brand-title { min-width: 0; flex: 1; }
+.brand-title span { overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 1020px) {
+  main { grid-template-columns: minmax(0, 1fr); max-width: 100%; overflow-x: hidden; padding: 8px; gap: 10px; }
+  .card { padding: 12px; }
+  .section-block { padding: 10px; }
+  .result-card, .canvas-card { padding: 10px; }
+}
+@media (max-width: 560px) {
+  .row { flex-wrap: wrap; }
+  .row > div { flex: 1 1 calc(50% - 4px); min-width: 120px; }
+  .top-bar { padding: 8px 10px; }
+  .mode-pill { padding: 4px 10px; font-size: 11.5px; }
+  table { font-size: 11px; }
+  th, td { padding: 5px 6px; }
+}
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div class="brand-title">
+    <div class="brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/><circle cx="14" cy="14" r="1"/></svg>
+    </div>
+    <span id="txt_app_title">Hệ thống Kiểm soát & Phân tích Chất lượng Lô sản xuất</span>
+  </div>
+  <div class="top-actions">
+    <button id="btn_dec" class="btn-dec" type="button" title="Chuyển đổi dấu thập phân">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="19" r="1.5"/></svg>
+      <span id="dec_label">Dấu thập phân: Chấm (.)</span>
+    </button>
+    <button id="s" class="secondary" type="button" style="width:auto;margin:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span id="txt_save_png">Lưu PNG</span>
+    </button>
+  </div>
+</header>
+
+<main>
+<!-- CỘT TRÁI: CÀI ĐẶT -->
+<section class="card scroll-pane">
+  <div class="card-header">
+    <h1 class="card-title" id="txt_sec1_title">1. Cài đặt & Sinh dữ liệu độc lập</h1>
+  </div>
+
+  <div style="margin-bottom:12px">
+    <label id="lbl_lot">Mã lô sản xuất</label>
+    <input type="text" id="lot" value="0222NC">
+  </div>
+
+  <!-- Yêu cầu 1 -->
+  <div class="section-block">
+    <h2 id="t_req1">Yêu cầu 1: Hàm lượng 10 vị trí</h2>
+    <div class="row">
+      <div><label id="lbl_h_min">Min</label><input type="number" step="any" id="h_min" value="11.25"></div>
+      <div><label id="lbl_h_max">Max</label><input type="number" step="any" id="h_max" value="13.75"></div>
+      <div><label id="lbl_h_mean">TB mong muốn</label><input type="number" step="any" id="h_mean" value="12.50"></div>
+    </div>
+    <button id="btn_ham_luong" class="success" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span id="txt_btn_h">Tạo dữ liệu Hàm lượng</span>
+    </button>
+  </div>
+
+  <!-- Yêu cầu 2 -->
+  <div class="section-block">
+    <h2 id="t_req2">Yêu cầu 2: Dập viên theo số khoảng động</h2>
+    <div class="row">
+      <div><label id="lbl_d_tot">Tổng số viên lô</label><input type="number" id="d_total_v" value="400000"></div>
+      <div><label id="lbl_d_spd">Tốc độ (v/p)</label><input type="number" id="d_speed" value="200"></div>
+    </div>
+    <div class="row">
+      <div><label id="lbl_d_m">KLTBV (mg)</label><input type="number" step="any" id="d_m" value="120"></div>
+      <div><label id="lbl_d_min">Min</label><input type="number" step="any" id="d_min" value="111"></div>
+      <div><label id="lbl_d_max">Max</label><input type="number" step="any" id="d_max" value="129"></div>
+    </div>
+    <div class="row">
+      <div><label id="lbl_d_chay">Số chày</label><input type="number" id="d_b" value="27"></div>
+      <div><label id="lbl_d_pheu">Số phễu</label><input type="number" id="d_c" value="2"></div>
+      <div><label id="lbl_d_phut">Phút/lần</label><input type="number" id="d_d" value="15"></div>
+    </div>
+    <button id="btn_dap_vien" class="success" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v20"/><path d="M2 12h20"/></svg>
+      <span id="txt_btn_dv">Tạo dữ liệu Dập viên động chuẩn</span>
+    </button>
+  </div>
+
+  <!-- Yêu cầu 3 -->
+  <div class="section-block generator-box">
+    <h2 id="t_req3">Yêu cầu 3: Đồng đều khối lượng & Biểu đồ Cpk</h2>
+    <label style="font-weight:normal; margin-bottom:6px; color:var(--ac); cursor:pointer">
+      <input type="checkbox" id="sync_cols_chk" checked>
+      <span id="txt_sync_cols">Đồng bộ số thời điểm (cột) theo Yêu cầu 2</span>
+    </label>
+    <div class="row">
+      <div><label id="lbl_gen_cols">Số thời điểm (cột)</label><input type="number" id="gen_cols" value="12" min="2" max="50"></div>
+      <div><label id="lbl_gen_rows">Số mẫu/thời điểm</label><input type="number" id="gen_rows" value="20" min="2" max="100"></div>
+    </div>
+    <div class="row">
+      <div><label id="lbl_gen_mean">Trung bình mong muốn</label><input type="number" step="any" id="gen_mean" value="120"></div>
+      <div><label id="lbl_gen_sd">Độ lệch chuẩn (SD)</label><input type="number" step="any" id="gen_sd" value="2"></div>
+    </div>
+    <div class="row">
+      <div><label id="lbl_gen_min">Giá trị Min (b)</label><input type="number" step="any" id="gen_min" value="111"></div>
+      <div><label id="lbl_gen_max">Giá trị Max (c)</label><input type="number" step="any" id="gen_max" value="129"></div>
+    </div>
+    
+    <div class="row" style="margin-top:6px;">
+      <div>
+        <button id="btn_gen_p1" class="secondary" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+          <span id="txt_gen_p1">Sinh dữ liệu Phễu 1</span>
+        </button>
+      </div>
+      <div>
+        <button id="btn_gen_p2" class="secondary" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+          <span id="txt_gen_p2">Sinh dữ liệu Phễu 2</span>
+        </button>
+      </div>
+    </div>
+
+    <div style="margin-top:10px; border-top:1px dashed var(--bd); padding-top:8px">
+      <label style="font-weight:normal; cursor:pointer">
+        <input type="checkbox" id="a" checked>
+        <span id="txt_auto_lsl">Tự tính LSL/USL = Mục tiêu ± %</span>
+      </label>
+      <div class="row">
+        <div><label id="lbl_t">Mục tiêu</label><input type="number" step="any" id="T" value="120"></div>
+        <div><label id="lbl_p">± %</label><input type="number" step="any" id="p" value="7.5"></div>
+      </div>
+      <div class="row">
+        <div><label>LSL</label><input type="number" step="any" id="L" value="111"></div>
+        <div><label>USL</label><input type="number" step="any" id="U" value="129"></div>
+      </div>
+      <label id="lbl_d">Dữ liệu thô Cpk (Phân chia Phễu 1, Phễu 2 & Toàn Lô)</label>
+      <textarea id="d" style="height: 100px;"></textarea>
+      <label style="font-weight:normal; cursor:pointer">
+        <input type="checkbox" id="t">
+        <span id="txt_subgroup">Mỗi hàng là nhóm con</span>
+      </label>
+      <button id="go" type="button" style="background:var(--ac)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <span id="txt_btn_go">Vẽ lại Biểu đồ Cpk</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Yêu cầu 4 -->
+  <div class="section-block">
+    <h2 id="t_req4">Yêu cầu 4: Bao phim (200 viên / 10 vị trí)</h2>
+    <label style="cursor:pointer">
+      <input type="checkbox" id="bao_phim_chk" checked>
+      <span id="txt_bp_chk">Thực hiện bao phim</span>
+    </label>
+    <div class="row">
+      <div><label id="lbl_bp_min">Min tăng trọng (%)</label><input type="number" step="any" id="bp_min" value="2.0"></div>
+      <div><label id="lbl_bp_max">Max tăng trọng (%)</label><input type="number" step="any" id="bp_max" value="4.0"></div>
+    </div>
+    <button id="btn_baophim" class="success" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+      <span id="txt_btn_bp">Tạo dữ liệu Bao phim chuẩn</span>
+    </button>
+  </div>
+
+  <p id="msg" style="color:var(--danger);font-size:12px;margin:4px 0 0;min-height:16px"></p>
+</section>
+
+<!-- CỘT PHẢI: KẾT QUẢ -->
+<section class="card scroll-pane">
+  <div class="card-header">
+    <h1 class="card-title" id="txt_sec2_title">2. Bảng kết quả & Trực quan hóa dữ liệu</h1>
+  </div>
+
+  <div class="result-box">
+    <!-- Bảng 1 -->
+    <div class="result-card">
+      <div class="hd">
+        <h2 id="t_tbl1">Bảng 1: Kiểm nghiệm độ phân tán hàm lượng (10 vị trí)</h2>
+        <button class="mini secondary copy-btn" type="button" data-t="tbl_hamluong">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="cp-txt">Sao chép bảng</span>
+        </button>
+      </div>
+      <div class="tw"><table id="tbl_hamluong"><tr><td>Chưa tạo dữ liệu.</td></tr></table></div>
+    </div>
+
+    <!-- Bảng 2 -->
+    <div class="result-card">
+      <div class="hd">
+        <h2 id="t_tbl2">Bảng 2: Theo dõi khối lượng dập viên theo thời điểm (Phễu động)</h2>
+        <button class="mini secondary copy-btn" type="button" data-t="tbl_dapvien">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="cp-txt">Sao chép bảng</span>
+        </button>
+      </div>
+      <div class="tw"><table id="tbl_dapvien"><tr><td>Chưa tạo dữ liệu.</td></tr></table></div>
+    </div>
+
+    <!-- Yêu cầu 3 Section -->
+    <div class="result-card" style="border:1.5px solid var(--ac)">
+      <div class="hd">
+        <h2 style="color:var(--ac)" id="t_cpk_section">Yêu cầu 3: Đồng đều khối lượng & Phân tích Cpk chi tiết theo Phễu</h2>
+      </div>
+      
+      <div>
+        <div class="hd" style="margin-top:6px">
+          <h3 id="title_tbl3" style="font-size:12.5px; margin:0; font-weight:700">Bảng 3: Khối lượng viên từng thời điểm (Phễu 1)</h3>
+          <button class="mini secondary copy-btn" type="button" data-t="tbl_pheu1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="cp-txt">Sao chép bảng</span>
+          </button>
+        </div>
+        <div class="tw" style="margin-top:6px"><table id="tbl_pheu1"><tr><td>Chưa tạo dữ liệu.</td></tr></table></div>
+      </div>
+
+      <div id="container_tbl4" style="display:none; margin-top:14px">
+        <div class="hd">
+          <h3 id="title_tbl4" style="font-size:12.5px; margin:0; font-weight:700">Bảng 4: Khối lượng viên từng thời điểm (Phễu 2)</h3>
+          <button class="mini secondary copy-btn" type="button" data-t="tbl_pheu2">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="cp-txt">Sao chép bảng</span>
+          </button>
+        </div>
+        <div class="tw" style="margin-top:6px"><table id="tbl_pheu2"><tr><td>Chưa tạo dữ liệu.</td></tr></table></div>
+      </div>
+
+      <!-- Mode Switch -->
+      <div style="margin-top:16px; text-align:center">
+        <div class="mode-switch-wrap">
+          <label class="mode-pill active" id="pill_simple">
+            <input type="radio" name="view_mode" value="simple" checked>
+            <span id="txt_view_simple">Biểu đồ Cpk đơn giản</span>
+          </label>
+          <label class="mode-pill" id="pill_sixpack">
+            <input type="radio" name="view_mode" value="sixpack">
+            <span id="txt_view_sixpack">Biểu đồ Cpk Six Pack</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Biểu đồ Phễu 1 -->
+      <div id="wrap_cv1" class="canvas-card">
+        <h3 id="lbl_cv1">BIỂU ĐỒ HIỆU NĂNG PHỄU 1</h3>
+        <canvas id="cv1" width="1290" height="960"></canvas>
+      </div>
+
+      <!-- Biểu đồ Phễu 2 -->
+      <div id="wrap_cv2" class="canvas-card" style="display:none">
+        <h3 id="lbl_cv2">BIỂU ĐỒ HIỆU NĂNG PHỄU 2</h3>
+        <canvas id="cv2" width="1290" height="960"></canvas>
+      </div>
+
+      <!-- Biểu đồ Toàn Lô -->
+      <div id="wrap_cv_total" class="canvas-card">
+        <h3 id="lbl_cv_total">BIỂU ĐỒ HIỆU NĂNG TOÀN LÔ</h3>
+        <canvas id="cv_total" width="1290" height="960"></canvas>
+      </div>
+    </div>
+    
+    <!-- Bảng Thống kê Cpk -->
+    <div class="result-card">
+      <div class="hd">
+        <h2 id="t_tbl_cpk">Thống kê chi tiết chỉ số Cpk / Ppk theo Phễu & Tổng lô</h2>
+        <button class="mini secondary copy-btn" type="button" data-t="tb">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="cp-txt">Sao chép bảng</span>
+        </button>
+      </div>
+      <div class="tw"><table id="tb"></table></div>
+    </div>
+
+    <!-- Bảng 5: Bao phim -->
+    <div class="result-card">
+      <div class="hd">
+        <h2 id="t_tbl_bp">Bảng 5 (Bao phim): Kiểm soát tăng trọng trong quá trình bao phim (Yêu cầu 4)</h2>
+        <button class="mini secondary copy-btn" type="button" data-t="tbl_baophim">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="cp-txt">Sao chép bảng</span>
+        </button>
+      </div>
+      <div class="tw"><table id="tbl_baophim"><tr><td>Chưa tạo dữ liệu.</td></tr></table></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+const $ = i => document.getElementById(i);
+let DEC = '.', curLang = 'vi';
+
+const DICT = {
+  vi: {
+    app_title: 'Hệ thống Kiểm soát & Phân tích Chất lượng Lô sản xuất',
+    dec_dot: 'Dấu thập phân: Chấm (.)',
+    dec_comma: 'Dấu thập phân: Phẩy (,)',
+    save_png: 'Lưu PNG',
+    sec1_title: '1. Cài đặt & Sinh dữ liệu độc lập',
+    sec2_title: '2. Bảng kết quả & Trực quan hóa dữ liệu',
+    lot_lbl: 'Mã lô sản xuất',
+    copy_btn: 'Sao chép bảng',
+    copied_btn: 'Đã chép',
+    no_data: 'Chưa tạo dữ liệu.',
+    pass: 'Đạt',
+    review: 'Xem lại',
+    req1_h: 'Yêu cầu 1: Hàm lượng 10 vị trí',
+    btn_h: 'Tạo dữ liệu Hàm lượng',
+    req2_h: 'Yêu cầu 2: Dập viên theo số khoảng động',
+    btn_dv: 'Tạo dữ liệu Dập viên động chuẩn',
+    req3_h: 'Yêu cầu 3: Đồng đều khối lượng & Biểu đồ Cpk',
+    sync_cols: 'Đồng bộ số thời điểm (cột) theo Yêu cầu 2',
+    gen_p1: 'Sinh dữ liệu Phễu 1',
+    gen_p2: 'Sinh dữ liệu Phễu 2',
+    auto_lsl: 'Tự tính LSL/USL = Mục tiêu ± %',
+    subgroup: 'Mỗi hàng là nhóm con',
+    btn_go: 'Vẽ lại Biểu đồ Cpk',
+    req4_h: 'Yêu cầu 4: Bao phim (200 viên / 10 vị trí)',
+    bp_chk: 'Thực hiện bao phim',
+    btn_bp: 'Tạo dữ liệu Bao phim chuẩn',
+    tbl1_t: 'Bảng 1: Kiểm nghiệm độ phân tán hàm lượng (10 vị trí)',
+    tbl2_t: 'Bảng 2: Theo dõi khối lượng dập viên theo thời điểm (Phễu động)',
+    cpk_sec: 'Yêu cầu 3: Đồng đều khối lượng & Phân tích Cpk chi tiết theo Phễu',
+    tbl3_t: 'Bảng 3: Khối lượng viên từng thời điểm (Phễu 1)',
+    tbl4_t: 'Bảng 4: Khối lượng viên từng thời điểm (Phễu 2)',
+    view_simple: 'Biểu đồ Cpk đơn giản',
+    view_sixpack: 'Biểu đồ Cpk Six Pack',
+    tbl_cpk_t: 'Thống kê chi tiết chỉ số Cpk / Ppk theo Phễu & Tổng lô',
+    tbl_bp_t: 'Bảng 5 (Bao phim): Kiểm soát tăng trọng trong quá trình bao phim (Yêu cầu 4)',
+    cv1_t: 'BIỂU ĐỒ HIỆU NĂNG PHỄU 1',
+    cv2_t: 'BIỂU ĐỒ HIỆU NĂNG PHỄU 2',
+    cv_tot_t: 'BIỂU ĐỒ HIỆU NĂNG TOÀN LÔ',
+    time_labels: ['Đầu lô', 'Cuối lô'],
+    stt: 'STT viên',
+    mass_h: 'Khối lượng viên (mg)',
+    mean_val: 'KLTB viên',
+    result: 'Kết quả',
+    lot_col: 'Số lô',
+    accept_crit: 'Chỉ tiêu chấp nhận',
+    crit_h_text: 'Từng giá trị: GT trung bình ± 10%, RSD ≤ 5,0%',
+    mean_abbr: 'Trung bình (TB)',
+    time_col: 'Thời điểm',
+    total_batch_text: 'viên | Số khoảng:',
+    no_bp: 'Không thực hiện quy trình bao phim.'
+  },
+  en: {
+    app_title: 'Batch Quality Control & Capability Analysis System',
+    dec_dot: 'Decimal separator: Period (.)',
+    dec_comma: 'Decimal separator: Comma (,)',
+    save_png: 'Export PNG',
+    sec1_title: '1. Parameters & Independent Generation',
+    sec2_title: '2. Result Tables & Data Visualization',
+    lot_lbl: 'Batch Number',
+    copy_btn: 'Copy Table',
+    copied_btn: 'Copied',
+    no_data: 'No data generated yet.',
+    pass: 'Pass',
+    review: 'Review',
+    req1_h: 'Requirement 1: Content Uniformity (10 Locations)',
+    btn_h: 'Generate Assay Data',
+    req2_h: 'Requirement 2: Compression Tracking across Dynamic Intervals',
+    btn_dv: 'Generate Compression Tracking Data',
+    req3_h: 'Requirement 3: Mass Uniformity & Cpk Capability Charts',
+    sync_cols: 'Sync time intervals (columns) with Requirement 2',
+    gen_p1: 'Generate Hopper 1 Data',
+    gen_p2: 'Generate Hopper 2 Data',
+    auto_lsl: 'Auto calculate LSL/USL = Target ± %',
+    subgroup: 'Each row is a subgroup',
+    btn_go: 'Redraw Cpk Charts',
+    req4_h: 'Requirement 4: Film Coating (200 Tablets / 10 Locations)',
+    bp_chk: 'Perform film coating',
+    btn_bp: 'Generate Film Coating Data',
+    tbl1_t: 'Table 1: Content Uniformity Assay (10 Sampling Locations)',
+    tbl2_t: 'Table 2: Tablet Mass Monitoring across Time (Dynamic Hoppers)',
+    cpk_sec: 'Requirement 3: Mass Uniformity & Detailed Cpk Analysis by Hopper',
+    tbl3_t: 'Table 3: Tablet Mass across Time (Hopper 1)',
+    tbl4_t: 'Table 4: Tablet Mass across Time (Hopper 2)',
+    view_simple: 'Simple Cpk Report',
+    view_sixpack: 'Cpk Sixpack Chart',
+    tbl_cpk_t: 'Detailed Cpk / Ppk Indices by Hopper & Batch Total',
+    tbl_bp_t: 'Table 5: Film Coating Weight Gain Control (Requirement 4)',
+    cv1_t: 'CAPABILITY CHART - HOPPER 1',
+    cv2_t: 'CAPABILITY CHART - HOPPER 2',
+    cv_tot_t: 'OVERALL BATCH CAPABILITY CHART',
+    time_labels: ['Beginning', 'End'],
+    stt: 'Tablet No.',
+    mass_h: 'Tablet Mass (mg)',
+    mean_val: 'Mean Tablet Mass',
+    result: 'Result',
+    lot_col: 'Batch No.',
+    accept_crit: 'Acceptance Criteria',
+    crit_h_text: 'Individual: Mean ± 10%, RSD ≤ 5.0%',
+    mean_abbr: 'Mean',
+    time_col: 'Time Interval',
+    total_batch_text: 'tablets | Intervals:',
+    no_bp: 'Film coating process was not performed.'
+  }
+};
+
+const sum = a => a.reduce((x, y) => x + y, 0), mean = a => sum(a) / a.length, sd = a => { const m = mean(a); return Math.sqrt(sum(a.map(v => (v - m) ** 2)) / (a.length - 1)); };
+function lg(x) { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, .1208650973866179e-2, -.5395239384953e-5]; let y = x, t = x + 5.5; t -= (x + .5) * Math.log(t); let s = 1.000000000190015; for (const v of c) s += v / ++y; return -t + Math.log(2.5066282746310005 * s / x); }
+const c4 = n => Math.sqrt(2 / (n - 1)) * Math.exp(lg(n / 2) - lg((n - 1) / 2));
+function erfc(x) { const z = Math.abs(x), t = 1 / (1 + .5 * z), r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (.37409196 + t * (.09678418 + t * (-.18628806 + t * (.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-.82215223 + t * .17087277))))))))); return x >= 0 ? r : 2 - r; }
+const Phi = z => erfc(-z / Math.SQRT2) / 2, iPhi = p => { let a = -9, b = 9; for (let i = 0; i < 60; i++) { const m = (a + b) / 2; Phi(m) < p ? a = m : b = m; } return (a + b) / 2; };
+const nt = (a, b, k) => { const r = (b - a) / k, p = 10 ** Math.floor(Math.log10(r)), f = r / p, s = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p, o = []; for (let v = Math.ceil(a / s - 1e-9) * s; v <= b + 1e-9; v += s) o.push(+v.toFixed(6)); return o; };
+const f = (v, d) => isFinite(v) ? v.toFixed(d) : '*';
+function randn_bm() { let u = 0, v = 0; while (u === 0) u = Math.random(); while (v === 0) v = Math.random(); return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v); }
+
+let globalPheuData = { p1: [], p2: [], times: [] };
+let calculatedColsFromReq2 = 12;
+
+function getComputedCols() {
+  if ($('sync_cols_chk').checked) return calculatedColsFromReq2;
+  return parseInt($('gen_cols').value) || 12;
+}
+
+function updateColsInputState() {
+  const isSync = $('sync_cols_chk').checked;
+  $('gen_cols').disabled = isSync;
+  if (isSync) $('gen_cols').value = calculatedColsFromReq2;
+}
+
+function generateTimeLabels(cols) {
+  const L = DICT[curLang];
+  let labels = [L.time_labels[0]];
+  let stepMin = parseInt($('d_d').value) || 15;
+  for (let i = 1; i < cols - 1; i++) {
+    labels.push(`${i * stepMin} ${curLang === 'vi' ? 'phút' : 'min'}`);
+  }
+  if (cols > 1) labels.push(L.time_labels[1]);
+  return labels;
+}
+
+$('sync_cols_chk').onchange = () => {
+  updateColsInputState();
+  generatePheu1Data();
+  let numPheu = parseInt($('d_c').value) || 2;
+  if (numPheu >= 2) generatePheu2Data();
+};
+
+function autoCalculateLSLUSL() {
+  if ($('a').checked) {
+    let T_val = pf($('T').value) || 120;
+    let p_val = pf($('p').value) || 7.5;
+    let l_val = +(T_val * (1 - p_val / 100)).toFixed(2);
+    let u_val = +(T_val * (1 + p_val / 100)).toFixed(2);
+    $('L').value = fmtIn(l_val);
+    $('U').value = fmtIn(u_val);
+  }
+}
+
+// SINH DỮ LIỆU ĐỘC LẬP CHO PHỄU 1
+function generatePheu1Data() {
+  autoCalculateLSLUSL();
+  const cols = getComputedCols();
+  const rows = parseInt($('gen_rows').value) || 20;
+  const mMean = pf($('gen_mean').value) || 120;
+  const mSd = pf($('gen_sd').value) || 2;
+  const minVal = pf($('gen_min').value) || 111;
+  const maxVal = pf($('gen_max').value) || 129;
+
+  let matrixP1 = [];
+  for (let r = 0; r < rows; r++) {
+    let rowData = [];
+    for (let c = 0; c < cols; c++) {
+      let val, count = 0;
+      do {
+        val = mMean + randn_bm() * mSd;
+        count++;
+        if (count > 50) { val = Math.max(minVal, Math.min(maxVal, val)); break; }
+      } while (val < minVal || val > maxVal);
+      rowData.push(Math.round(val * 10) / 10);
+    }
+    matrixP1.push(rowData);
+  }
+  globalPheuData.p1 = Array.from({ length: cols }, (_, c) => matrixP1.map(row => row[c]));
+  globalPheuData.times = generateTimeLabels(cols);
+
+  renderPheuTableStructure(3, globalPheuData.p1, globalPheuData.times, mMean);
+  syncTextAreaAndChart();
+}
+
+// SINH DỮ LIỆU ĐỘC LẬP CHO PHỄU 2
+function generatePheu2Data() {
+  autoCalculateLSLUSL();
+  const cols = getComputedCols();
+  const rows = parseInt($('gen_rows').value) || 20;
+  const mMean = pf($('gen_mean').value) || 120;
+  const mSd = pf($('gen_sd').value) || 2;
+  const minVal = pf($('gen_min').value) || 111;
+  const maxVal = pf($('gen_max').value) || 129;
+
+  let matrixP2 = [];
+  for (let r = 0; r < rows; r++) {
+    let rowData = [];
+    for (let c = 0; c < cols; c++) {
+      let val, count = 0;
+      do {
+        val = mMean + randn_bm() * mSd;
+        count++;
+        if (count > 50) { val = Math.max(minVal, Math.min(maxVal, val)); break; }
+      } while (val < minVal || val > maxVal);
+      rowData.push(Math.round(val * 10) / 10);
+    }
+    matrixP2.push(rowData);
+  }
+  globalPheuData.p2 = Array.from({ length: cols }, (_, c) => matrixP2.map(row => row[c]));
+  globalPheuData.times = generateTimeLabels(cols);
+
+  $('container_tbl4').style.display = 'block';
+  renderPheuTableStructure(4, globalPheuData.p2, globalPheuData.times, mMean);
+  syncTextAreaAndChart();
+}
+
+$('btn_gen_p1').onclick = generatePheu1Data;
+$('btn_gen_p2').onclick = generatePheu2Data;
+
+// ĐỒNG BỘ DỮ LIỆU TỪ GLOBAL PDS VÀO TEXTAREA
+function syncTextAreaAndChart() {
+  let numPheu = parseInt($('d_c').value) || 2;
+  let rawTextContent = `=== PHỄU 1 ===\n`;
+  if (globalPheuData.p1.length > 0) {
+    globalPheuData.p1.forEach(colArr => { rawTextContent += colArr.join('\t') + '\n'; });
+  }
+
+  if (numPheu >= 2 && globalPheuData.p2.length > 0) {
+    rawTextContent += `\n=== PHỄU 2 ===\n`;
+    globalPheuData.p2.forEach(colArr => { rawTextContent += colArr.join('\t') + '\n'; });
+
+    let combinedAll = globalPheuData.p1.concat(globalPheuData.p2);
+    rawTextContent += `\n=== TOÀN LÔ (PHỄU 1 + PHỄU 2) ===\n`;
+    combinedAll.forEach(colArr => { rawTextContent += colArr.join('\t') + '\n'; });
+  }
+  $('d').value = rawTextContent.replace(/\./g, DEC);
+  updateChart();
+}
+
+// YÊU CẦU 1: HÀM LƯỢNG
+$('btn_ham_luong').onclick = () => {
+  const L = DICT[curLang];
+  let hMean = pf($('h_mean').value) || 12.5;
+  let vList = [];
+  for (let i = 0; i < 10; i++) vList.push(+(hMean + (Math.random() - 0.5) * 0.8).toFixed(2));
+  let mH = mean(vList), sH = sd(vList), rsdH = (sH / mH) * 100;
+  let minH = Math.min(...vList), maxH = Math.max(...vList);
+  let l_10 = hMean * 0.9, u_10 = hMean * 1.1;
+  let isPassH = (rsdH <= 5.0 && minH >= l_10 && maxH <= u_10);
+  let badge = isPassH ? `<span class="badge badge-pass">${L.pass}</span>` : `<span class="badge badge-review">${L.review}</span>`;
+  let lotName = $('lot').value;
+
+  let posTitle = curLang === 'vi' ? 'Vị trí' : 'Loc';
+  let htmlH = `<tr><th>${L.lot_col}</th><th>${L.accept_crit}</th>` + Array.from({ length: 10 }, (_, i) => `<th>${posTitle} ${i + 1}</th>`).join('') + `<th>${L.mean_abbr}</th><th>Min</th><th>Max</th><th>-10%</th><th>+10%</th><th>RSD (%)</th><th>${L.result}</th></tr>`;
+  htmlH += `<tr><td>${lotName}</td><td>${L.crit_h_text}</td>` + vList.map(v => `<td>${v.toFixed(2)}</td>`).join('') + `<td><b>${mH.toFixed(2)}</b></td><td>${minH.toFixed(2)}</td><td>${maxH.toFixed(2)}</td><td>${l_10.toFixed(2)}</td><td>${u_10.toFixed(2)}</td><td><b>${rsdH.toFixed(2)}%</b></td><td>${badge}</td></tr>`;
+  $('tbl_hamluong').innerHTML = htmlH;
+};
+
+// YÊU CẦU 2: DẬP VIÊN ĐỘNG
+$('btn_dap_vien').onclick = () => {
+  const L = DICT[curLang];
+  let totalVien = pf($('d_total_v').value) || 400000;
+  let speed = pf($('d_speed').value) || 200;
+  let numChay = pf($('d_b').value) || 27;
+  let numPheu = pf($('d_c').value) || 2;
+  let stepMin = pf($('d_d').value) || 15;
+  let dMeanVal = pf($('d_m').value) || 120;
+  let dMinVal = pf($('d_min').value) || 111;
+  let dMaxVal = pf($('d_max').value) || 129;
+  let lotName = $('lot').value;
+
+  let rawIntervals = (totalVien / numPheu) / (numChay * speed * stepMin);
+  let totalKhoang = Number.isInteger(rawIntervals) ? rawIntervals : Math.ceil(rawIntervals);
+  if (totalKhoang < 3) totalKhoang = 3;
+
+  calculatedColsFromReq2 = totalKhoang;
+  updateColsInputState();
+
+  let timeLabels = generateTimeLabels(totalKhoang);
+
+  let timeRows = [];
+  for (let tLabel of timeLabels) {
+    let r = { time: tLabel };
+    let p1Viens = [];
+    for (let v = 0; v < 20; v++) {
+      let val = Math.round((dMeanVal + (Math.random() - 0.5) * 6) * 10) / 10;
+      p1Viens.push(Math.max(dMinVal, Math.min(dMaxVal, val)));
+    }
+    r['p1'] = +(mean(p1Viens)).toFixed(1);
+
+    if (numPheu >= 2) {
+      let p2Viens = [];
+      for (let v = 0; v < 20; v++) {
+        let val = Math.round((dMeanVal + (Math.random() - 0.5) * 6) * 10) / 10;
+        p2Viens.push(Math.max(dMinVal, Math.min(dMaxVal, val)));
+      }
+      r['p2'] = +(mean(p2Viens)).toFixed(1);
+    }
+    timeRows.push(r);
+  }
+
+  let hopperWord = curLang === 'vi' ? 'KLTB Phễu' : 'Mean Hopper';
+  let htmlD = `<tr><th rowspan="2">${L.time_col}</th><th colspan="${numPheu}">${lotName} (${L.total_batch_text} <span class="ths" data-n="${totalVien}"></span> | ${totalKhoang})</th></tr><tr>`;
+  for (let p = 1; p <= numPheu; p++) htmlD += `<th>${hopperWord} ${p} (mg)</th>`;
+  htmlD += `</tr>`;
+
+  timeRows.forEach(r => {
+    htmlD += `<tr><td>${r.time}</td><td>${r.p1.toFixed(1)}</td>`;
+    if (numPheu >= 2) htmlD += `<td>${r.p2.toFixed(1)}</td>`;
+    htmlD += `</tr>`;
+  });
+  $('tbl_dapvien').innerHTML = htmlD;
+
+  generatePheu1Data();
+  if (numPheu >= 2) generatePheu2Data();
+};
+
+function renderPheuTableStructure(tableNum, matrix, times, targetVal) {
+  const L = DICT[curLang];
+  let pPctInput = pf($('p').value) || 7.5;
+  let numCols = matrix.length;
+  let numRowsPerCol = matrix[0] ? matrix[0].length : 20;
+
+  let html = `<tr><th rowspan="2">${L.stt}</th><th colspan="${numCols}">${L.mass_h}</th></tr><tr>`;
+  times.slice(0, numCols).forEach(t => { html += `<th>${t}</th>`; });
+  html += `</tr>`;
+
+  for (let vIdx = 0; vIdx < numRowsPerCol; vIdx++) {
+    let vListAcrossTimes = matrix.map(timeArr => timeArr[vIdx]);
+    html += `<tr><td>${vIdx + 1}</td>` + vListAcrossTimes.map(val => `<td>${val !== undefined && val.toFixed ? val.toFixed(1) : val}</td>`).join('') + `</tr>`;
+  }
+
+  let avgRow = matrix.map(colVals => mean(colVals).toFixed(1));
+  html += `<tr><td>${L.mean_val}</td>` + avgRow.map(v => `<td><b>${v}</b></td>`).join('') + `</tr>`;
+
+  let minRow = matrix.map(colVals => Math.min(...colVals).toFixed(1));
+  html += `<tr><td>Min</td>` + minRow.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+
+  let maxRow = matrix.map(colVals => Math.max(...colVals).toFixed(1));
+  html += `<tr><td>Max</td>` + maxRow.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+
+  let minusPctRow = matrix.map(() => (targetVal * (1 - pPctInput / 100)).toFixed(1).replace('.', DEC));
+  html += `<tr><td>- ${pPctInput}%</td>` + minusPctRow.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+
+  let plusPctRow = matrix.map(() => (targetVal * (1 + pPctInput / 100)).toFixed(1).replace('.', DEC));
+  html += `<tr><td>+ ${pPctInput}%</td>` + plusPctRow.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+
+  let resultRow = matrix.map(() => `<span class="badge badge-pass">${L.pass}</span>`);
+  html += `<tr><td>${L.result}</td>` + resultRow.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+
+  if (tableNum === 3) $('tbl_pheu1').innerHTML = html;
+  else $('tbl_pheu2').innerHTML = html;
+}
+
+// YÊU CẦU 4: BAO PHIM
+$('btn_baophim').onclick = () => {
+  const L = DICT[curLang];
+  if (!$('bao_phim_chk').checked) {
+    $('tbl_baophim').innerHTML = `<tr><td colspan="11">${L.no_bp}</td></tr>`;
+    return;
+  }
+  let bpMin = pf($('bp_min').value) || 2.0, bpMax = pf($('bp_max').value) || 4.0, coreBase = pf($('d_m').value) || 120;
+  let coreVals20 = [];
+  for (let i = 0; i < 10; i++) coreVals20.push(Math.round((coreBase * 20) + (Math.random() - 0.5) * 40));
+  let coreAvg1Vien = (sum(coreVals20) / 200).toFixed(1);
+  let incPct = bpMin + Math.random() * (bpMax - bpMin), coatAvg1VienVal = coreAvg1Vien * (1 + incPct / 100);
+  let coatVals20 = [];
+  for (let i = 0; i < 10; i++) coatVals20.push(Math.round((coatAvg1VienVal * 20) + (Math.random() - 0.5) * 40));
+  let coatAvg1Vien = (sum(coatVals20) / 200).toFixed(1), actualInc = (((coatAvg1Vien - coreAvg1Vien) / coreAvg1Vien) * 100).toFixed(1);
+
+  let posTitle = curLang === 'vi' ? 'Vị trí' : 'Loc';
+  let coreTitle = curLang === 'vi' ? 'Khối lượng viên nhân (20 viên/vị trí) (mg)' : 'Core tablet mass (20 tab/loc) (mg)';
+  let coatTitle = curLang === 'vi' ? 'Khối lượng viên bao phim (20 viên/vị trí) (mg)' : 'Coated tablet mass (20 tab/loc) (mg)';
+  let coreAvgText = curLang === 'vi' ? 'KLTB viên nhân:' : 'Core tablet mean mass:';
+  let coatAvgText = curLang === 'vi' ? 'KLTB viên bao phim:' : 'Coated tablet mean mass:';
+  let weightGainText = curLang === 'vi' ? 'Tăng trọng:' : 'Weight gain:';
+  let reqText = curLang === 'vi' ? 'Yêu cầu:' : 'Spec:';
+
+  let htmlBp = `<tr><th>${L.accept_crit}</th>` + Array.from({ length: 10 }, (_, i) => `<th>${posTitle} ${i + 1}</th>`).join('') + `</tr>`;
+  htmlBp += `<tr><td>${coreTitle}</td>` + coreVals20.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+  htmlBp += `<tr><td colspan="11"><b>${coreAvgText}</b> ${coreAvg1Vien} mg</td></tr>`;
+  htmlBp += `<tr><td>${coatTitle}</td>` + coatVals20.map(v => `<td>${v}</td>`).join('') + `</tr>`;
+  htmlBp += `<tr><td colspan="11"><b>${coatAvgText}</b> ${coatAvg1Vien} mg</td></tr>`;
+  htmlBp += `<tr><td colspan="11"><b>${weightGainText}</b> <b>${actualInc} %</b> (${reqText} ${bpMin}% - ${bpMax}%) | <b>${L.result}: <span class="badge badge-pass">${L.pass}</span></b></td></tr>`;
+  $('tbl_baophim').innerHTML = htmlBp;
+};
+
+// TRÍCH XUẤT DỮ LIỆU TỪ TEXTAREA
+function parseRawDataFromTextarea() {
+  let text = $('d').value;
+  let lines = text.split(/\r?\n/);
+  let p1Rows = [];
+  let p2Rows = [];
+  let currentSection = 'p1';
+
+  for (let line of lines) {
+    let trimmed = line.trim();
+    if (trimmed.includes('=== PHỄU 1') || trimmed.includes('=== HOPPER 1')) { currentSection = 'p1'; continue; }
+    if (trimmed.includes('=== PHỄU 2') || trimmed.includes('=== HOPPER 2')) { currentSection = 'p2'; continue; }
+    if (trimmed.includes('=== TOÀN LÔ') || trimmed.includes('=== OVERALL')) { currentSection = 'total'; continue; }
+
+    let tokensArr = tokens(trimmed, DEC).map(t => Number(t.replace(',', '.'))).filter(isFinite);
+    if (tokensArr.length > 0) {
+      if (currentSection === 'p1') p1Rows.push(tokensArr);
+      else if (currentSection === 'p2') p2Rows.push(tokensArr);
+    }
+  }
+
+  if (p1Rows.length > 0 && p2Rows.length === 0 && currentSection === 'p1') {
+    let numPheu = parseInt($('d_c').value) || 2;
+    if (numPheu >= 2 && p1Rows.length >= 4) {
+      let mid = Math.floor(p1Rows.length / 2);
+      p2Rows = p1Rows.slice(mid);
+      p1Rows = p1Rows.slice(0, mid);
+    }
+  }
+  return { p1Rows, p2Rows };
+}
+
+// TÍNH TOÁN CPK
+function calc(customDataArr = null) {
+  autoCalculateLSLUSL();
+  let rows = customDataArr ? customDataArr : parseRawDataFromTextarea().p1Rows;
+  let g = customDataArr ? rows : ($('t').checked ? rows : rows[0].map((_, j) => rows.map(r => r[j]).filter(v => v !== undefined)));
+  g = g.filter(x => x.length > 1);
+  if (!g.length) throw Error(curLang === 'vi' ? 'Cần ít nhất 1 nhóm con.' : 'At least 1 subgroup required.');
+  const all = g.flat(), N = all.length, m = mean(all);
+  const Tv = pf($('T').value);
+  const L = pf($('L').value);
+  const U = pf($('U').value);
+  const so = sd(all), k = g.length, n = g[0].length;
+  if (!(U > L)) throw Error(curLang === 'vi' ? 'USL phải lớn hơn LSL.' : 'USL must be greater than LSL.');
+  const d = sum(g.map(x => x.length - 1)), sw = Math.sqrt(sum(g.map(x => (x.length - 1) * sd(x) ** 2)) / d) / c4(d + 1);
+  const gm = g.map(mean), gs = g.map(sd), sb = mean(gs), cn = c4(n), ss = sb / cn, w3 = 3 * sw / Math.sqrt(n), sw3 = 3 * ss * Math.sqrt(1 - cn * cn);
+  const s = [...all].sort((a, b) => a - b), F = s.map(v => Phi((v - m) / so));
+  const A = -N - sum(F.map((q, i) => (2 * i + 1) * (Math.log(q) + Math.log(1 - F[N - 1 - i])))) / N, B = A * (1 + .75 / N + 2.25 / N / N);
+  const p = B >= .6 ? Math.exp(1.2937 - 5.709 * B + .0186 * B * B) : B >= .34 ? Math.exp(.9177 - 4.279 * B - 1.38 * B * B) : B > .2 ? 1 - Math.exp(-8.318 + 42.796 * B - 59.938 * B * B) : 1 - Math.exp(-13.436 + 101.14 * B - 223.73 * B * B);
+  const ppm = (LSL, USL, sg) => (Phi((LSL - m) / sg) + 1 - Phi((USL - m) / sg)) * 1e6;
+  const cp = u => (U - L) / 6 / u, cpk_val = u => Math.min(U - m, m - L) / 3 / u;
+  const pplt = z => (Phi((L - m) / z)) * 1e6, ppt = z => (1 - Phi((U - m) / z)) * 1e6;
+
+  return {
+    g, all, s, N, L, U, m, so, sw, k, n, gm, gs, sb, xU: m + w3, xL: m - w3, sU: sb + sw3, sL: Math.max(0, sb - sw3), A, p,
+    Cp: cp(sw), Cpk: cpk_val(sw), Pp: cp(so), Ppk: cpk_val(so),
+    CPL: (m - L) / 3 / sw, CPU: (U - m) / 3 / sw, PPL: (m - L) / 3 / so, PPU: (U - m) / 3 / so,
+    pw: ppm(L, U, sw), po: ppm(L, U, so),
+    obs_l: all.filter(v => v < L).length / N * 1e6, obs_u: all.filter(v => v > U).length / N * 1e6,
+    exp_ol: pplt(so), exp_ou: ppt(so), exp_wl: pplt(sw), exp_wu: ppt(sw),
+    lot: $('lot').value, target: isNaN(Tv) ? '' : String(Tv)
+  };
+}
+
+const W = 645, H = 480;
+function drawSixPack(c, sx, sy, R, customTitle = '') {
+  c.setTransform(sx, 0, 0, sy, 0, 0); c.fillStyle = '#e6e6e6'; c.fillRect(0, 0, W, H);
+  const T = (t, x, y, o = {}) => { c.font = (o.b ? 'bold ' : '') + (o.s || 9) + "px 'Be Vietnam Pro', Arial"; c.fillStyle = o.c || '#000'; c.textAlign = o.a || 'center'; c.textBaseline = 'middle'; c.save(); c.translate(x, y); if (o.r) c.rotate(-Math.PI / 2); c.fillText(o.raw ? String(t) : fmtDec(t), 0, 0); c.restore(); };
+  const Ln = (a, b, x, y, col, w, dash) => { c.beginPath(); c.moveTo(a, b); c.lineTo(x, y); c.strokeStyle = col; c.lineWidth = w || 1; c.setLineDash(dash || []); c.stroke(); c.setLineDash([]); };
+  const Dot = (x, y, r, col) => { c.beginPath(); c.arc(x, y, r, 0, 7); c.fillStyle = col; c.fill(); };
+  const P = (x, y, w, h, xr, yr, xt, yt, o = {}) => {
+    c.fillStyle = '#fff'; c.fillRect(x, y, w, h);
+    const X = v => x + (v - xr[0]) / (xr[1] - xr[0]) * w, Y = v => y + h - (v - yr[0]) / (yr[1] - yr[0]) * h;
+    xt.forEach(v => { if (o.g) Ln(X(v), y, X(v), y + h, '#d8d8d8', .6); if (!o.nx) T(String(v), X(v), y + h + 8, { s: 8 }); });
+    yt.forEach(v => { if (o.g) Ln(x, Y(v), x + w, Y(v), '#d8d8d8', .6); if (!o.ny) T(String(v), x - 4, Y(v), { s: 8, a: 'right' }); });
+    c.strokeStyle = '#888'; c.lineWidth = .7; c.strokeRect(x, y, w, h); return { X, Y, x, y, w, h };
+  };
+  const clip = p => { c.save(); c.beginPath(); c.rect(p.x, p.y, p.w, p.h); c.clip(); };
+  const BL = '#0b57d0', RD = '#c00000', GR = '#15803d', { k, m } = R;
+  T(customTitle || (curLang === 'vi' ? 'Biểu đồ hiệu năng lô ' + R.lot : 'Capability Chart - Batch ' + R.lot), 322, 20, { s: 14, b: 1, raw: 1 });
+  const xr = [.5, k + .5], tk = Array.from({ length: k }, (_, i) => i + 1);
+  const ctrl = (y, h, ttl, yl, vals, U, Cc, Lw, dg, cl) => {
+    const lo = Math.min(...vals, Lw), hi = Math.max(...vals, U), pd = (hi - lo) * .12, yr = [lo - pd, hi + pd], p = P(42, y, 286, h, xr, yr, tk, nt(yr[0], yr[1], 3));
+    T(ttl, 185, y - 13, { s: 11, b: 1 }); T(yl, 10, y + h / 2, { r: 1, s: 9 });
+    [[U, RD, 'UCL='], [Cc, GR, cl], [Lw, RD, 'LCL=']].forEach(([v, col, t]) => { Ln(p.x, p.Y(v), p.x + p.w, p.Y(v), col, 1.3); T(t + f(v, dg), 332, p.Y(v), { a: 'left', s: 8 }); });
+    c.beginPath(); vals.forEach((v, i) => i ? c.lineTo(p.X(i + 1), p.Y(v)) : c.moveTo(p.X(1), p.Y(v))); c.strokeStyle = BL; c.lineWidth = 1; c.stroke(); vals.forEach((v, i) => Dot(p.X(i + 1), p.Y(v), 2.6, BL));
+  };
+  ctrl(58, 98, 'Xbar Chart', 'Sample Mean', R.gm, R.xU, m, R.xL, 2, 'X̄=');
+  ctrl(196, 98, 'S Chart', 'Sample StDev', R.gs, R.sU, R.sb, R.sL, 3, 'S̄=');
+  {
+    const lo = R.s[0], hi = R.s[R.N - 1], pd = (hi - lo) * .1, yr = [lo - pd, hi + pd], p = P(42, 352, 286, 72, xr, yr, tk.filter(v => v % 2 == 0), nt(yr[0], yr[1], 2));
+    T('Last ' + k + ' Subgroups', 185, 341, { s: 11, b: 1 }); T('Values', 10, 388, { r: 1, s: 9 }); T('Sample', 185, 462, { s: 9 });
+    Ln(p.x, p.Y(m), p.x + p.w, p.Y(m), '#777', .8, [4, 3]); R.g.forEach((x, j) => x.forEach(v => Dot(p.X(j + 1), p.Y(v), 1.9, BL)));
+  }
+  {
+    const lo = R.s[0], hi = R.s[R.N - 1], bw = Math.max(1, Math.round((R.s[R.N - 1] - R.s[0]) / 17)), b0 = Math.floor(R.s[0] / bw) * bw, nb = Math.floor((R.s[R.N - 1] - b0) / bw) + 1, cnt = Array(nb).fill(0);
+    R.all.forEach(v => cnt[Math.floor((v - b0) / bw)]++);
+    const dens = (x, sg) => R.N * bw * Math.exp(-(((x - m) / sg) ** 2) / 2) / (sg * Math.sqrt(2 * Math.PI)), ym = Math.max(...cnt, dens(m, R.so), dens(m, R.sw)) * 1.1,
+      p = P(402, 58, 158, 102, [lo, hi], [0, ym], nt(lo, hi, 6), [], { ny: 1 }); T('Capability Histogram', 480, 44, { s: 11, b: 1 });
+    T('LSL', 402, 46, { s: 7, c: RD }); T('USL', 560, 46, { s: 7, c: RD });
+    cnt.forEach((q, i) => { const x1 = p.X(b0 + i * bw), x2 = p.X(b0 + (i + 1) * bw); c.fillStyle = '#93c5fd'; c.fillRect(x1, p.Y(q), x2 - x1, p.Y(0) - p.Y(q)); c.strokeStyle = '#1d4ed8'; c.lineWidth = .6; c.strokeRect(x1, p.Y(q), x2 - x1, p.Y(0) - p.Y(q)); });
+    clip(p); [[R.so, []], [R.sw, [4, 3]]].forEach(([sg, ds]) => { c.beginPath(); for (let i = 0; i <= 80; i++) { const x = lo + (hi - lo) * i / 80; i ? c.lineTo(p.X(x), p.Y(dens(x, sg))) : c.moveTo(p.X(x), p.Y(dens(x, sg))); } c.strokeStyle = RD; c.lineWidth = 1; c.setLineDash(ds); c.stroke(); c.setLineDash([]); }); c.restore();
+    [R.L, R.U].forEach(v => Ln(p.X(v), p.y, p.X(v), p.y + p.h, RD, 1, [3, 2]));
+    c.fillStyle = '#fff'; c.strokeStyle = '#888'; c.lineWidth = .7; c.fillRect(566, 58, 76, 38); c.strokeRect(566, 58, 76, 38);
+    Ln(570, 68, 590, 68, RD, 1); T('Overall', 596, 68, { a: 'left', s: 8 }); Ln(570, 84, 590, 84, RD, 1, [4, 3]); T('Within', 596, 84, { a: 'left', s: 8 });
+    c.fillStyle = '#fff'; c.strokeStyle = '#888'; c.fillRect(566, 102, 76, 52); c.strokeRect(566, 102, 76, 52); T('Specifications', 604, 111, { s: 8, b: 1 }); T('LSL', 574, 127, { a: 'left', s: 8 }); T(String(R.L), 636, 127, { a: 'right', s: 8 }); T('USL', 574, 142, { a: 'left', s: 8 }); T(String(R.U), 636, 142, { a: 'right', s: 8 });
+  }
+  {
+    const pd = (R.s[R.N - 1] - R.s[0]) * .06, xr2 = [R.s[0] - pd, R.s[R.N - 1] + pd], zs = [.01, .05, .1, .2, .3, .4, .5, .6, .7, .8, .9, .95, .99].map(iPhi), z0 = 3.4,
+      p = P(402, 208, 228, 100, xr2, [-z0, z0], nt(xr2[0], xr2[1], 4), zs, { g: 1, ny: 1 });
+    T('Normal Prob Plot', 516, 187, { s: 11, b: 1 }); T('AD: ' + f(R.A, 3) + ', P: ' + f(R.p, 3), 516, 199, { s: 8 });
+    clip(p); const line = (fn, col, w) => { c.beginPath(); for (let z = -z0; z <= z0 + 1e-9; z += .1) z < -z0 + .05 ? c.moveTo(p.X(fn(z)), p.Y(z)) : c.lineTo(p.X(fn(z)), p.Y(z)); c.strokeStyle = col; c.lineWidth = w; c.stroke(); };
+    line(z => m + R.so * z, RD, 1); [-1, 1].forEach(sg => line(z => m + R.so * z + sg * 1.96 * R.so * Math.sqrt((1 + z * z / 2) / R.N), RD, .7));
+    R.s.forEach((v, i) => Dot(p.X(v), p.Y(iPhi((i + .7) / (R.N + .4))), 1.7, BL)); c.restore();
+  }
+  {
+    const a = Math.min(R.L, m - 3 * R.so, m - 3 * R.sw), b = Math.max(R.U, m + 3 * R.so, m + 3 * R.sw), X = v => 456 + (v - a) / (b - a) * 108;
+    [['Overall', m - 3 * R.so, m, m + 3 * R.so], ['Within', m - 3 * R.sw, m, m + 3 * R.sw], ['Specs', R.L, (R.L + R.U) / 2, R.U]].forEach(([t, x1, x2, x3], i) => {
+      const y = 352 + i * 36;
+      c.fillStyle = '#fff'; c.fillRect(450, y, 120, 36); c.strokeStyle = '#888'; c.lineWidth = .7; c.strokeRect(450, y, 120, 36); T(t, 510, y + 7, { s: 8 });
+      Ln(X(x1), y + 23, X(x3), y + 23, RD, 1); [x1, x2, x3].forEach(v => Ln(X(v), y + 19, X(v), y + 27, RD, 1));
+    });
+    T(f(a, 0), X(a), 466, { s: 7 }); T(f(b, 0), X(b), 466, { s: 7 });
+    const bx = (x, w, ttl, rows) => {
+      c.fillStyle = '#fff'; c.fillRect(x, 352, w, 14 + rows.length * 13); c.strokeStyle = '#888'; c.strokeRect(x, 352, w, 14 + rows.length * 13); T(ttl, x + w / 2, 359, { s: 8 });
+      rows.forEach(([l, v], i) => { T(l, x + 4, 374 + i * 13, { a: 'left', s: 8 }); T(v, x + w - 4, 374 + i * 13, { a: 'right', s: 8 }); });
+    };
+    bx(385, 60, 'Within', [['StDev', f(R.sw, 3)], ['Cp', f(R.Cp, 2)], ['Cpk', f(R.Cpk, 2)], ['PPM', f(R.pw, 2)]]);
+    bx(575, 66, 'Overall', [['StDev', f(R.so, 3)], ['Pp', f(R.Pp, 2)], ['Ppk', f(R.Ppk, 2)], ['Cpm', '*'], ['PPM', f(R.po, 2)]]);
+  }
+}
+
+function drawSimpleReport(c, sx, sy, R, customTitle = '') {
+  c.setTransform(sx, 0, 0, sy, 0, 0); c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+  const T = (t, x, y, o = {}) => { c.font = (o.b ? 'bold ' : '') + (o.s || 9) + "px 'Be Vietnam Pro', Arial"; c.fillStyle = o.c || '#000'; c.textAlign = o.a || 'center'; c.textBaseline = 'middle'; c.save(); c.translate(x, y); if (o.r) c.rotate(-Math.PI / 2); c.fillText(o.raw ? String(t) : fmtDec(t), 0, 0); c.restore(); };
+  const Ln = (a, b, x, y, col, w, dash) => { c.beginPath(); c.moveTo(a, b); c.lineTo(a == x && b == y ? x + 1 : x, y); c.strokeStyle = col; c.lineWidth = w || 1; c.setLineDash(dash || []); c.stroke(); c.setLineDash([]); };
+
+  T(customTitle || (curLang === 'vi' ? 'Biểu đồ hiệu năng lô ' + R.lot : 'Capability Chart - Batch ' + R.lot), 322, 25, { s: 14, b: 1, raw: 1 });
+  c.strokeStyle = '#c00000'; c.lineWidth = 1.2; Ln(550, 40, 570, 40, '#c00000', 1.2);
+  T('Overall', 578, 40, { s: 9, a: 'left' });
+  Ln(550, 54, 570, 54, '#c00000', 1.2, [4, 3]);
+  T('B/W', 578, 54, { s: 9, a: 'left' });
+
+  T('Process Data', 80, 75, { s: 10, b: 1 });
+  const pdRows = [['LSL', R.L], ['Target', R.target === '' ? '*' : R.target], ['USL', R.U], ['Sample Mean', f(R.m, 3)], ['Sample N', R.N], ['StDev(Overall)', f(R.so, 5)], ['StDev(Between)', '0'], ['StDev(Within)', f(R.sw, 5)], ['StDev(B/W)', f(R.sw, 5)]];
+  pdRows.forEach(([k, v], i) => { T(k, 15, 95 + i * 16, { s: 9, a: 'left' }); T(String(v), 150, 95 + i * 16, { s: 9, a: 'right', b: true }); });
+
+  T('Overall Capability', 590, 82, { s: 10, b: 1 });
+  const ocRows = [['Pp', R.Pp], ['PPL', R.PPL], ['PPU', R.PPU], ['Ppk', R.Ppk], ['Cpm', '*']];
+  ocRows.forEach(([k, v], i) => { T(k, 540, 102 + i * 15, { s: 9, a: 'left' }); T(f(v, 2), 635, 102 + i * 15, { s: 9, a: 'right', b: true }); });
+
+  T('B/W Capability', 590, 192, { s: 10, b: 1 });
+  const bwRows = [['Cp', R.Cp], ['CPL', R.CPL], ['CPU', R.CPU], ['Cpk', R.Cpk]];
+  bwRows.forEach(([k, v], i) => { T(k, 540, 212 + i * 15, { s: 9, a: 'left' }); T(f(v, 2), 635, 212 + i * 15, { s: 9, a: 'right', b: true }); });
+
+  const lo = Math.min(R.L, R.s[0]), hi = Math.max(R.U, R.s[R.N - 1]), bw = Math.max(1, Math.round((hi - lo) / 18)), b0 = Math.floor(lo / bw) * bw, nb = Math.floor((hi - b0) / bw) + 1, cnt = Array(nb).fill(0);
+  R.all.forEach(v => cnt[Math.min(nb - 1, Math.max(0, Math.floor((v - b0) / bw)))]++);
+  const dens = (x, sg) => R.N * bw * Math.exp(-(((x - R.m) / sg) ** 2) / 2) / (sg * Math.sqrt(2 * Math.PI));
+  const ym = Math.max(...cnt, dens(R.m, R.so), dens(R.m, R.sw)) * 1.1;
+
+  const px = 230, py = 75, pw = 280, p_h = 230;
+  const X = v => px + (v - lo) / (hi - lo) * pw, Y = v => py + p_h - (v / ym) * p_h;
+
+  cnt.forEach((q, i) => { if (q > 0) { const x1 = X(b0 + i * bw), x2 = X(b0 + (i + 1) * bw); c.fillStyle = '#60a5fa'; c.fillRect(x1, Y(q), x2 - x1, py + p_h - Y(q)); c.strokeStyle = '#1d4ed8'; c.lineWidth = .5; c.strokeRect(x1, Y(q), x2 - x1, py + p_h - Y(q)); } });
+
+  c.save(); c.beginPath(); c.rect(px, py, pw, p_h); c.clip();
+  [[R.so, []], [R.sw, [4, 3]]].forEach(([sg, ds]) => {
+    c.beginPath(); for (let i = 0; i <= 100; i++) { const x = lo + (hi - lo) * i / 100, y = dens(x, sg); i ? c.lineTo(X(x), Y(y)) : c.moveTo(X(x), Y(y)); }
+    c.strokeStyle = '#c00000'; c.lineWidth = 1.5; c.setLineDash(ds); c.stroke(); c.setLineDash([]);
+  });
+  c.restore();
+
+  [R.L, R.U].forEach(v => { Ln(X(v), py, X(v), py + p_h, '#c00000', 1.2, [4, 4]); });
+  T('LSL', X(R.L), py - 10, { s: 9, c: '#c00000', b: true });
+  T('USL', X(R.U), py - 10, { s: 9, c: '#c00000', b: true });
+
+  c.strokeStyle = '#888'; c.lineWidth = 1; c.beginPath(); c.moveTo(px, py + p_h); c.lineTo(px + pw, py + p_h); c.stroke();
+  nt(lo, hi, 5).forEach(v => { Ln(X(v), py + p_h, X(v), py + p_h + 4, '#888', 1); T(String(v), X(v), py + p_h + 14, { s: 9 }); });
+  c.strokeRect(px, py, pw, p_h);
+
+  T('Performance', 190, 328, { s: 9, b: 1 }); T('Observed', 265, 328, { s: 9, b: 1 }); T('Expected', 340, 328, { s: 9, b: 1 }); T('Overall', 415, 328, { s: 9, b: 1 }); T('Expected B/W', 495, 328, { s: 9, b: 1 });
+  const ppmRows = [['PPM < LSL', R.obs_l, R.exp_ol, R.exp_wl], ['PPM > USL', R.obs_u, R.exp_ou, R.exp_wu], ['PPM Total', R.obs_l + R.obs_u, R.exp_ol + R.exp_ou, R.exp_wl + R.exp_wu]];
+  ppmRows.forEach(([lbl, o, e_ov, e_bw], i) => {
+    T(lbl, 80, 348 + i * 16, { s: 9, a: 'left' }); T(f(o, 2), 265, 348 + i * 16, { s: 9, a: 'right' }); T(f(e_ov, 2), 340, 348 + i * 16, { s: 9, a: 'right' });
+    T(f(e_ov, 2), 415, 348 + i * 16, { s: 9, a: 'right' }); T(f(e_bw, 2), 495, 348 + i * 16, { s: 9, a: 'right' });
+  });
+  c.font = "italic 9px 'Be Vietnam Pro', Arial"; c.fillStyle = '#444'; c.textAlign = 'left'; c.fillText('The actual process spread is represented by 6 sigma.', 15, 435);
+}
+
+let cur = null;
+function updateChart() {
+  $('msg').textContent = '';
+  try {
+    let numPheu = parseInt($('d_c').value) || 2;
+    let lotName = $('lot').value;
+    let isSimple = document.querySelector('input[name="view_mode"]:checked').value === 'simple';
+
+    let parsed = parseRawDataFromTextarea();
+    let p1Data = parsed.p1Rows;
+    let p2Data = parsed.p2Rows;
+
+    // Cpk toàn lô tính dựa trên dữ liệu tổng hợp từ Bảng 3 và Bảng 4
+    if (numPheu >= 2 && p1Data.length > 0 && p2Data.length > 0) {
+      let combinedP1P2 = p1Data.concat(p2Data);
+      cur = calc(combinedP1P2);
+    } else if (p1Data.length > 0) {
+      cur = calc(p1Data);
+    } else {
+      cur = calc();
+    }
+
+    const cvTotal = $('cv_total'), ctxTotal = cvTotal.getContext('2d');
+    cvTotal.width = 1290; cvTotal.height = 960;
+    const totTitle = curLang === 'vi' ? `BIỂU ĐỒ HIỆU NĂNG TOÀN LÔ ${lotName}` : `OVERALL BATCH CAPABILITY ${lotName}`;
+    if (isSimple) drawSimpleReport(ctxTotal, cvTotal.width / W, cvTotal.height / H, cur, totTitle);
+    else drawSixPack(ctxTotal, cvTotal.width / W, cvTotal.height / H, cur, totTitle);
+
+    let cpkTextRows = [];
+
+    if (numPheu >= 2 && p1Data.length > 0 && p2Data.length > 0) {
+      $('wrap_cv1').style.display = 'block'; $('wrap_cv2').style.display = 'block';
+
+      let resP1 = calc(p1Data);
+      let resP2 = calc(p2Data);
+
+      const cv1 = $('cv1'), ctx1 = cv1.getContext('2d');
+      cv1.width = 1290; cv1.height = 960;
+      const p1Title = curLang === 'vi' ? `BIỂU ĐỒ HIỆU NĂNG PHỄU 1 - LÔ ${lotName}` : `CAPABILITY CHART HOPPER 1 - BATCH ${lotName}`;
+      if (isSimple) drawSimpleReport(ctx1, cv1.width / W, cv1.height / H, resP1, p1Title);
+      else drawSixPack(ctx1, cv1.width / W, cv1.height / H, resP1, p1Title);
+
+      const cv2 = $('cv2'), ctx2 = cv2.getContext('2d');
+      cv2.width = 1290; cv2.height = 960;
+      const p2Title = curLang === 'vi' ? `BIỂU ĐỒ HIỆU NĂNG PHỄU 2 - LÔ ${lotName}` : `CAPABILITY CHART HOPPER 2 - BATCH ${lotName}`;
+      if (isSimple) drawSimpleReport(ctx2, cv2.width / W, cv2.height / H, resP2, p2Title);
+      else drawSixPack(ctx2, cv2.width / W, cv2.height / H, resP2, p2Title);
+
+      cpkTextRows = curLang === 'vi' ? [
+        ['Số nhóm × cỡ mẫu (Toàn lô)', cur.k + ' × ' + cur.n],
+        ['N (Toàn lô)', cur.N],
+        ['Trung bình (Toàn lô)', f(cur.m, 3)],
+        ['Cpk (Phễu 1 - Bảng 3)', f(resP1.Cpk, 3)],
+        ['Cpk (Phễu 2 - Bảng 4)', f(resP2.Cpk, 3)],
+        ['Cpk (Toàn lô cả 2 phễu)', f(cur.Cpk, 3)],
+        ['Ppk (Toàn lô)', f(cur.Ppk, 3)],
+        ['PPM Toàn lô', f(cur.po, 2)]
+      ] : [
+        ['Subgroups × Sample size (Overall)', cur.k + ' × ' + cur.n],
+        ['N (Overall)', cur.N],
+        ['Mean (Overall)', f(cur.m, 3)],
+        ['Cpk (Hopper 1 - Table 3)', f(resP1.Cpk, 3)],
+        ['Cpk (Hopper 2 - Table 4)', f(resP2.Cpk, 3)],
+        ['Cpk (Overall both hoppers)', f(cur.Cpk, 3)],
+        ['Ppk (Overall)', f(cur.Ppk, 3)],
+        ['PPM Overall', f(cur.po, 2)]
+      ];
+    } else {
+      $('wrap_cv1').style.display = 'block'; $('wrap_cv2').style.display = 'none';
+
+      const cv1 = $('cv1'), ctx1 = cv1.getContext('2d');
+      cv1.width = 1290; cv1.height = 960;
+      const p1Title = curLang === 'vi' ? `BIỂU ĐỒ HIỆU NĂNG PHỄU 1 - LÔ ${lotName}` : `CAPABILITY CHART HOPPER 1 - BATCH ${lotName}`;
+      if (isSimple) drawSimpleReport(ctx1, cv1.width / W, cv1.height / H, cur, p1Title);
+      else drawSixPack(ctx1, cv1.width / W, cv1.height / H, cur, p1Title);
+
+      cpkTextRows = curLang === 'vi' ? [
+        ['Số nhóm × cỡ mẫu', cur.k + ' × ' + cur.n], ['N', cur.N], ['Trung bình', f(cur.m, 3)],
+        ['StDev Within', f(cur.sw, 5)], ['StDev Overall', f(cur.so, 5)],
+        ['Cp', f(cur.Cp, 3)], ['Cpk', f(cur.Cpk, 3)], ['Pp', f(cur.Pp, 3)], ['Ppk', f(cur.Ppk, 3)],
+        ['PPM Within', f(cur.pw, 2)], ['PPM Overall', f(cur.po, 2)]
+      ] : [
+        ['Subgroups × Sample size', cur.k + ' × ' + cur.n], ['N', cur.N], ['Mean', f(cur.m, 3)],
+        ['StDev Within', f(cur.sw, 5)], ['StDev Overall', f(cur.so, 5)],
+        ['Cp', f(cur.Cp, 3)], ['Cpk', f(cur.Cpk, 3)], ['Pp', f(cur.Pp, 3)], ['Ppk', f(cur.Ppk, 3)],
+        ['PPM Within', f(cur.pw, 2)], ['PPM Overall', f(cur.po, 2)]
+      ];
+    }
+
+    $('tb').innerHTML = cpkTextRows.map(x => '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>').join('');
+    applyDecDOM();
+  } catch (e) { $('msg').textContent = e.message; }
+}
+
+$('go').onclick = () => {
+  let parsed = parseRawDataFromTextarea();
+  let p1Rows = parsed.p1Rows;
+  let p2Rows = parsed.p2Rows;
+  let numPheu = parseInt($('d_c').value) || 2;
+  let targetVal = pf($('T').value) || 120;
+  let timeLabels = generateTimeLabels(p1Rows.length > 0 ? p1Rows.length : 12);
+
+  if (p1Rows.length > 0) {
+    globalPheuData.p1 = p1Rows;
+    globalPheuData.times = timeLabels;
+    renderPheuTableStructure(3, p1Rows, timeLabels, targetVal);
+  }
+  if (numPheu >= 2 && p2Rows.length > 0) {
+    globalPheuData.p2 = p2Rows;
+    renderPheuTableStructure(4, p2Rows, timeLabels, targetVal);
+    $('container_tbl4').style.display = 'block';
+  } else {
+    $('container_tbl4').style.display = 'none';
+  }
+  updateChart();
+};
+
+document.querySelectorAll('input[name="view_mode"]').forEach(el => el.onchange = () => {
+  const isSimple = el.value === 'simple';
+  $('pill_simple').classList.toggle('active', isSimple);
+  $('pill_sixpack').classList.toggle('active', !isSimple);
+  updateChart();
+});
+
+['T', 'p'].forEach(id => {
+  $(id).addEventListener('input', () => {
+    autoCalculateLSLUSL();
+    updateChart();
+  });
+});
+
+$('a').addEventListener('change', () => {
+  autoCalculateLSLUSL();
+  updateChart();
+});
+
+['L', 'U'].forEach(i => $(i).addEventListener('input', () => { $('a').checked = false; }));
+['lot', 'L', 'U', 'd', 't', 'p', 'a'].forEach(i => ['input', 'change'].forEach(ev => $(i).addEventListener(ev, updateChart)));
+
+$('s').onclick = () => {
+  updateChart();
+  if (!cur) return;
+  const cv = document.createElement('canvas'); cv.width = 2014; cv.height = 1500;
+  const isSimple = document.querySelector('input[name="view_mode"]:checked').value === 'simple';
+  if (isSimple) drawSimpleReport(cv.getContext('2d'), 2014 / W, 1500 / H, cur);
+  else drawSixPack(cv.getContext('2d'), 2014 / W, 1500 / H, cur);
+  const a = document.createElement('a'); a.download = 'Cpk_' + cur.lot + '.png'; a.href = cv.toDataURL('image/png'); a.click();
+};
+
+const DEC_IDS = ['h_min', 'h_max', 'h_mean', 'd_m', 'd_min', 'd_max', 'bp_min', 'bp_max', 'gen_mean', 'gen_sd', 'gen_min', 'gen_max', 'T', 'p', 'L', 'U'];
+const pf = v => parseFloat(String(v).replace(',', '.'));
+const fmtIn = v => String(v).replace('.', DEC);
+const fmtDec = t => DEC === ',' ? String(t).replace(/(\d)\.(\d)/g, '$1,$2') : String(t);
+const fmtInt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, DEC === ',' ? '.' : ',');
+
+const tokens = (line, dec) => {
+  if (dec === ',') return line.trim().split(/[\s;\t]+/).filter(t => t !== '');
+  return line.trim().split(/[\s,;\t]+/).filter(t => t !== '');
+};
+
+const origTxt = new WeakMap();
+function applyDecDOM() {
+  ['tbl_hamluong', 'tbl_dapvien', 'tbl_pheu1', 'tbl_pheu2', 'tbl_baophim', 'tb'].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n;
+    while ((n = w.nextNode())) {
+      if (!origTxt.has(n)) origTxt.set(n, n.nodeValue);
+      const o = origTxt.get(n); n.nodeValue = DEC === ',' ? o.replace(/(\d)\.(\d)/g, '$1,$2') : o;
+    }
+  });
+  document.querySelectorAll('.ths').forEach(e => e.textContent = fmtInt(+e.dataset.n));
+}
+
+['btn_ham_luong', 'btn_dap_vien', 'btn_baophim'].forEach(id => {
+  const h = $(id).onclick; $(id).onclick = function () { h.apply(this, arguments); applyDecDOM(); };
+});
+
+function setDec(d) {
+  const old = DEC;
+  if (old !== d) {
+    DEC_IDS.forEach(id => { const e = $(id); if (e) e.value = e.value.split(old).join(d); });
+    $('d').value = $('d').value.split(/\n/).map(l => tokens(l, old).map(t => t.split(old).join(d)).join('\t')).join('\n');
+  }
+  DEC = d;
+  $('dec_label').textContent = d === '.' ? DICT[curLang].dec_dot : DICT[curLang].dec_comma;
+  try { localStorage.setItem('decSep', d); } catch (e) { }
+  updateChart(); applyDecDOM();
+}
+$('btn_dec').onclick = () => setDec(DEC === '.' ? ',' : '.');
+
+// ---- Copy Buttons
+function initCopyButtons() {
+  document.querySelectorAll('.copy-btn').forEach(b => b.onclick = () => {
+    const tableId = b.dataset.t;
+    const table = $(tableId);
+    if (!table) return;
+    const txt = [...table.rows].map(r => [...r.cells].flatMap(c => [c.textContent, ...Array((c.colSpan || 1) - 1).fill('')]).join('\t')).join('\n');
+    const span = b.querySelector('.cp-txt');
+    const ok = () => { if (span) span.textContent = DICT[curLang].copied_btn; setTimeout(() => { if (span) span.textContent = DICT[curLang].copy_btn; }, 1200); };
+    const fb = () => { const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); };
+    navigator.clipboard ? navigator.clipboard.writeText(txt).then(ok, fb) : fb();
+  });
+}
+initCopyButtons();
+
+// ---- Apply Language
+function applyLang(lang) {
+  curLang = lang === 'en' ? 'en' : 'vi';
+  document.documentElement.lang = curLang;
+  const L = DICT[curLang];
+
+  $('txt_app_title').textContent = L.app_title;
+  $('dec_label').textContent = DEC === '.' ? L.dec_dot : L.dec_comma;
+  $('txt_save_png').textContent = L.save_png;
+  $('txt_sec1_title').textContent = L.sec1_title;
+  $('txt_sec2_title').textContent = L.sec2_title;
+  $('lbl_lot').textContent = L.lot_lbl;
+
+  $('t_req1').textContent = L.req1_h;
+  $('txt_btn_h').textContent = L.btn_h;
+  $('t_req2').textContent = L.req2_h;
+  $('txt_btn_dv').textContent = L.btn_dv;
+  $('t_req3').textContent = L.req3_h;
+  $('txt_sync_cols').textContent = L.sync_cols;
+  $('txt_gen_p1').textContent = L.gen_p1;
+  $('txt_gen_p2').textContent = L.gen_p2;
+  $('txt_auto_lsl').textContent = L.auto_lsl;
+  $('txt_subgroup').textContent = L.subgroup;
+  $('txt_btn_go').textContent = L.btn_go;
+  $('t_req4').textContent = L.req4_h;
+  $('txt_bp_chk').textContent = L.bp_chk;
+  $('txt_btn_bp').textContent = L.btn_bp;
+
+  $('t_tbl1').textContent = L.tbl1_t;
+  $('t_tbl2').textContent = L.tbl2_t;
+  $('t_cpk_section').textContent = L.cpk_sec;
+  $('title_tbl3').textContent = L.tbl3_t;
+  $('title_tbl4').textContent = L.tbl4_t;
+  $('txt_view_simple').textContent = L.view_simple;
+  $('txt_view_sixpack').textContent = L.view_sixpack;
+  $('lbl_cv1').textContent = L.cv1_t;
+  $('lbl_cv2').textContent = L.cv2_t;
+  $('lbl_cv_total').textContent = L.cv_tot_t;
+  $('t_tbl_cpk').textContent = L.tbl_cpk_t;
+  $('t_tbl_bp').textContent = L.tbl_bp_t;
+
+  document.querySelectorAll('.copy-btn .cp-txt').forEach(s => s.textContent = L.copy_btn);
+
+  // Trigger re-renders
+  $('btn_ham_luong').click();
+  $('btn_dap_vien').click();
+  $('btn_baophim').click();
+}
+
+// ---- Parent Communication & Theme Sync
+function setTheme(th) {
+  document.documentElement.setAttribute('data-theme', th === 'dark' ? 'dark' : 'light');
+}
+
+window.addEventListener('message', e => {
+  if (!e.data) return;
+  if (e.data.theme) setTheme(e.data.theme);
+  if (e.data.lang) applyLang(e.data.lang);
+});
+
+// Init
+window.onload = () => {
+  let sv = '.';
+  try { sv = localStorage.getItem('decSep') === ',' ? ',' : '.'; } catch (e) { }
+
+  try {
+    if (window.parent && window.parent.currentTheme) setTheme(window.parent.currentTheme);
+    if (window.parent && window.parent.L) curLang = window.parent.L;
+  } catch (e) { }
+
+  setDec(sv);
+  applyLang(curLang);
+};
+</script>
+</body>
+</html>
