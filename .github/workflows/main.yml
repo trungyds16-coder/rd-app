@@ -1,0 +1,63 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Flatten project directory
+        run: |
+          if [ ! -f "package.json" ] && [ -d "app cổng công cụ rd apk" ]; then
+            cp -r "app cổng công cụ rd apk"/* .
+          fi
+          if [ ! -f "package.json" ]; then
+            SUB_DIR=$(find . -maxdepth 2 -name "package.json" -not -path "./package.json" -exec dirname {} \;)
+            if [ -n "$SUB_DIR" ]; then
+              echo "Found project in $SUB_DIR, moving to root..."
+              cp -r "$SUB_DIR"/* .
+            fi
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Apply Sapphire icons & StatusBar styles
+        run: node scripts/apply-icons.js
+
+      - name: Sync web assets
+        run: npx cap sync android
+
+      - name: Build Debug APK
+        env:
+          GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=512m"
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace || ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RD-Tools-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
